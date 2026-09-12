@@ -1,0 +1,16 @@
+[Unit]
+Description=Tg Results Bot - Valorant Premier match reporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tgbot
+WorkingDirectory=/opt/tg-results-bot
+EnvironmentFile=/opt/tg-results-bot/.env
+ExecStart=/usr/bin/node src/index.js
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,20 @@
+{
+  "name": "tg-results-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot that posts Valorant Premier match results as a scoreboard image, sourced from tracker.gg",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test-once": "node src/index.js --once"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "puppeteer": "^23.5.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

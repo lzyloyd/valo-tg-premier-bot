@@ -1,0 +1,265 @@
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'Europe/Moscow',
+  });
+}
+
+// Sides swap at halftime (after round 12), then every 2 rounds once a match
+// reaches overtime (round 24+).
+function isSideSwitchAfter(round) {
+  return round === 12 || (round > 12 && round >= 24 && round % 2 === 0);
+}
+
+// Small stroke/fill glyphs for how a round ended — matches the four outcomes
+// tracker.gg's own round-result field can report.
+const ROUND_ICONS = {
+  Elimination:
+    '<line x1="5" y1="5" x2="15" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="5" x2="5" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/>',
+  Defuse: '<polygon points="10,4 16,10 10,16 4,10" fill="none" stroke="white" stroke-width="1.8"/>',
+  Detonate:
+    '<polygon points="10,2 12,7.5 18,7.5 13,11.5 15,17.5 10,13.8 5,17.5 7,11.5 2,7.5 8,7.5" fill="white"/>',
+  Time: '<path d="M5 3h10M5 17h10M5 3c0 4 4 5 5 7-1 2-5 3-5 7M15 3c0 4-4 5-5 7 1 2 5 3 5 7" fill="none" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>',
+};
+
+function roundIcon(result) {
+  return `<svg viewBox="0 0 20 20" width="12" height="12">${ROUND_ICONS[result] ?? ROUND_ICONS.Elimination}</svg>`;
+}
+
+const ROUND_CELL = 19;
+const ROUND_SWITCH = 13;
+const ROUND_LABEL = 130;
+
+function roundsStrip(match) {
+  const slots = [];
+  for (const r of match.rounds) {
+    slots.push({ kind: 'round', round: r });
+    if (isSideSwitchAfter(r.round)) slots.push({ kind: 'switch' });
+  }
+
+  const colWidths = slots.map((s) => (s.kind === 'switch' ? ROUND_SWITCH : ROUND_CELL));
+  const gridTemplateColumns = `${ROUND_LABEL}px ${colWidths.map((w) => `${w}px`).join(' ')}`;
+
+  const ourCells = [];
+  const theirCells = [];
+  const numbers = [];
+  const switches = [];
+
+  slots.forEach((s, i) => {
+    const col = i + 2; // column 1 is the team-label column
+    if (s.kind === 'switch') {
+      switches.push(
+        `<div class="sb-round-switch" style="grid-column:${col};grid-row:1 / span 2" title="Смена сторон">⇄</div>`,
+      );
+      return;
+    }
+    const { round } = s;
+    ourCells.push(
+      `<div class="sb-round-cell${round.won ? ' us' : ''}" style="grid-column:${col};grid-row:1">${round.won ? roundIcon(round.result) : ''}</div>`,
+    );
+    theirCells.push(
+      `<div class="sb-round-cell${round.won ? '' : ' them'}" style="grid-column:${col};grid-row:2">${round.won ? '' : roundIcon(round.result)}</div>`,
+    );
+    numbers.push(`<div class="sb-round-num" style="grid-column:${col};grid-row:3">${round.round}</div>`);
+  });
+
+  const teamLabel = (name, logoUrl, row) => `
+    <div class="sb-rounds-team" style="grid-column:1;grid-row:${row}">
+      ${logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="" />` : ''}
+      <span>${escapeHtml(name)}</span>
+    </div>`;
+
+  return `
+    <div class="sb-rounds" style="grid-template-columns:${gridTemplateColumns}">
+      ${teamLabel(match.ourTeamName, match.ourTeamLogoUrl, 1)}
+      ${teamLabel(match.theirTeamName, match.theirTeamLogoUrl, 2)}
+      ${ourCells.join('')}
+      ${theirCells.join('')}
+      ${switches.join('')}
+      ${numbers.join('')}
+    </div>`;
+}
+
+function playerRow(p) {
+  const sign = p.plusMinus > 0 ? '+' : p.plusMinus < 0 ? '−' : '';
+  const plusMinusValue = `${sign}${Math.abs(p.plusMinus)}`;
+  const plusMinusColor = p.plusMinus > 0 ? 'var(--win)' : p.plusMinus < 0 ? 'var(--loss)' : 'var(--muted)';
+  return `
+    <div class="sb-row">
+      <div class="sb-avatar-wrap">
+        <img class="sb-avatar" src="${escapeHtml(p.agentImageUrl)}" style="background:${escapeHtml(p.agentColor)}" alt="" />
+        <img class="sb-rank-badge" src="${escapeHtml(p.rankIconUrl)}" title="${escapeHtml(p.rankName)}" alt="" />
+      </div>
+      <div class="sb-name">${escapeHtml(p.name)}</div>
+      <div class="sb-acs">${p.acs}</div>
+      <div class="sb-num">${p.kills}</div>
+      <div class="sb-num">${p.deaths}</div>
+      <div class="sb-num">${p.assists}</div>
+      <div class="sb-num" style="color:${plusMinusColor}">${plusMinusValue}</div>
+      <div class="sb-num sb-muted">${p.adr}</div>
+      <div class="sb-num sb-muted">${p.hsAccuracy}%</div>
+      <div class="sb-num sb-muted">${p.kast}%</div>
+      <div class="sb-num sb-muted">${p.firstKills}</div>
+      <div class="sb-num sb-muted">${p.firstDeaths}</div>
+    </div>`;
+}
+
+function teamBlock({ side, teamName, logoUrl, rank, divisionName, players, avgRankName, avgRankIconUrl }) {
+  const standing = rank ? `#${rank}${divisionName ? ` · ${escapeHtml(divisionName)}` : ''}` : '';
+  return `
+    <div class="sb-team ${side}">
+      <div class="sb-team-label">
+        <div class="sb-team-identity">
+          ${logoUrl ? `<img class="sb-team-logo" src="${escapeHtml(logoUrl)}" alt="" />` : ''}
+          <div class="sb-team-name-wrap">
+            <div class="sb-team-name">${escapeHtml(teamName)}</div>
+            ${standing ? `<div class="sb-team-standing">${standing}</div>` : ''}
+          </div>
+        </div>
+        <div class="sb-team-rank">
+          <div class="sb-team-rank-info">
+            <div class="sb-team-rank-label">Ср. ранг</div>
+            <div class="sb-team-rank-value">${escapeHtml(avgRankName)}</div>
+          </div>
+          <img src="${escapeHtml(avgRankIconUrl)}" alt="" />
+        </div>
+      </div>
+      <div class="sb-row sb-hd"><span></span><span>Игрок</span><span class="sb-acs">ACS</span><span class="sb-num">K</span><span class="sb-num">D</span><span class="sb-num">A</span><span class="sb-num">+/-</span><span class="sb-num">ADR</span><span class="sb-num">HS%</span><span class="sb-num">KAST</span><span class="sb-num">FK</span><span class="sb-num">FD</span></div>
+      ${players.map(playerRow).join('')}
+    </div>`;
+}
+
+function mvpBlock(mvp) {
+  return `
+    <div class="sb-mvp">
+      <div class="sb-mvp-label">Лучший игрок команды</div>
+      <div class="sb-mvp-body">
+        <img class="sb-mvp-avatar" src="${escapeHtml(mvp.agentImageUrl)}" style="background:${escapeHtml(mvp.agentColor)}" alt="" />
+        <div class="sb-mvp-info">
+          <div class="sb-mvp-name">${escapeHtml(mvp.name)}</div>
+          <div class="sb-mvp-sub">${escapeHtml(mvp.agentName)} · ACS ${mvp.acs} · ${mvp.kills}/${mvp.deaths}/${mvp.assists} · KAST ${mvp.kast}%</div>
+        </div>
+        <div class="sb-mvp-trs">
+          <div class="sb-mvp-trs-num">${mvp.trs}</div>
+          <div class="sb-mvp-trs-lbl">TRS</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+export function buildScoreboardHtml(match) {
+  const won = match.won;
+  return `<!doctype html>
+<html><head><meta charset="utf-8" />
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --win:#3ddb8a; --loss:#ff6b83; --muted:#7383a3;
+}
+body{background:#0e1621;font-family:'Manrope',sans-serif;}
+#card{width:740px;background:linear-gradient(180deg,#141b26,#101620);border-radius:14px;overflow:hidden;border:1px solid #232d3a;}
+.sb-head{
+  display:flex;align-items:center;justify-content:space-between;padding:24px 22px;min-height:88px;
+  background-size:cover;background-position:center;border-bottom:1px solid #232d3a;
+}
+.sb-map{font-weight:800;font-size:20px;color:#eef2f6;text-shadow:0 1px 4px rgba(0,0,0,.5);}
+.sb-sub{font-size:12.5px;color:#c3ccd8;margin-top:4px;font-family:'JetBrains Mono',monospace;text-shadow:0 1px 4px rgba(0,0,0,.5);}
+.sb-score-wrap{text-align:right;}
+.sb-result{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;color:${won ? 'var(--win)' : 'var(--loss)'};text-shadow:0 1px 4px rgba(0,0,0,.5);}
+.sb-score{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:27px;text-shadow:0 1px 4px rgba(0,0,0,.5);}
+.sb-score .a{color:${won ? 'var(--win)' : 'var(--loss)'}}
+.sb-score .b{color:#c3ccd8}
+.sb-rounds{display:grid;row-gap:6px;column-gap:3px;align-items:center;padding:14px 22px;border-bottom:1px solid #232d3a;overflow-x:auto;}
+.sb-rounds-team{display:flex;align-items:center;gap:7px;min-width:0;padding-right:10px;}
+.sb-rounds-team img{width:18px;height:18px;border-radius:4px;object-fit:contain;flex-shrink:0;}
+.sb-rounds-team span{font-size:11.5px;font-weight:700;color:#c9d4e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-round-cell{width:19px;height:19px;border-radius:5px;background:#232d3a;display:flex;align-items:center;justify-content:center;}
+.sb-round-cell.us{background:#ff4655;}
+.sb-round-cell.them{background:#39d6c9;}
+.sb-round-num{text-align:center;font-size:9px;color:#5b6b80;font-family:'JetBrains Mono',monospace;}
+.sb-round-switch{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;line-height:1;}
+.sb-team{border-left:4px solid transparent;}
+.sb-team.us{border-left-color:#ff4655;}
+.sb-team.them{border-left-color:#39d6c9;}
+.sb-team-label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px 12px;}
+.sb-team-identity{display:flex;align-items:center;gap:12px;min-width:0;}
+.sb-team-logo{width:38px;height:38px;border-radius:8px;object-fit:contain;flex-shrink:0;}
+.sb-team-name-wrap{min-width:0;}
+.sb-team-name{font-size:17px;font-weight:800;color:#eef2f6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-team-standing{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.sb-team-rank{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sb-team-rank-info{text-align:right;}
+.sb-team-rank-label{font-size:9px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);line-height:1;}
+.sb-team-rank-value{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#c9d4e0;margin-top:2px;}
+.sb-team-rank img{width:22px;height:22px;flex-shrink:0;}
+.sb-row{display:grid;grid-template-columns:32px 1fr 42px 28px 28px 28px 38px 38px 34px 42px 26px 26px;gap:8px;align-items:center;padding:7px 22px;font-size:13.5px;font-family:'JetBrains Mono',monospace;color:#c9d4e0;}
+.sb-avatar-wrap{position:relative;width:32px;height:32px;}
+.sb-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;}
+.sb-rank-badge{position:absolute;bottom:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#141b26;border:1px solid #141b26;object-fit:contain;}
+.sb-name{font-family:'Manrope',sans-serif;font-weight:700;color:#e8ecf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-acs{font-weight:800;color:#eef2f6;}
+.sb-num{text-align:right;font-variant-numeric:tabular-nums;}
+.sb-muted{color:var(--muted);}
+.sb-hd{color:#4c5a70;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;padding-top:4px;padding-bottom:6px;}
+.sb-hd .sb-num,.sb-hd .sb-acs{font-weight:600;color:inherit;}
+.sb-foot{padding:12px 22px;font-size:11px;color:#3d4a5f;border-top:1px solid #232d3a;font-family:'JetBrains Mono',monospace;}
+.sb-mvp{margin:14px 22px 18px;background:linear-gradient(135deg,rgba(255,209,102,.14),rgba(255,209,102,.04));border:1px solid rgba(255,209,102,.35);border-radius:10px;padding:12px 16px;}
+.sb-mvp-label{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#ffd166;margin-bottom:8px;}
+.sb-mvp-body{display:flex;align-items:center;gap:12px;}
+.sb-mvp-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #ffd166;flex-shrink:0;}
+.sb-mvp-info{flex:1;min-width:0;}
+.sb-mvp-name{font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;color:#f4f6fa;}
+.sb-mvp-sub{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-mvp-trs{text-align:right;flex-shrink:0;}
+.sb-mvp-trs-num{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:#ffd166;line-height:1;}
+.sb-mvp-trs-lbl{font-size:9.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:2px;}
+</style></head>
+<body>
+<div id="card">
+  <div class="sb-head" style="background-image:linear-gradient(180deg, rgba(14,22,33,.55), rgba(14,22,33,.94)), url('${escapeHtml(match.mapImageUrl)}')">
+    <div>
+      <div class="sb-map">${escapeHtml(match.mapName)}</div>
+      <div class="sb-sub">${formatDate(match.dateStarted)} · Premier · ${escapeHtml(match.durationText)}</div>
+    </div>
+    <div class="sb-score-wrap">
+      <div class="sb-result">${won ? 'Победа' : 'Поражение'}</div>
+      <div class="sb-score"><span class="a">${match.ourScore}</span> <span class="b">:</span> <span class="b">${match.theirScore}</span></div>
+    </div>
+  </div>
+  ${roundsStrip(match)}
+  ${teamBlock({
+    side: 'us',
+    teamName: match.ourTeamName,
+    logoUrl: match.ourTeamLogoUrl,
+    rank: match.ourTeamRank,
+    divisionName: match.ourTeamDivision,
+    players: match.ourTeam,
+    avgRankName: match.ourTeamAvgRankName,
+    avgRankIconUrl: match.ourTeamAvgRankIconUrl,
+  })}
+  ${teamBlock({
+    side: 'them',
+    teamName: match.theirTeamName,
+    logoUrl: match.theirTeamLogoUrl,
+    rank: match.theirTeamRank,
+    divisionName: match.theirTeamDivision,
+    players: match.theirTeam,
+    avgRankName: match.theirTeamAvgRankName,
+    avgRankIconUrl: match.theirTeamAvgRankIconUrl,
+  })}
+  ${mvpBlock(match.mvp)}
+  <div class="sb-foot">tracker.gg/valorant/match/${match.matchId}</div>
+</div>
+</body></html>`;
+}
