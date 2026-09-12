@@ -21,24 +21,28 @@ function isSideSwitchAfter(round) {
   return round === 12 || (round > 12 && round >= 24 && round % 2 === 0);
 }
 
-// Small stroke/fill glyphs for how a round ended — matches the four outcomes
-// tracker.gg's own round-result field can report.
-const ROUND_ICONS = {
-  Elimination:
-    '<line x1="5" y1="5" x2="15" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="5" x2="5" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/>',
-  Defuse: '<polygon points="10,4 16,10 10,16 4,10" fill="none" stroke="white" stroke-width="1.8"/>',
-  Detonate:
-    '<polygon points="10,2 12,7.5 18,7.5 13,11.5 15,17.5 10,13.8 5,17.5 7,11.5 2,7.5 8,7.5" fill="white"/>',
-  Time: '<path d="M5 3h10M5 17h10M5 3c0 4 4 5 5 7-1 2-5 3-5 7M15 3c0 4-4 5-5 7 1 2 5 3 5 7" fill="none" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>',
+// tracker.gg's own round-outcome icons — pre-colored (teal for a win, coral
+// for a loss) rather than a neutral glyph we'd have to tint ourselves.
+const ROUND_ICON_BASE = 'https://trackercdn.com/cdn/tracker.gg/valorant/icons';
+const ROUND_ICON_FILES = {
+  Elimination: 'elimination',
+  Defuse: 'diffuse', // tracker.gg's own spelling of the asset name
+  Detonate: 'explosion',
+  Time: 'time',
 };
 
-function roundIcon(result) {
-  return `<svg viewBox="0 0 20 20" width="12" height="12">${ROUND_ICONS[result] ?? ROUND_ICONS.Elimination}</svg>`;
+function roundIconUrl(result, won) {
+  const file = ROUND_ICON_FILES[result] ?? ROUND_ICON_FILES.Elimination;
+  return `${ROUND_ICON_BASE}/${file}${won ? 'win' : 'loss'}1.png`;
 }
 
-const ROUND_CELL = 19;
-const ROUND_SWITCH = 13;
-const ROUND_LABEL = 130;
+const ROUND_LABEL = 140;
+const ROUND_SWITCH = 15;
+const ROUND_GAP = 4;
+const ROUND_CELL_MIN = 18;
+const ROUND_CELL_MAX = 26;
+// #card is CARD_WIDTH wide with 22px padding on each side (see below).
+const ROUNDS_INNER_WIDTH = 840 - 44;
 
 function roundsStrip(match) {
   const slots = [];
@@ -47,7 +51,15 @@ function roundsStrip(match) {
     if (isSideSwitchAfter(r.round)) slots.push({ kind: 'switch' });
   }
 
-  const colWidths = slots.map((s) => (s.kind === 'switch' ? ROUND_SWITCH : ROUND_CELL));
+  // Cell size shrinks a little for a long (or overtime) match instead of
+  // overflowing the fixed-width card — sized to always fit ROUNDS_INNER_WIDTH.
+  const switchCount = slots.filter((s) => s.kind === 'switch').length;
+  const roundCount = slots.length - switchCount;
+  const gapTotal = slots.length * ROUND_GAP;
+  const availableForCells = ROUNDS_INNER_WIDTH - ROUND_LABEL - gapTotal - switchCount * ROUND_SWITCH;
+  const cellSize = Math.min(ROUND_CELL_MAX, Math.max(ROUND_CELL_MIN, Math.floor(availableForCells / roundCount)));
+
+  const colWidths = slots.map((s) => (s.kind === 'switch' ? ROUND_SWITCH : cellSize));
   const gridTemplateColumns = `${ROUND_LABEL}px ${colWidths.map((w) => `${w}px`).join(' ')}`;
 
   const ourCells = [];
@@ -64,11 +76,13 @@ function roundsStrip(match) {
       return;
     }
     const { round } = s;
+    const ourIcon = round.won ? `<img src="${roundIconUrl(round.result, true)}" alt="" />` : '';
+    const theirIcon = round.won ? '' : `<img src="${roundIconUrl(round.result, false)}" alt="" />`;
     ourCells.push(
-      `<div class="sb-round-cell${round.won ? ' us' : ''}" style="grid-column:${col};grid-row:1">${round.won ? roundIcon(round.result) : ''}</div>`,
+      `<div class="sb-round-cell${round.won ? '' : ' empty'}" style="grid-column:${col};grid-row:1">${ourIcon}</div>`,
     );
     theirCells.push(
-      `<div class="sb-round-cell${round.won ? '' : ' them'}" style="grid-column:${col};grid-row:2">${round.won ? '' : roundIcon(round.result)}</div>`,
+      `<div class="sb-round-cell${round.won ? ' empty' : ''}" style="grid-column:${col};grid-row:2">${theirIcon}</div>`,
     );
     numbers.push(`<div class="sb-round-num" style="grid-column:${col};grid-row:3">${round.round}</div>`);
   });
@@ -168,7 +182,7 @@ export function buildScoreboardHtml(match) {
   --win:#3ddb8a; --loss:#ff6b83; --muted:#7383a3;
 }
 body{background:#0e1621;font-family:'Manrope',sans-serif;}
-#card{width:740px;background:linear-gradient(180deg,#141b26,#101620);border-radius:14px;overflow:hidden;border:1px solid #232d3a;}
+#card{width:840px;background:linear-gradient(180deg,#141b26,#101620);border-radius:14px;overflow:hidden;border:1px solid #232d3a;}
 .sb-head{
   display:flex;align-items:center;justify-content:space-between;padding:24px 22px;min-height:88px;
   background-size:cover;background-position:center;border-bottom:1px solid #232d3a;
@@ -180,15 +194,15 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-score{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:27px;text-shadow:0 1px 4px rgba(0,0,0,.5);}
 .sb-score .a{color:${won ? 'var(--win)' : 'var(--loss)'}}
 .sb-score .b{color:#c3ccd8}
-.sb-rounds{display:grid;row-gap:6px;column-gap:3px;align-items:center;padding:14px 22px;border-bottom:1px solid #232d3a;overflow-x:auto;}
-.sb-rounds-team{display:flex;align-items:center;gap:7px;min-width:0;padding-right:10px;}
-.sb-rounds-team img{width:18px;height:18px;border-radius:4px;object-fit:contain;flex-shrink:0;}
-.sb-rounds-team span{font-size:11.5px;font-weight:700;color:#c9d4e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sb-round-cell{width:19px;height:19px;border-radius:5px;background:#232d3a;display:flex;align-items:center;justify-content:center;}
-.sb-round-cell.us{background:#ff4655;}
-.sb-round-cell.them{background:#39d6c9;}
-.sb-round-num{text-align:center;font-size:9px;color:#5b6b80;font-family:'JetBrains Mono',monospace;}
-.sb-round-switch{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;line-height:1;}
+.sb-rounds{display:grid;row-gap:8px;column-gap:4px;align-items:center;padding:16px 22px;border-bottom:1px solid #232d3a;overflow-x:auto;}
+.sb-rounds-team{display:flex;align-items:center;gap:8px;min-width:0;padding-right:10px;}
+.sb-rounds-team img{width:20px;height:20px;border-radius:4px;object-fit:contain;flex-shrink:0;}
+.sb-rounds-team span{font-size:12px;font-weight:700;color:#c9d4e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-round-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;}
+.sb-round-cell img{width:88%;height:88%;object-fit:contain;}
+.sb-round-cell.empty::after{content:"";width:5px;height:5px;border-radius:50%;background:#2a3442;}
+.sb-round-num{text-align:center;font-size:10px;color:#5b6b80;font-family:'JetBrains Mono',monospace;}
+.sb-round-switch{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;line-height:1;}
 .sb-team{border-left:4px solid transparent;}
 .sb-team.us{border-left-color:#ff4655;}
 .sb-team.them{border-left-color:#39d6c9;}
