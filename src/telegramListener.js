@@ -13,6 +13,7 @@ const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
 // How you get the bot's attention — "Резалтик, ..." with or without the comma.
 const TRIGGER = /^рез[аa]лтик[\s,:-]*/i;
 const MATCH_URL_RE = /tracker\.gg\/valorant\/match\/([0-9a-f-]{36})/i;
+const HEALTHCHECK_RE = /^healthcheck$/i;
 
 async function loadOffset() {
   try {
@@ -43,9 +44,19 @@ async function summarizeMatch(matchId, message) {
   }
 }
 
+function healthcheckReply() {
+  const uptimeMin = Math.floor(process.uptime() / 60);
+  return `✅ На связи, вижу сообщения. Аптайм процесса: ${uptimeMin} мин.`;
+}
+
 async function handleCommand(commandText, message) {
+  const trimmed = commandText.trim();
   const urlMatch = commandText.match(MATCH_URL_RE);
   try {
+    if (HEALTHCHECK_RE.test(trimmed)) {
+      await sendTextTo(message.chat.id, message.message_thread_id, healthcheckReply());
+      return;
+    }
     if (urlMatch) {
       await summarizeMatch(urlMatch[1], message);
       return;
