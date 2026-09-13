@@ -9,13 +9,17 @@ function escapeHtml(str) {
     .replaceAll('>', '&gt;');
 }
 
+// 5 non-breaking spaces (the Unicode counterpart of the old Alt+255 trick) —
+// padding to stretch the caption line so Telegram renders the photo wider.
+const WIDTH_PAD = ' '.repeat(5);
+
 function caption(match) {
   const icon = match.won ? '✅' : '❌';
   const date = new Date(match.dateStarted).toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow' });
   const matchUrl = `https://tracker.gg/valorant/match/${match.matchId}`;
   return (
     `${icon} ${date} · ${escapeHtml(match.mapName)} · Premier — ` +
-    `<a href="${matchUrl}">Ссылка на матч тут</a>`
+    `<a href="${matchUrl}">Ссылка на матч тут</a>${WIDTH_PAD}`
   );
 }
 
