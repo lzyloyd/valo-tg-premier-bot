@@ -9,7 +9,10 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "test-once": "node src/index.js --once"
+    "test-once": "node src/index.js --once",
+    "seed-state": "node scripts/seed-state.mjs",
+    "test-report": "node scripts/test-report.mjs",
+    "debug-match": "node scripts/debug-match.mjs"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
