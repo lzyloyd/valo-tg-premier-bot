@@ -34,6 +34,10 @@ async function summarizeMatch(matchId, message) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   try {
+    // A fresh page has no origin yet — api.tracker.gg only allows fetches
+    // that originate from a tracker.gg page (CORS), so we have to land on
+    // one first, same as the scheduled poller does via fetchRecentMatches.
+    await page.goto(config.trackerProfileUrl, { waitUntil: 'networkidle2', timeout: 60_000 });
     const raw = await fetchMatchDetail(page, matchId);
     const teamsInfo = await fetchTeamStandings(page, config.trackedRiotId, matchId);
     const match = buildMatchView(raw, teamsInfo);
