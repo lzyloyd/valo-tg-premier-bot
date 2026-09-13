@@ -73,6 +73,28 @@ export function weekDeadline(weekStart) {
   return weekStart;
 }
 
+// 4 hours before the deadline (Monday 20:00 MSK, since the deadline itself
+// is Tuesday 00:00 MSK) — when the "last chance" reminder goes out.
+export function reminderInstant(weekStart) {
+  return new Date(weekStart.getTime() - 4 * 60 * 60 * 1000);
+}
+
+// Whichever of weekResetInstant/reminderInstant hasn't happened yet for the
+// currently-open week — advances a full week once it has, same rollover
+// rule currentWeekStart() itself uses.
+function nextOccurrence(now, instantFor) {
+  const instant = instantFor(currentWeekStart(now));
+  return instant > now ? instant : new Date(instant.getTime() + 7 * DAY_MS);
+}
+
+export function nextResetInstant(now = new Date()) {
+  return nextOccurrence(now, weekResetInstant);
+}
+
+export function nextReminderInstant(now = new Date()) {
+  return nextOccurrence(now, reminderInstant);
+}
+
 export function weekDayDates(weekStart) {
   return DAYS.map((d, i) => ({ ...d, dateIso: mskIsoDate(new Date(weekStart.getTime() + i * DAY_MS)) }));
 }
