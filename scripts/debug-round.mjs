@@ -15,7 +15,11 @@ try {
   await gotoTrackerProfile(page);
   const raw = await fetchMatchDetail(page, matchId);
   const rounds = raw.segments.filter((s) => s.type === 'round-summary');
-  console.log(JSON.stringify(rounds.slice(0, 3), null, 2));
+  const first = rounds[0];
+  console.log('attributes:', JSON.stringify(first.attributes, null, 2));
+  console.log('metadata:', JSON.stringify(first.metadata, null, 2));
+  console.log('stats keys:', Object.keys(first.stats));
+  console.log('full stats:', JSON.stringify(first.stats, null, 2));
 } finally {
   await page.close();
   await closeBrowser();
