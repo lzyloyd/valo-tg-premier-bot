@@ -77,6 +77,12 @@ export function weekDayDates(weekStart) {
   return DAYS.map((d, i) => ({ ...d, dateIso: mskIsoDate(new Date(weekStart.getTime() + i * DAY_MS)) }));
 }
 
+// "Answered" means all 6 days have a yes/no — a stray click on just one day
+// (leaving the other 5 untouched) shouldn't read as a completed submission.
+export function hasFullyAnswered(responses, username) {
+  return DAYS.every((d) => responses[username]?.[d.key]?.avail);
+}
+
 function availableFor(responses, day, slot) {
   return Object.entries(responses)
     .filter(([, byDay]) => byDay[day]?.avail === 'yes' && byDay[day]?.slots?.includes(slot))
@@ -118,8 +124,8 @@ export function buildSummaryText(week) {
     lines.push('');
   }
 
-  const answered = ROSTER.filter((u) => week.responses[u]);
-  const missing = ROSTER.filter((u) => !week.responses[u]);
+  const answered = ROSTER.filter((u) => hasFullyAnswered(week.responses, u));
+  const missing = ROSTER.filter((u) => !hasFullyAnswered(week.responses, u));
   lines.push(`Ответили: ${answered.length}/${ROSTER.length}${missing.length ? ` · не ответил(и): ${missing.map((n) => `@${n}`).join(', ')}` : ''}`);
 
   return lines.join('\n');

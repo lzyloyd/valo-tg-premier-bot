@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { config } from './config.js';
 import { verifyInitData } from './telegramAuth.js';
-import { DAYS, ROSTER, QUORUM, weekDayDates, weekStartFromIso, buildSummaryText, buildEditAlertText } from './scheduleModel.js';
+import { DAYS, ROSTER, QUORUM, weekDayDates, weekStartFromIso, buildSummaryText, buildEditAlertText, hasFullyAnswered } from './scheduleModel.js';
 import { loadCurrentWeek, setResponse } from './scheduleStore.js';
 import { sendTextTo } from './telegram.js';
 
@@ -32,7 +32,7 @@ function weekView(week, auth) {
     responses: week.responses,
     edits: auth.isAdmin ? week.edits : [],
     summaryPreview: auth.isAdmin ? buildSummaryText(week) : null,
-    answeredCount: ROSTER.filter((u) => week.responses[u]).length,
+    answeredCount: ROSTER.filter((u) => hasFullyAnswered(week.responses, u)).length,
     me: { username: auth.username, isAdmin: auth.isAdmin },
   };
 }
