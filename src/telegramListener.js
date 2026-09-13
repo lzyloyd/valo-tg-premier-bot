@@ -15,6 +15,10 @@ const TRIGGER = /^рез[аa]лтик[\s,:-]*/i;
 const MATCH_URL_RE = /tracker\.gg\/valorant\/match\/([0-9a-f-]{36})/i;
 const HEALTHCHECK_RE = /^healthcheck$/i;
 const SCHEDULE_RE = /^расписание$/i;
+// "покажи премьер матч" must match before the more general "покажи матч" —
+// both start with "покажи", only one has "премьер" in the middle.
+const PREMIER_MATCH_RE = /^покажи\s+премьер\s+матч\b/i;
+const ANY_MATCH_RE = /^покажи\s+матч\b/i;
 
 async function loadOffset() {
   try {
@@ -31,7 +35,10 @@ async function saveOffset(offset) {
   await fs.writeFile(OFFSET_PATH, JSON.stringify({ offset }));
 }
 
-async function summarizeMatch(matchId, message) {
+// "Резалтик, покажи премьер матч <ссылка>" — unchanged logic: looks up the
+// tracked player's Premier team standings, throws if they're not in this
+// match (buildMatchView's default behavior).
+async function summarizePremierMatch(matchId, message) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   try {
@@ -42,6 +49,25 @@ async function summarizeMatch(matchId, message) {
     const raw = await fetchMatchDetail(page, matchId);
     const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
     const match = buildMatchView(raw, teamsInfo);
+    match.playlistName = 'Premier'; // this command is specifically for Premier matches — pin it regardless of tracker.gg's raw queueId
+    const png = await renderScoreboardPng(browser, match);
+    await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
+  } finally {
+    await page.close();
+  }
+}
+
+// "Резалтик, покажи матч <ссылка>" — any match, any player, any playlist.
+// No Premier roster lookup (doesn't make sense outside Premier anyway), so
+// team names fall back to "Наша команда"/"Соперник" with no rank/standing;
+// "our" side is just whichever team appears first in the data.
+async function summarizeAnyMatch(matchId, message) {
+  const browser = await getBrowser();
+  const page = await browser.newPage();
+  try {
+    await gotoTrackerProfile(page);
+    const raw = await fetchMatchDetail(page, matchId);
+    const match = buildMatchView(raw, {}, { trackedRiotId: null, requireTracked: false });
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
   } finally {
@@ -72,8 +98,20 @@ async function handleCommand(commandText, message) {
       await sendTextTo(message.chat.id, message.message_thread_id, `📅 Расписание команды: ${config.miniappLaunchUrl}`);
       return;
     }
-    if (urlMatch) {
-      await summarizeMatch(urlMatch[1], message);
+    if (PREMIER_MATCH_RE.test(trimmed)) {
+      if (!urlMatch) {
+        await sendTextTo(message.chat.id, message.message_thread_id, 'Нужна ссылка на матч tracker.gg.');
+        return;
+      }
+      await summarizePremierMatch(urlMatch[1], message);
+      return;
+    }
+    if (ANY_MATCH_RE.test(trimmed)) {
+      if (!urlMatch) {
+        await sendTextTo(message.chat.id, message.message_thread_id, 'Нужна ссылка на матч tracker.gg.');
+        return;
+      }
+      await summarizeAnyMatch(urlMatch[1], message);
       return;
     }
     await sendTextTo(message.chat.id, message.message_thread_id, 'Не знаю такой команды пока.');

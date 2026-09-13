@@ -273,7 +273,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
   <div class="sb-head" style="background-image:linear-gradient(180deg, rgba(14,22,33,.55), rgba(14,22,33,.94)), url('${escapeHtml(match.mapImageUrl)}')">
     <div>
       <div class="sb-map">${escapeHtml(match.mapName)}</div>
-      <div class="sb-sub">${formatDate(match.dateStarted)} · Premier · ${escapeHtml(match.durationText)}</div>
+      <div class="sb-sub">${formatDate(match.dateStarted)} · ${escapeHtml(match.playlistName)} · ${escapeHtml(match.durationText)}</div>
     </div>
     <div class="sb-score-wrap">
       <div class="sb-result">${won ? 'Победа' : 'Поражение'}</div>

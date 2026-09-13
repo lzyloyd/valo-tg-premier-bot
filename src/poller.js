@@ -26,6 +26,7 @@ export async function runPollCycle() {
       const raw = await fetchMatchDetail(page, id);
       const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
       const match = buildMatchView(raw, teamsInfo);
+      match.playlistName = 'Premier'; // this poller only ever watches Premier matches — pin it regardless of tracker.gg's raw queueId
       const png = await renderScoreboardPng(browser, match);
       await sendMatchReport(match, png);
       seen.add(id);

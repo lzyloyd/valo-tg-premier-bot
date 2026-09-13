@@ -11,23 +11,49 @@ function formatDuration(totalSeconds) {
   return `${minutes}м ${seconds}с`;
 }
 
+// tracker.gg's queueId is a lowercase internal slug, not a display name.
+const QUEUE_LABELS = {
+  competitive: 'Competitive',
+  unrated: 'Unrated',
+  premier: 'Premier',
+  spikerush: 'Spike Rush',
+  deathmatch: 'Deathmatch',
+  swiftplay: 'Swiftplay',
+  hurm: 'Team Deathmatch',
+  onefa: 'Escalation',
+  snowball: 'Snowball Fight',
+};
+
+function playlistLabel(queueId) {
+  if (!queueId) return 'Матч';
+  return QUEUE_LABELS[queueId.toLowerCase()] ?? queueId;
+}
+
 /**
  * Turns the raw tracker.gg match payload (data.segments is a flat bag of
  * team-summary / player-summary / round-summary / loadout-* entries) into
  * the shape the scoreboard template wants.
+ *
+ * `trackedRiotId` anchors which side is "our team" — defaults to the
+ * configured tracked player and throws if they're not in this match
+ * (existing behavior, relied on by the scheduled poller and the Premier
+ * match command). Passing `trackedRiotId: null, requireTracked: false`
+ * (the generic "покажи матч" command) skips that search entirely and just
+ * treats whichever team appears first as "our" side — a neutral team1-vs-
+ * team2 view instead of throwing.
  */
-export function buildMatchView(raw, teamsInfo = {}) {
+export function buildMatchView(raw, teamsInfo = {}, { trackedRiotId = config.trackedRiotId, requireTracked = true } = {}) {
   const teamSummaries = raw.segments.filter((s) => s.type === 'team-summary');
   const playerSummaries = raw.segments.filter((s) => s.type === 'player-summary');
   const roundSummaries = raw.segments.filter((s) => s.type === 'round-summary');
 
-  const tracked = playerSummaries.find(
-    (p) => p.attributes.platformUserIdentifier.toLowerCase() === config.trackedRiotId.toLowerCase(),
-  );
-  if (!tracked) {
-    throw new Error(`Tracked player ${config.trackedRiotId} not found in match ${raw.attributes.id}`);
+  const tracked = trackedRiotId
+    ? playerSummaries.find((p) => p.attributes.platformUserIdentifier.toLowerCase() === trackedRiotId.toLowerCase())
+    : null;
+  if (requireTracked && !tracked) {
+    throw new Error(`Tracked player ${trackedRiotId} not found in match ${raw.attributes.id}`);
   }
-  const ourTeamId = tracked.metadata.teamId;
+  const ourTeamId = tracked ? tracked.metadata.teamId : teamSummaries[0]?.attributes.teamId;
   const otherTeamId = teamSummaries.map((t) => t.attributes.teamId).find((id) => id !== ourTeamId);
 
   const toPlayer = (p) => ({
@@ -74,11 +100,13 @@ export function buildMatchView(raw, teamsInfo = {}) {
 
   // tracker.gg's round-summary segments don't say which side a team played —
   // that only shows up per-player, on the "player-round" segments (one per
-  // player per round, metadata.teamSide: 'attacker' | 'defender').
+  // player per round, metadata.teamSide: 'attacker' | 'defender'). Any player
+  // on our team gives the same answer, so this doesn't depend on a specific
+  // tracked player being present.
   const ourSideByRound = new Map();
   for (const s of raw.segments) {
     if (s.type !== 'player-round') continue;
-    if (s.attributes.platformUserIdentifier.toLowerCase() === config.trackedRiotId.toLowerCase()) {
+    if (s.metadata.teamId === ourTeamId) {
       ourSideByRound.set(s.attributes.round, s.metadata.teamSide);
     }
   }
@@ -101,6 +129,7 @@ export function buildMatchView(raw, teamsInfo = {}) {
 
   return {
     matchId: raw.attributes.id,
+    playlistName: playlistLabel(raw.metadata.queueId),
     mapName: raw.metadata.mapName,
     mapImageUrl: raw.metadata.mapImageUrl,
     dateStarted: raw.metadata.dateStarted,

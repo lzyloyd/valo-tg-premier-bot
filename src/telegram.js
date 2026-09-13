@@ -14,7 +14,7 @@ function caption(match) {
   const date = new Date(match.dateStarted).toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow' });
   const matchUrl = `https://tracker.gg/valorant/match/${match.matchId}`;
   return (
-    `${icon} ${date} · ${escapeHtml(match.mapName)} · Premier — ` +
+    `${icon} ${date} · ${escapeHtml(match.mapName)} · ${escapeHtml(match.playlistName)} — ` +
     `<a href="${matchUrl}">Ссылка на матч тут</a>`
   );
 }
