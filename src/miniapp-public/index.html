@@ -30,7 +30,7 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .day-name{font-weight:700;font-size:13px;}
 .day-date{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
 .day-kind{font-size:9.5px;color:var(--text-muted);margin-top:1px;}
-.avail-toggle{display:flex;gap:4px;flex-shrink:0;}
+.avail-toggle{display:flex;gap:4px;flex-shrink:0;margin-left:12px;}
 .slots{display:flex;gap:6px;flex-wrap:wrap;flex:1;justify-content:flex-end;}
 .avail-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;}
 .avail-btn.yes.active{background:var(--on-bg);border-color:var(--on);color:var(--on);}
@@ -129,6 +129,12 @@ function weekLabel(days) {
   return `${DAY_ABBR[first.key]} ${dateParts(first.dateIso).day} — ${DAY_ABBR[last.key]} ${dateParts(last.dateIso).day} ${FULL_MONTHS[dateParts(last.dateIso).month - 1]}`;
 }
 
+function applyLastSaved() {
+  if (state.me.lastSaved) {
+    saveStatusText = `Сохранено автоматически · ${formatTime(new Date(state.me.lastSaved))} МСК`;
+  }
+}
+
 async function loadState() {
   state = await api('/api/state');
   draft = {};
@@ -136,6 +142,7 @@ async function loadState() {
     const mine = state.responses[state.me.username]?.[day.key];
     draft[day.key] = mine ? { avail: mine.avail, slots: [...mine.slots] } : { avail: null, slots: [] };
   }
+  applyLastSaved();
   render();
 }
 

@@ -33,7 +33,7 @@ function weekView(week, auth) {
     edits: auth.isAdmin ? week.edits : [],
     summaryPreview: auth.isAdmin ? buildSummaryText(week) : null,
     answeredCount: ROSTER.filter((u) => hasFullyAnswered(week.responses, u)).length,
-    me: { username: auth.username, isAdmin: auth.isAdmin },
+    me: { username: auth.username, isAdmin: auth.isAdmin, lastSaved: week.lastSaved?.[auth.username] || null },
   };
 }
 

@@ -6,6 +6,7 @@ function emptyWeek(weekStart) {
   return {
     weekStart: mskIsoDate(weekStart),
     responses: {},
+    lastSaved: {}, // username -> ISO timestamp of their last save, for the "Расписание" tab's save status
     edits: [], // post-deadline changes, newest first — shown on the admin tab
   };
 }
@@ -69,6 +70,8 @@ export async function setResponse(username, day, avail, slots, now = new Date())
   week.responses[username] ??= {};
   const previous = week.responses[username][day];
   week.responses[username][day] = { avail, slots: avail === 'yes' ? slots : [] };
+  week.lastSaved ??= {};
+  week.lastSaved[username] = now.toISOString();
 
   if (isPostDeadlineEdit) {
     week.edits.unshift({
