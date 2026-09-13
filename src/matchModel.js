@@ -38,11 +38,16 @@ function playlistLabel(queueId) {
  * configured tracked player and throws if they're not in this match
  * (existing behavior, relied on by the scheduled poller and the Premier
  * match command). Passing `trackedRiotId: null, requireTracked: false`
- * (the generic "покажи матч" command) skips that search entirely and just
- * treats whichever team appears first as "our" side — a neutral team1-vs-
- * team2 view instead of throwing.
+ * (the generic "покажи матч" command) skips that search and instead falls
+ * back to `ourRosterRiotIds`: if any of those known teammates played in
+ * this match, their side becomes "our team"; otherwise it's a neutral
+ * team1-vs-team2 view (whichever team appears first).
  */
-export function buildMatchView(raw, teamsInfo = {}, { trackedRiotId = config.trackedRiotId, requireTracked = true } = {}) {
+export function buildMatchView(
+  raw,
+  teamsInfo = {},
+  { trackedRiotId = config.trackedRiotId, requireTracked = true, ourRosterRiotIds = [] } = {},
+) {
   const teamSummaries = raw.segments.filter((s) => s.type === 'team-summary');
   const playerSummaries = raw.segments.filter((s) => s.type === 'player-summary');
   const roundSummaries = raw.segments.filter((s) => s.type === 'round-summary');
@@ -58,7 +63,16 @@ export function buildMatchView(raw, teamsInfo = {}, { trackedRiotId = config.tra
   if (requireTracked && !tracked) {
     throw new Error(`Tracked player ${trackedRiotId} not found in match ${raw.attributes.id}`);
   }
-  const ourTeamId = tracked ? tracked.metadata.teamId : teamSummaries[0]?.attributes.teamId;
+  let ourTeamId;
+  if (tracked) {
+    ourTeamId = tracked.metadata.teamId;
+  } else if (ourRosterRiotIds.length) {
+    const rosterLower = new Set(ourRosterRiotIds.map((id) => id.toLowerCase()));
+    const rosterMatch = playerSummaries.find((p) => rosterLower.has(p.attributes.platformUserIdentifier.toLowerCase()));
+    ourTeamId = rosterMatch ? rosterMatch.metadata.teamId : teamSummaries[0]?.attributes.teamId;
+  } else {
+    ourTeamId = teamSummaries[0]?.attributes.teamId;
+  }
   const otherTeamId = teamSummaries.map((t) => t.attributes.teamId).find((id) => id !== ourTeamId);
 
   const toPlayer = (p) => ({

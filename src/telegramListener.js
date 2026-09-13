@@ -85,15 +85,22 @@ async function summarizePracticeMatch(matchId, message) {
 
 // "Резалтик, покажи матч <ссылка>" — any match, any player, any playlist.
 // No Premier roster lookup (doesn't make sense outside Premier anyway), so
-// team names fall back to "Наша команда"/"Соперник" with no rank/standing;
-// "our" side is just whichever team appears first in the data.
+// team names fall back to "Команда A"/"Команда B" with no rank/standing.
+// "Our" side is whichever team has a known roster member in it (checked
+// against config.teamRosterRiotIds, since the tracked player specifically
+// might not be the one who played this match); if nobody we know played,
+// it's just a neutral team1-vs-team2 view.
 async function summarizeAnyMatch(matchId, message) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   try {
     await gotoTrackerProfile(page);
     const raw = await fetchMatchDetail(page, matchId);
-    const match = buildMatchView(raw, {}, { trackedRiotId: null, requireTracked: false });
+    const match = buildMatchView(raw, {}, {
+      trackedRiotId: null,
+      requireTracked: false,
+      ourRosterRiotIds: config.teamRosterRiotIds,
+    });
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
   } finally {

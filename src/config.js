@@ -16,6 +16,13 @@ export const config = {
   telegramMessageThreadId: process.env.TELEGRAM_MESSAGE_THREAD_ID || null,
   trackerProfileUrl: required('TRACKER_PROFILE_URL'),
   trackedRiotId: required('TRACKED_RIOT_ID'),
+  // Every known roster member's Riot ID (Name#tag) — lets the generic
+  // "покажи матч" command recognize our team even when the tracked player
+  // (Space) isn't the one who happened to play this particular match.
+  teamRosterRiotIds: (process.env.TEAM_ROSTER_RIOT_IDS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
   headless: process.env.HEADLESS !== 'false',
   dataDir,
   statePath: path.join(dataDir, 'state.json'),
