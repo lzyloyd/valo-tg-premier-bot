@@ -83,6 +83,7 @@ function healthcheckReply() {
 async function handleCommand(commandText, message) {
   const trimmed = commandText.trim();
   const urlMatch = commandText.match(MATCH_URL_RE);
+  console.log('[listener] parsed commandText:', JSON.stringify(trimmed), 'premierMatch:', PREMIER_MATCH_RE.test(trimmed), 'anyMatch:', ANY_MATCH_RE.test(trimmed), 'urlMatch:', Boolean(urlMatch));
   try {
     if (HEALTHCHECK_RE.test(trimmed)) {
       await sendTextTo(message.chat.id, message.message_thread_id, healthcheckReply());
