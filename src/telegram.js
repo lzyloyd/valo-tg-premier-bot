@@ -9,13 +9,18 @@ function escapeHtml(str) {
     .replaceAll('>', '&gt;');
 }
 
+// A longer caption line seems to make Telegram render the bubble (and the
+// photo inside it) wider — 5 invisible characters weren't enough to matter,
+// so try a much bigger pad. Easy to tune up/down based on how it looks.
+const WIDTH_PAD = ' '.repeat(40);
+
 function caption(match) {
   const icon = match.won ? '✅' : '❌';
   const date = new Date(match.dateStarted).toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow' });
   const matchUrl = `https://tracker.gg/valorant/match/${match.matchId}`;
   return (
     `${icon} ${date} · ${escapeHtml(match.mapName)} · Premier — ` +
-    `<a href="${matchUrl}">Ссылка на матч тут</a>`
+    `<a href="${matchUrl}">Ссылка на матч тут</a>${WIDTH_PAD}`
   );
 }
 
