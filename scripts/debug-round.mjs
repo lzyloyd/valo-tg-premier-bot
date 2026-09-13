@@ -4,13 +4,26 @@ import { getBrowser, closeBrowser } from '../src/browser.js';
 import { gotoTrackerProfile, fetchMatchDetail } from '../src/trackerClient.js';
 import { config } from '../src/config.js';
 
-// Dumps the full raw match payload to disk so it can be grepped for fields
-// tracker.gg's API doesn't document (e.g. which side each team played),
-// instead of scrolling through truncated terminal output.
+// Dumps the full raw match payload to disk, plus a de-duplicated list of
+// every key name (grouped by segment type) that mentions side/attack/defense
+// — the terminal-scrollback-friendly way to find an undocumented field.
 const matchId = process.argv[2];
 if (!matchId) {
   console.error('usage: node scripts/debug-round.mjs <matchId>');
   process.exit(1);
+}
+
+function collectKeys(node, path, into) {
+  if (Array.isArray(node)) {
+    node.forEach((item) => collectKeys(item, path, into));
+    return;
+  }
+  if (node && typeof node === 'object') {
+    for (const [key, value] of Object.entries(node)) {
+      into.add(`${path}.${key}`);
+      collectKeys(value, `${path}.${key}`, into);
+    }
+  }
 }
 
 const browser = await getBrowser();
@@ -22,6 +35,22 @@ try {
   await fs.mkdir(config.dataDir, { recursive: true });
   await fs.writeFile(outPath, JSON.stringify(raw, null, 2));
   console.log(`wrote ${outPath}`);
+
+  const bySegmentType = new Map();
+  for (const segment of raw.segments) {
+    const keys = bySegmentType.get(segment.type) ?? new Set();
+    collectKeys(segment, segment.type, keys);
+    bySegmentType.set(segment.type, keys);
+  }
+
+  const pattern = /side|attack|defen/i;
+  for (const [type, keys] of bySegmentType) {
+    const matches = [...keys].filter((k) => pattern.test(k));
+    if (matches.length) {
+      console.log(`\n--- ${type} ---`);
+      console.log([...new Set(matches.map((k) => k.replace(/^[^.]+\./, '')))].sort().join('\n'));
+    }
+  }
 } finally {
   await page.close();
   await closeBrowser();
