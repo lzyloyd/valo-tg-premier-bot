@@ -21,6 +21,7 @@ const SCHEDULE_RE = /^расписание$/i;
 // so it never finds a boundary next to Cyrillic text. (?=\s|$) instead.
 const PREMIER_MATCH_RE = /^покажи\s+премьер\s+матч(?=\s|$)/i;
 const ANY_MATCH_RE = /^покажи\s+матч(?=\s|$)/i;
+const PRACTICE_MATCH_RE = /^покажи\s+прак(?=\s|$)/i;
 
 async function loadOffset() {
   try {
@@ -52,6 +53,26 @@ async function summarizePremierMatch(matchId, message) {
     const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
     const match = buildMatchView(raw, teamsInfo);
     match.playlistName = 'Premier'; // this command is specifically for Premier matches — pin it regardless of tracker.gg's raw queueId
+    const png = await renderScoreboardPng(browser, match);
+    await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
+  } finally {
+    await page.close();
+  }
+}
+
+// "Резалтик, покажи прак <ссылка>" — for custom (scrim) matches: same
+// Premier roster lookup as "покажи премьер матч" (team name + rank/standing),
+// but no playlistName override — the match's own queueId is null for a
+// custom lobby, so buildMatchView's isCustom kicks in on its own (no TRS
+// column, MVP by ACS, "Кастомка" label) exactly like "покажи матч" already does.
+async function summarizePracticeMatch(matchId, message) {
+  const browser = await getBrowser();
+  const page = await browser.newPage();
+  try {
+    await gotoTrackerProfile(page);
+    const raw = await fetchMatchDetail(page, matchId);
+    const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
+    const match = buildMatchView(raw, teamsInfo);
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
   } finally {
@@ -106,6 +127,14 @@ async function handleCommand(commandText, message) {
         return;
       }
       await summarizePremierMatch(urlMatch[1], message);
+      return;
+    }
+    if (PRACTICE_MATCH_RE.test(trimmed)) {
+      if (!urlMatch) {
+        await sendTextTo(message.chat.id, message.message_thread_id, 'Нужна ссылка на матч tracker.gg.');
+        return;
+      }
+      await summarizePracticeMatch(urlMatch[1], message);
       return;
     }
     if (ANY_MATCH_RE.test(trimmed)) {
