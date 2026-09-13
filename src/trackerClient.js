@@ -41,7 +41,15 @@ export async function fetchRecentMatches(page) {
   return matches.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 }
 
-async function fetchJson(page, url) {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// A burst of back-to-back requests occasionally trips a transient Cloudflare
+// block on one of them ("Failed to fetch", or a non-200 status) even on an
+// already-cleared page — it's usually gone a second or two later.
+async function fetchJson(page, url, attempt = 1) {
+  const maxAttempts = 3;
   let result;
   try {
     result = await page.evaluate(async (url) => {
@@ -50,10 +58,18 @@ async function fetchJson(page, url) {
       return { ok: true, json: await res.json() };
     }, url);
   } catch (err) {
+    if (attempt < maxAttempts) {
+      await sleep(attempt * 1000);
+      return fetchJson(page, url, attempt + 1);
+    }
     throw new Error(`fetch failed for ${url} (page was at ${page.url()}): ${err.message}`);
   }
 
   if (!result.ok) {
+    if (attempt < maxAttempts) {
+      await sleep(attempt * 1000);
+      return fetchJson(page, url, attempt + 1);
+    }
     throw new Error(`tracker.gg API returned ${result.status} for ${url}`);
   }
   return result.json;
