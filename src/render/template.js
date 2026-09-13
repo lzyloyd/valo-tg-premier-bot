@@ -242,7 +242,6 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-muted{color:var(--muted);}
 .sb-hd{color:#4c5a70;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;padding-top:4px;padding-bottom:6px;}
 .sb-hd .sb-num,.sb-hd .sb-acs,.sb-hd .sb-trs{font-weight:600;color:inherit;}
-.sb-foot{padding:12px 22px;font-size:11px;color:#3d4a5f;border-top:1px solid #232d3a;font-family:'JetBrains Mono',monospace;}
 .sb-mvp{margin:14px 22px 18px;background:linear-gradient(135deg,rgba(255,209,102,.14),rgba(255,209,102,.04));border:1px solid rgba(255,209,102,.35);border-radius:10px;padding:12px 16px;}
 .sb-mvp-label{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#ffd166;margin-bottom:8px;}
 .sb-mvp-body{display:flex;align-items:center;gap:12px;}
@@ -288,7 +287,6 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
     avgRankIconUrl: match.theirTeamAvgRankIconUrl,
   })}
   ${mvpBlock(match.mvp)}
-  <div class="sb-foot">tracker.gg/valorant/match/${match.matchId}</div>
 </div>
 </body></html>`;
 }
