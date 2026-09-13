@@ -44,6 +44,7 @@ export function buildMatchView(raw, teamsInfo = {}) {
     assists: p.stats.assists?.value ?? 0,
     plusMinus: (p.stats.kills?.value ?? 0) - (p.stats.deaths?.value ?? 0),
     adr: Math.round(p.stats.damagePerRound?.value ?? 0),
+    ddelta: Math.round(p.stats.damageDeltaPerRound?.value ?? 0),
     hsAccuracy: Math.round(p.stats.hsAccuracy?.value ?? 0),
     kast: Math.round(p.stats.kast?.value ?? 0),
     firstKills: p.stats.firstKills?.value ?? 0,
