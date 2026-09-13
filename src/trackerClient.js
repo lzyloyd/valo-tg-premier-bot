@@ -92,26 +92,32 @@ function toTeamInfo(roster) {
   };
 }
 
+async function fetchRosterInfoForPlayer(page, riotId) {
+  const profileJson = await fetchJson(page, `${PROFILE_API_BASE}/${encodeURIComponent(riotId)}?`);
+  const rosterId = profileJson.data.metadata.premierRosterId;
+  if (!rosterId) return null;
+  const rosterJson = await fetchJson(page, `${ROSTER_API_BASE}/${rosterId}/summary`);
+  return toTeamInfo(rosterJson.data);
+}
+
 /**
  * Premier team identity (name, logo, league rank) isn't part of the match
  * payload at all — it lives under a separate Premier roster API, keyed by a
  * roster id that a player's own standard profile happens to carry
- * (metadata.premierRosterId). Our roster's own `recentMatches` list then
- * points at the specific opponent roster for a given matchId.
+ * (metadata.premierRosterId). Any player on a side works to look their
+ * roster up, so this doesn't depend on the match being recent.
  */
-export async function fetchTeamStandings(page, trackedRiotId, matchId) {
-  const profileJson = await fetchJson(page, `${PROFILE_API_BASE}/${encodeURIComponent(trackedRiotId)}?`);
-  const ourRosterId = profileJson.data.metadata.premierRosterId;
-  if (!ourRosterId) return { ourTeam: null, theirTeam: null };
+export async function fetchTeamStandings(page, raw, trackedRiotId) {
+  const playerSummaries = raw.segments.filter((s) => s.type === 'player-summary');
+  const tracked = playerSummaries.find(
+    (p) => p.attributes.platformUserIdentifier.toLowerCase() === trackedRiotId.toLowerCase(),
+  );
+  if (!tracked) return { ourTeam: null, theirTeam: null };
 
-  const ourRosterJson = await fetchJson(page, `${ROSTER_API_BASE}/${ourRosterId}/summary`);
-  const ourTeam = toTeamInfo(ourRosterJson.data);
+  const opponent = playerSummaries.find((p) => p.metadata.teamId !== tracked.metadata.teamId);
 
-  const matchEntry = ourRosterJson.data.recentMatches?.find((m) => m.matchId === matchId);
-  if (!matchEntry) return { ourTeam, theirTeam: null };
-
-  const theirRosterJson = await fetchJson(page, `${ROSTER_API_BASE}/${matchEntry.opponentRosterId}/summary`);
-  const theirTeam = toTeamInfo(theirRosterJson.data);
+  const ourTeam = await fetchRosterInfoForPlayer(page, trackedRiotId);
+  const theirTeam = opponent ? await fetchRosterInfoForPlayer(page, opponent.attributes.platformUserIdentifier) : null;
 
   return { ourTeam, theirTeam };
 }

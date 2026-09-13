@@ -16,8 +16,9 @@ function formatDate(iso) {
 }
 
 // Sides swap at halftime (after round 12), then every 2 rounds once a match
-// reaches overtime (round 24+).
-function isSideSwitchAfter(round) {
+// reaches overtime (round 24+) — but never after the match's last round.
+function isSideSwitchAfter(round, isLastRound) {
+  if (isLastRound) return false;
   return round === 12 || (round > 12 && round >= 24 && round % 2 === 0);
 }
 
@@ -46,10 +47,11 @@ const ROUNDS_INNER_WIDTH = 840 - 44;
 
 function roundsStrip(match) {
   const slots = [];
-  for (const r of match.rounds) {
+  match.rounds.forEach((r, i) => {
     slots.push({ kind: 'round', round: r });
-    if (isSideSwitchAfter(r.round)) slots.push({ kind: 'switch' });
-  }
+    const isLastRound = i === match.rounds.length - 1;
+    if (isSideSwitchAfter(r.round, isLastRound)) slots.push({ kind: 'switch' });
+  });
 
   // Cell size shrinks a little for a long (or overtime) match instead of
   // overflowing the fixed-width card — sized to always fit ROUNDS_INNER_WIDTH.
@@ -71,7 +73,10 @@ function roundsStrip(match) {
     const col = i + 2; // column 1 is the team-label column
     if (s.kind === 'switch') {
       switches.push(
-        `<div class="sb-round-switch" style="grid-column:${col};grid-row:1 / span 2" title="Смена сторон">⇄</div>`,
+        `<div class="sb-round-switch" style="grid-column:${col};grid-row:1 / span 2" title="Смена сторон">` +
+          '<svg viewBox="0 0 20 20" width="13" height="13">' +
+          '<path d="M4 7h10l-3-3M16 13H6l3 3" fill="none" stroke="#7383a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '</svg></div>',
       );
       return;
     }
@@ -204,8 +209,8 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-round-num{text-align:center;font-size:10px;color:#5b6b80;font-family:'JetBrains Mono',monospace;}
 .sb-round-switch{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;line-height:1;}
 .sb-team{border-left:4px solid transparent;}
-.sb-team.us{border-left-color:#ff4655;}
-.sb-team.them{border-left-color:#39d6c9;}
+.sb-team.winner{border-left-color:#39d6c9;}
+.sb-team.loser{border-left-color:#ff4655;}
 .sb-team-label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px 12px;}
 .sb-team-identity{display:flex;align-items:center;gap:12px;min-width:0;}
 .sb-team-logo{width:38px;height:38px;border-radius:8px;object-fit:contain;flex-shrink:0;}
@@ -253,7 +258,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
   </div>
   ${roundsStrip(match)}
   ${teamBlock({
-    side: 'us',
+    side: match.won ? 'winner' : 'loser',
     teamName: match.ourTeamName,
     logoUrl: match.ourTeamLogoUrl,
     rank: match.ourTeamRank,
@@ -263,7 +268,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
     avgRankIconUrl: match.ourTeamAvgRankIconUrl,
   })}
   ${teamBlock({
-    side: 'them',
+    side: match.won ? 'loser' : 'winner',
     teamName: match.theirTeamName,
     logoUrl: match.theirTeamLogoUrl,
     rank: match.theirTeamRank,

@@ -24,7 +24,7 @@ export async function runPollCycle() {
     for (const { id } of newMatches) {
       console.log(`[poller] new match ${id}, fetching detail...`);
       const raw = await fetchMatchDetail(page, id);
-      const teamsInfo = await fetchTeamStandings(page, config.trackedRiotId, id);
+      const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
       const match = buildMatchView(raw, teamsInfo);
       const png = await renderScoreboardPng(browser, match);
       await sendMatchReport(match, png);

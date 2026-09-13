@@ -39,7 +39,7 @@ async function summarizeMatch(matchId, message) {
     // one first, same as the scheduled poller does via fetchRecentMatches.
     await gotoTrackerProfile(page);
     const raw = await fetchMatchDetail(page, matchId);
-    const teamsInfo = await fetchTeamStandings(page, config.trackedRiotId, matchId);
+    const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
     const match = buildMatchView(raw, teamsInfo);
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
