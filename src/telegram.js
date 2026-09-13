@@ -14,6 +14,9 @@ function caption(match) {
 export async function sendMatchReport(match, pngBuffer) {
   const form = new FormData();
   form.append('chat_id', config.telegramChatId);
+  if (config.telegramMessageThreadId) {
+    form.append('message_thread_id', config.telegramMessageThreadId);
+  }
   form.append('caption', caption(match));
   form.append('photo', new Blob([pngBuffer], { type: 'image/png' }), 'scoreboard.png');
 
