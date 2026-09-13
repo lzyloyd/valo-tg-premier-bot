@@ -158,8 +158,10 @@ function playerRow(p, isCustom) {
     </div>`;
 }
 
-function teamBlock({ side, teamName, logoUrl, rank, divisionName, players, avgRankName, avgRankIconUrl, isCustom }) {
-  const standing = rank ? `#${rank}${divisionName ? ` · ${escapeHtml(divisionName)}` : ''}` : '';
+function teamBlock({ side, teamName, logoUrl, rank, divisionName, zoneName, players, avgRankName, avgRankIconUrl, isCustom }) {
+  const standing = rank
+    ? `#${rank}${divisionName ? ` · ${escapeHtml(divisionName)}` : ''}${zoneName ? ` · ${escapeHtml(zoneName)}` : ''}`
+    : '';
   const trsHeaderCells = isCustom ? '' : '<span></span><span class="sb-trs">TRS</span><span></span>';
   return `
     <div class="sb-team ${side}">
@@ -300,6 +302,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
     logoUrl: match.ourTeamLogoUrl,
     rank: match.ourTeamRank,
     divisionName: match.ourTeamDivision,
+    zoneName: match.ourTeamZone,
     players: match.ourTeam,
     avgRankName: match.ourTeamAvgRankName,
     avgRankIconUrl: match.ourTeamAvgRankIconUrl,
@@ -311,6 +314,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
     logoUrl: match.theirTeamLogoUrl,
     rank: match.theirTeamRank,
     divisionName: match.theirTeamDivision,
+    zoneName: match.theirTeamZone,
     players: match.theirTeam,
     avgRankName: match.theirTeamAvgRankName,
     avgRankIconUrl: match.theirTeamAvgRankIconUrl,

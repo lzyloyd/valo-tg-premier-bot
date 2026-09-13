@@ -105,6 +105,7 @@ function toTeamInfo(roster) {
     logoUrl: coloredLogoUrl(roster.icon),
     rank: roster.rank ?? null,
     divisionName: roster.divisionName ?? null,
+    zoneName: roster.zoneName ?? null, // e.g. "DACH" — sub-region within roster.region ("eu")
   };
 }
 

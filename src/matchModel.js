@@ -150,6 +150,7 @@ export function buildMatchView(raw, teamsInfo = {}, { trackedRiotId = config.tra
     ourTeamLogoUrl: teamsInfo.ourTeam?.logoUrl ?? null,
     ourTeamRank: teamsInfo.ourTeam?.rank ?? null,
     ourTeamDivision: teamsInfo.ourTeam?.divisionName ?? null,
+    ourTeamZone: teamsInfo.ourTeam?.zoneName ?? null,
     theirTeam: theirTeam.players,
     theirTeamAvgRankName: rankName(theirAvgRankTierId),
     theirTeamAvgRankIconUrl: rankIconUrl(theirAvgRankTierId),
@@ -157,6 +158,7 @@ export function buildMatchView(raw, teamsInfo = {}, { trackedRiotId = config.tra
     theirTeamLogoUrl: teamsInfo.theirTeam?.logoUrl ?? null,
     theirTeamRank: teamsInfo.theirTeam?.rank ?? null,
     theirTeamDivision: teamsInfo.theirTeam?.divisionName ?? null,
+    theirTeamZone: teamsInfo.theirTeam?.zoneName ?? null,
     rounds,
     mvp,
   };
