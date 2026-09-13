@@ -2,10 +2,21 @@ import { config } from './config.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
 
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
 function caption(match) {
   const icon = match.won ? '✅' : '❌';
   const date = new Date(match.dateStarted).toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow' });
-  return `${icon} ${date} · ${match.mapName} · Premier\ntracker.gg/valorant/match/${match.matchId}`;
+  const matchUrl = `https://tracker.gg/valorant/match/${match.matchId}`;
+  return (
+    `${icon} ${date} · ${escapeHtml(match.mapName)} · Premier — ` +
+    `<a href="${matchUrl}">Ссылка на матч тут</a>`
+  );
 }
 
 async function callApi(method, form) {
@@ -21,6 +32,7 @@ export async function sendPhotoTo(chatId, threadId, captionText, pngBuffer) {
   form.append('chat_id', chatId);
   if (threadId) form.append('message_thread_id', threadId);
   form.append('caption', captionText);
+  form.append('parse_mode', 'HTML');
   form.append('photo', new Blob([pngBuffer], { type: 'image/png' }), 'scoreboard.png');
   await callApi('sendPhoto', form);
 }
