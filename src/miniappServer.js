@@ -45,7 +45,15 @@ export function startMiniAppServer() {
 
   const app = express();
   app.use(express.json());
-  app.use(express.static(path.join(__dirname, 'miniapp-public')));
+  // Telegram's in-app webview caches the mini app aggressively — without an
+  // explicit no-store (set before the static handler can send a response),
+  // edits to index.html can keep showing the old version even after a fresh
+  // open of the app.
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store');
+    next();
+  });
+  app.use(express.static(path.join(__dirname, 'miniapp-public'), { etag: false, lastModified: false, cacheControl: false }));
 
   app.post('/api/state', async (req, res) => {
     const auth = authenticate(req, res);
