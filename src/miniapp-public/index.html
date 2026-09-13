@@ -17,11 +17,13 @@
 *{box-sizing:border-box;}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;}
 #app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+.app-header{padding:14px 16px 2px;background:var(--surface);}
+.app-header-title{font-weight:800;font-size:16px;}
+.app-header-sub{font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-top:2px;}
 .tabs{display:flex;gap:4px;padding:10px 12px 0;background:var(--surface);position:sticky;top:0;z-index:2;}
 .tab{flex:1;border:none;background:none;color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;padding:9px 4px 12px;cursor:pointer;border-bottom:2px solid transparent;}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .screen{padding:16px;flex:1;}
-.week-label{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);margin-bottom:12px;}
 .day-list{display:flex;flex-direction:column;gap:8px;}
 .day-card{border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;background:var(--surface);}
 .day-id{width:78px;flex-shrink:0;}
@@ -86,6 +88,11 @@ let state = null;
 let activeTab = 'me';
 let teamMode = 'avatars';
 let draft = {}; // local edits before they round-trip, keyed by day
+let saveStatusText = 'Изменения сохраняются автоматически';
+
+function formatTime(date) {
+  return date.toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' });
+}
 
 async function api(path, body) {
   const res = await fetch(path, {
@@ -132,6 +139,13 @@ async function loadState() {
   render();
 }
 
+function renderHeader() {
+  return `<div class="app-header">
+    <div class="app-header-title">Overthinkers</div>
+    <div class="app-header-sub">${weekLabel(state.days)}</div>
+  </div>`;
+}
+
 function renderTabs() {
   const tabs = [['me', 'Расписание'], ['team', 'Команда']];
   if (state.me.isAdmin) tabs.push(['admin', 'Админ']);
@@ -166,9 +180,8 @@ function renderMeScreen() {
     })
     .join('');
   return `<div class="screen">
-    <div class="week-label">${weekLabel(state.days)}</div>
     <div class="day-list">${cards}</div>
-    <div class="save-status" id="saveStatus">Сохранено автоматически</div>
+    <div class="save-status" id="saveStatus">${saveStatusText}</div>
   </div>`;
 }
 
@@ -201,7 +214,7 @@ function renderTeamScreen() {
     const cells = state.days
       .map((d) => (d.slots.includes(time) ? `<div>${teamCell(availableFor(d.key, time))}</div>` : `<div style="text-align:center;color:var(--text-muted)">—</div>`))
       .join('');
-    return `<div class="team-row"><div style="font-weight:700;font-size:11px">${time}</div>${cells}</div>`;
+    return `<div class="team-row"><div style="font-weight:700;font-size:11px;padding-left:10px">${time}</div>${cells}</div>`;
   };
   return `<div class="screen">
     <div class="variant-switch">
@@ -241,7 +254,7 @@ function renderAdminScreen() {
 function render() {
   const root = document.getElementById('app');
   const screen = activeTab === 'me' ? renderMeScreen() : activeTab === 'team' ? renderTeamScreen() : renderAdminScreen();
-  root.innerHTML = renderTabs() + screen;
+  root.innerHTML = renderHeader() + renderTabs() + screen;
   bindEvents();
 }
 
@@ -287,10 +300,11 @@ async function saveDay(day) {
   const status = document.getElementById('saveStatus');
   try {
     state = await api('/api/update', { day, avail: draft[day].avail, slots: draft[day].slots });
-    if (status) status.textContent = 'Сохранено автоматически';
+    saveStatusText = `Сохранено автоматически · ${formatTime(new Date())} МСК`;
   } catch (err) {
-    if (status) status.textContent = `Не сохранилось: ${err.message}`;
+    saveStatusText = `Не сохранилось: ${err.message}`;
   }
+  if (status) status.textContent = saveStatusText;
 }
 
 loadState().catch((err) => {
