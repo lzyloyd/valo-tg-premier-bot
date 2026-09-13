@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { getBrowser } from './browser.js';
-import { fetchMatchDetail, fetchTeamStandings } from './trackerClient.js';
+import { fetchMatchDetail, fetchTeamStandings, gotoTrackerProfile } from './trackerClient.js';
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
 import { sendPhotoTo, sendTextTo, matchCaption } from './telegram.js';
@@ -37,7 +37,7 @@ async function summarizeMatch(matchId, message) {
     // A fresh page has no origin yet — api.tracker.gg only allows fetches
     // that originate from a tracker.gg page (CORS), so we have to land on
     // one first, same as the scheduled poller does via fetchRecentMatches.
-    await page.goto(config.trackerProfileUrl, { waitUntil: 'networkidle2', timeout: 60_000 });
+    await gotoTrackerProfile(page);
     const raw = await fetchMatchDetail(page, matchId);
     const teamsInfo = await fetchTeamStandings(page, config.trackedRiotId, matchId);
     const match = buildMatchView(raw, teamsInfo);

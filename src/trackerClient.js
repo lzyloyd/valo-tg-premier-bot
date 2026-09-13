@@ -6,12 +6,24 @@ const ROSTER_API_BASE = 'https://api.tracker.gg/api/v1/valorant/premier/roster';
 const IMAGE_PROXY_BASE = 'https://imgsvc.trackercdn.com/url';
 
 /**
+ * Cloudflare's "Just a moment..." interstitial can still be showing by the
+ * time page.goto's own waitUntil condition is satisfied — networkidle2 is
+ * happy to fire on the challenge page itself. Confirm the real page actually
+ * landed by waiting for the state object every genuine tracker.gg page embeds,
+ * instead of trusting navigation-lifecycle timing alone.
+ */
+export async function gotoTrackerProfile(page) {
+  await page.goto(config.trackerProfileUrl, { waitUntil: 'networkidle2', timeout: 60_000 });
+  await page.waitForFunction(() => window.__INITIAL_STATE__ !== undefined, { timeout: 30_000 });
+}
+
+/**
  * tracker.gg embeds its initial React state as `window.__INITIAL_STATE__` in the
  * server-rendered HTML — reading it avoids needing a separate API call (and its
  * own Cloudflare check) just to list recent matches.
  */
 export async function fetchRecentMatches(page) {
-  await page.goto(config.trackerProfileUrl, { waitUntil: 'networkidle2', timeout: 60_000 });
+  await gotoTrackerProfile(page);
 
   const matches = await page.evaluate(() => {
     const state = window.__INITIAL_STATE__;
@@ -30,11 +42,16 @@ export async function fetchRecentMatches(page) {
 }
 
 async function fetchJson(page, url) {
-  const result = await page.evaluate(async (url) => {
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) return { ok: false, status: res.status };
-    return { ok: true, json: await res.json() };
-  }, url);
+  let result;
+  try {
+    result = await page.evaluate(async (url) => {
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!res.ok) return { ok: false, status: res.status };
+      return { ok: true, json: await res.json() };
+    }, url);
+  } catch (err) {
+    throw new Error(`fetch failed for ${url} (page was at ${page.url()}): ${err.message}`);
+  }
 
   if (!result.ok) {
     throw new Error(`tracker.gg API returned ${result.status} for ${url}`);
