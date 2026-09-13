@@ -7,10 +7,11 @@ import { sendTextTo } from './telegram.js';
 // is created first, then everyone's told filling starts now.
 export async function resetWeekAndAnnounce() {
   await runWeeklyReset();
+  const mentions = ROSTER.map((u) => `@${u}`).join(', ');
   await sendTextTo(
     config.scheduleChatId,
     config.scheduleThreadId,
-    '📅 Открыли новую неделю — заполните расписание в мини-аппе до понедельника 24:00 МСК.',
+    `📅 Открыли новую неделю — заполните расписание в мини-аппе до понедельника 24:00 МСК.\n${mentions}`,
   );
 }
 
