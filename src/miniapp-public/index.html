@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Расписание Overthinkers</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<style>
+:root{
+  --bg:#0b0f16; --surface:#141b26; --surface-2:#1b2430; --surface-3:#232d3a;
+  --text:#eef2f6; --text-muted:#7383a3; --border:#232d3a;
+  --accent:#ff5a68; --on:#3ddb8a; --on-bg:rgba(61,219,138,.16);
+  --warn:#ffd166; --warn-bg:rgba(255,209,102,.12); --warn-border:rgba(255,209,102,.3);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;}
+#app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+.tabs{display:flex;gap:4px;padding:10px 12px 0;background:var(--surface);position:sticky;top:0;z-index:2;}
+.tab{flex:1;border:none;background:none;color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;padding:9px 4px 12px;cursor:pointer;border-bottom:2px solid transparent;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.screen{padding:16px;flex:1;}
+.week-label{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);margin-bottom:12px;}
+.day-list{display:flex;flex-direction:column;gap:8px;}
+.day-card{border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;background:var(--surface);}
+.day-id{width:78px;flex-shrink:0;}
+.day-name{font-weight:700;font-size:13px;}
+.day-date{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
+.day-kind{font-size:9.5px;color:var(--text-muted);margin-top:1px;}
+.avail-toggle{display:flex;gap:4px;flex-shrink:0;}
+.slots{display:flex;gap:6px;flex-wrap:wrap;flex:1;justify-content:flex-end;}
+.avail-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;}
+.avail-btn.yes.active{background:var(--on-bg);border-color:var(--on);color:var(--on);}
+.avail-btn.no.active{background:var(--surface-3);border-color:var(--text-muted);color:var(--text);}
+.slot-chip{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px;padding:6px 11px;border-radius:8px;cursor:pointer;}
+.slot-chip.on{background:var(--on-bg);border-color:var(--on);color:var(--on);}
+.slot-chip[disabled]{opacity:.35;cursor:not-allowed;}
+.save-status{margin-top:14px;font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;text-align:center;}
+.variant-switch{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap;}
+.variant-switch>span{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;}
+.seg{display:flex;flex-wrap:wrap;background:var(--surface-2);border-radius:8px;padding:2px;gap:2px;}
+.seg-btn{border:none;background:none;color:var(--text-muted);font-weight:700;font-size:10.5px;padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+.seg-btn.active{background:var(--surface);color:var(--text);}
+.team-grid{border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.team-row{display:grid;grid-template-columns:64px repeat(6,1fr);border-top:1px solid var(--border);min-height:150px;align-items:center;}
+.team-row:first-child{border-top:none;background:var(--surface-2);min-height:0;}
+.team-row>div{padding:12px 4px;font-size:10.5px;}
+.team-row>div:last-child{padding-right:14px;}
+.team-day{font-weight:700;font-size:11px;text-align:center;}
+.team-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted);text-align:center;}
+.avatars{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.avatar{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:7.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.avatar.dim{background:var(--surface-3);color:var(--text-muted);}
+.count-badge{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;background:var(--surface-3);color:var(--text-muted);}
+.count-badge.quorum{background:var(--on-bg);color:var(--on);}
+.pips-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.pips-count{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);}
+.pips{display:flex;flex-direction:column-reverse;gap:3px;justify-content:center;align-items:center;}
+.pip{width:20px;height:6px;border-radius:2px;background:var(--surface-3);}
+.pip.filled{background:var(--on);opacity:.4;}
+.pip.filled.quorum{opacity:1;}
+.admin-lock{font-size:10.5px;color:var(--text-muted);background:var(--surface-2);border-radius:8px;padding:7px 10px;margin-bottom:14px;}
+.admin-progress{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.admin-progress .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;}
+.admin-progress .lbl{font-size:10.5px;color:var(--text-muted);}
+.send-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:16px;}
+.send-btn[disabled]{opacity:.5;}
+.section-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;margin-bottom:8px;}
+.tg-bubble-wrap{background:var(--bg);border-radius:12px;padding:14px 12px;margin-bottom:6px;}
+.tg-bubble{background:var(--surface-2);border-radius:0 12px 12px 12px;padding:10px 12px;white-space:pre-wrap;font-size:12.5px;line-height:1.6;}
+.alert-item{border:1px solid var(--warn-border);background:var(--warn-bg);border-radius:10px;padding:9px 11px;margin-bottom:7px;font-size:12px;}
+.empty-note{font-size:11.5px;color:var(--text-muted);}
+.loading{padding:40px;text-align:center;color:var(--text-muted);}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Загрузка…</div></div>
+<script>
+const tg = window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
+const initData = tg?.initData || '';
+
+let state = null;
+let activeTab = 'me';
+let teamMode = 'avatars';
+let draft = {}; // local edits before they round-trip, keyed by day
+
+async function api(path, body) {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ initData, ...body }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Ошибка запроса');
+  return json;
+}
+
+function initials(name) {
+  return name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2);
+}
+
+async function loadState() {
+  state = await api('/api/state');
+  draft = {};
+  for (const day of state.days) {
+    const mine = state.responses[state.me.username]?.[day.key];
+    draft[day.key] = mine ? { avail: mine.avail, slots: [...mine.slots] } : { avail: null, slots: [] };
+  }
+  render();
+}
+
+function renderTabs() {
+  const tabs = [['me', 'Расписание'], ['team', 'Команда']];
+  if (state.me.isAdmin) tabs.push(['admin', 'Админ']);
+  return `<nav class="tabs">${tabs
+    .map(([key, label]) => `<button class="tab${activeTab === key ? ' active' : ''}" data-tab="${key}">${label}</button>`)
+    .join('')}</nav>`;
+}
+
+function renderMeScreen() {
+  const cards = state.days
+    .map((d) => {
+      const my = draft[d.key];
+      const slots = d.slots
+        .map((t) => {
+          const on = my.avail === 'yes' && my.slots.includes(t);
+          const disabled = my.avail !== 'yes' ? 'disabled' : '';
+          return `<button class="slot-chip${on ? ' on' : ''}" ${disabled} data-day="${d.key}" data-slot="${t}">${t}</button>`;
+        })
+        .join('');
+      return `<div class="day-card">
+        <div class="day-id">
+          <div class="day-name">${d.label}</div>
+          <div class="day-date">${d.dateIso.slice(8, 10)}.${d.dateIso.slice(5, 7)}</div>
+          <div class="day-kind">${d.kind}</div>
+        </div>
+        <div class="avail-toggle">
+          <button class="avail-btn yes${my.avail === 'yes' ? ' active' : ''}" data-day="${d.key}" data-avail="yes">могу</button>
+          <button class="avail-btn no${my.avail === 'no' ? ' active' : ''}" data-day="${d.key}" data-avail="no">не могу</button>
+        </div>
+        <div class="slots">${slots}</div>
+      </div>`;
+    })
+    .join('');
+  return `<div class="screen">
+    <div class="week-label">${state.days[0].dateIso} — ${state.days[5].dateIso}</div>
+    <div class="day-list">${cards}</div>
+    <div class="save-status" id="saveStatus">Сохранено автоматически</div>
+  </div>`;
+}
+
+function availableFor(day, slot) {
+  return state.roster.filter((u) => {
+    const r = state.responses[u]?.[day];
+    return r?.avail === 'yes' && r.slots.includes(slot);
+  });
+}
+
+function teamCell(names) {
+  const met = names.length >= state.quorum;
+  if (teamMode === 'count') {
+    if (names.length === 0) return `<div class="count-badge">0</div>`;
+    return `<div class="count-badge${met ? ' quorum' : ''}">${names.length}</div>`;
+  }
+  if (teamMode === 'pips') {
+    const pips = state.roster.map((_, i) => `<div class="pip${i < names.length ? ' filled' + (met ? ' quorum' : '') : ''}"></div>`).join('');
+    return `<div class="pips-wrap"><div class="pips-count">${names.length}</div><div class="pips">${pips}</div></div>`;
+  }
+  if (names.length === 0) return `<div class="avatars"><span class="avatar dim">—</span></div>`;
+  return `<div class="avatars">${names.map((n) => `<span class="avatar" title="${n}">${initials(n)}</span>`).join('')}</div>`;
+}
+
+function renderTeamScreen() {
+  const header = `<div class="team-row"><div></div>${state.days
+    .map((d) => `<div><div class="team-day">${d.label.slice(0, 2)}</div><div class="team-date">${d.dateIso.slice(8, 10)}.${d.dateIso.slice(5, 7)}</div></div>`)
+    .join('')}</div>`;
+  const rowFor = (time) => {
+    const cells = state.days
+      .map((d) => (d.slots.includes(time) ? `<div>${teamCell(availableFor(d.key, time))}</div>` : `<div style="text-align:center;color:var(--text-muted)">—</div>`))
+      .join('');
+    return `<div class="team-row"><div style="font-weight:700;font-size:11px">${time}</div>${cells}</div>`;
+  };
+  return `<div class="screen">
+    <div class="variant-switch">
+      <span>Как показывать</span>
+      <div class="seg">
+        <button class="seg-btn${teamMode === 'avatars' ? ' active' : ''}" data-teammode="avatars">Аватары</button>
+        <button class="seg-btn${teamMode === 'count' ? ' active' : ''}" data-teammode="count">Число</button>
+        <button class="seg-btn${teamMode === 'pips' ? ' active' : ''}" data-teammode="pips">Полоска</button>
+      </div>
+    </div>
+    <div class="team-grid">${header}${rowFor('20:00')}${rowFor('22:00')}${rowFor('18:00')}</div>
+  </div>`;
+}
+
+function renderAdminScreen() {
+  const edits = state.edits.length
+    ? state.edits
+        .map(
+          (e) =>
+            `<div class="alert-item">@${e.username} · ${new Date(e.at).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}</div>`,
+        )
+        .join('')
+    : `<div class="empty-note">Правок после дедлайна пока нет.</div>`;
+  return `<div class="screen">
+    <div class="admin-lock">🔒 Видно только тебе</div>
+    <div class="admin-progress">
+      <div><div class="num">${state.answeredCount}<span style="color:var(--text-muted);font-size:13px">/${state.roster.length}</span></div><div class="lbl">ответили</div></div>
+    </div>
+    <button class="send-btn" id="sendBtn">Отправить сводку в «Сборы»</button>
+    <div class="section-lbl">Так выглядит сообщение</div>
+    <div class="tg-bubble-wrap"><div class="tg-bubble">${state.summaryPreview}</div></div>
+    <div class="section-lbl" style="margin-top:14px">Правки после дедлайна</div>
+    ${edits}
+  </div>`;
+}
+
+function render() {
+  const root = document.getElementById('app');
+  const screen = activeTab === 'me' ? renderMeScreen() : activeTab === 'team' ? renderTeamScreen() : renderAdminScreen();
+  root.innerHTML = renderTabs() + screen;
+  bindEvents();
+}
+
+function bindEvents() {
+  document.querySelectorAll('.tab').forEach((btn) => btn.addEventListener('click', () => { activeTab = btn.dataset.tab; render(); }));
+  document.querySelectorAll('[data-teammode]').forEach((btn) => btn.addEventListener('click', () => { teamMode = btn.dataset.teammode; render(); }));
+
+  document.querySelectorAll('.avail-btn').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      const day = btn.dataset.day;
+      draft[day].avail = btn.dataset.avail;
+      if (draft[day].avail !== 'yes') draft[day].slots = [];
+      render();
+      await saveDay(day);
+    }),
+  );
+  document.querySelectorAll('.slot-chip').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      const day = btn.dataset.day;
+      if (draft[day].avail !== 'yes') return;
+      const t = btn.dataset.slot;
+      draft[day].slots = draft[day].slots.includes(t) ? draft[day].slots.filter((x) => x !== t) : [...draft[day].slots, t];
+      render();
+      await saveDay(day);
+    }),
+  );
+
+  document.getElementById('sendBtn')?.addEventListener('click', async (e) => {
+    e.target.disabled = true;
+    e.target.textContent = 'Отправляю…';
+    try {
+      await api('/api/send-summary');
+      e.target.textContent = 'Отправлено ✓';
+    } catch (err) {
+      tg?.showAlert?.(err.message) ?? alert(err.message);
+      e.target.textContent = 'Отправить сводку в «Сборы»';
+      e.target.disabled = false;
+    }
+  });
+}
+
+async function saveDay(day) {
+  const status = document.getElementById('saveStatus');
+  try {
+    state = await api('/api/update', { day, avail: draft[day].avail, slots: draft[day].slots });
+    if (status) status.textContent = 'Сохранено автоматически';
+  } catch (err) {
+    if (status) status.textContent = `Не сохранилось: ${err.message}`;
+  }
+}
+
+loadState().catch((err) => {
+  document.getElementById('app').innerHTML = `<div class="loading">${err.message}</div>`;
+});
+</script>
+</body>
+</html>

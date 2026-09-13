@@ -45,6 +45,20 @@ export async function sendTextTo(chatId, threadId, text) {
   await callApi('sendMessage', form);
 }
 
+// A `web_app` inline button is the only way to launch a Telegram Mini App
+// from a message — regular links just open the URL in a browser instead.
+export async function sendWebAppButtonTo(chatId, threadId, text, buttonText, url) {
+  const form = new FormData();
+  form.append('chat_id', chatId);
+  if (threadId) form.append('message_thread_id', threadId);
+  form.append('text', text);
+  form.append(
+    'reply_markup',
+    JSON.stringify({ inline_keyboard: [[{ text: buttonText, web_app: { url } }]] }),
+  );
+  await callApi('sendMessage', form);
+}
+
 export async function sendMatchReport(match, pngBuffer) {
   await sendPhotoTo(config.telegramChatId, config.telegramMessageThreadId, caption(match), pngBuffer);
 }

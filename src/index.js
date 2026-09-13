@@ -1,7 +1,9 @@
 import { runPollCycle } from './poller.js';
-import { scheduleNext } from './scheduler.js';
+import { scheduleNext, scheduleWeeklyReset } from './scheduler.js';
 import { runTelegramListener } from './telegramListener.js';
 import { closeBrowser } from './browser.js';
+import { startMiniAppServer } from './miniappServer.js';
+import { runWeeklyReset } from './scheduleStore.js';
 
 const once = process.argv.includes('--once');
 
@@ -12,6 +14,8 @@ if (once) {
 } else {
   console.log('[index] tg-results-bot started. Polling tracker.gg only Saturdays at 21:00 and 23:00 MSK.');
   scheduleNext(runPollCycle);
+  scheduleWeeklyReset(runWeeklyReset);
+  startMiniAppServer();
   runTelegramListener().catch((err) => {
     console.error('[index] Telegram listener crashed:', err);
     process.exit(1);

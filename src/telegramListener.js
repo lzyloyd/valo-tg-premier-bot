@@ -5,7 +5,7 @@ import { getBrowser } from './browser.js';
 import { fetchMatchDetail, fetchTeamStandings, gotoTrackerProfile } from './trackerClient.js';
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
-import { sendPhotoTo, sendTextTo, matchCaption } from './telegram.js';
+import { sendPhotoTo, sendTextTo, sendWebAppButtonTo, matchCaption } from './telegram.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
 const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
@@ -14,6 +14,7 @@ const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
 const TRIGGER = /^рез[аa]лтик[\s,:-]*/i;
 const MATCH_URL_RE = /tracker\.gg\/valorant\/match\/([0-9a-f-]{36})/i;
 const HEALTHCHECK_RE = /^healthcheck$/i;
+const SCHEDULE_RE = /^расписание$/i;
 
 async function loadOffset() {
   try {
@@ -59,6 +60,20 @@ async function handleCommand(commandText, message) {
   try {
     if (HEALTHCHECK_RE.test(trimmed)) {
       await sendTextTo(message.chat.id, message.message_thread_id, healthcheckReply());
+      return;
+    }
+    if (SCHEDULE_RE.test(trimmed)) {
+      if (!config.miniappPublicUrl) {
+        await sendTextTo(message.chat.id, message.message_thread_id, 'Мини-апп расписания ещё не настроен (нет MINIAPP_PUBLIC_URL).');
+        return;
+      }
+      await sendWebAppButtonTo(
+        message.chat.id,
+        message.message_thread_id,
+        '📅 Расписание команды',
+        'Открыть расписание',
+        config.miniappPublicUrl,
+      );
       return;
     }
     if (urlMatch) {

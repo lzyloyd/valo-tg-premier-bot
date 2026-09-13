@@ -25,7 +25,60 @@
   на матч tracker.gg (`Резалтик, дай сводку по матчу <ссылка>`), и бот
   соберёт и пришлёт карточку по этому матчу так же, как по расписанию; и
   `Резалтик, healthcheck` — бот подтверждает, что процесс жив и видит
-  сообщения. Новые команды добавляются там же.
+  сообщения; `Резалтик, расписание` — присылает кнопку запуска мини-аппа
+  «Расписание» (см. ниже). Новые команды добавляются там же.
+
+## Мини-апп «Расписание»
+
+Telegram Mini App, в котором каждый из ростера отмечает свою доступность на
+неделю (Вт–Сб — праки/премьер, Вс — необязательный МСК-турнир). Живёт в
+`src/miniappServer.js` (Express, часть того же процесса, что и бот) +
+`src/miniapp-public/index.html` (сам интерфейс) + `src/scheduleModel.js` /
+`src/scheduleStore.js` (даты недели, кворум, хранение в `data/schedule.json`).
+
+- Неделя открыта на редактирование с **воскресенья 20:00 МСК** (в этот момент
+  прошлая неделя удаляется и создаётся новая пустая) до **понедельника 24:00
+  МСК**. Любое изменение после дедлайна прилетает алертом в топик «Сборы»
+  группы NF // OVT — это же место, откуда открывается сам мини-апп
+  (кнопка `web_app` через команду «Резалтик, расписание»).
+- Сводку с кворумом (✅ только если доступны 5+ человек) отправляет туда же
+  только админ (`ADMIN_USER_ID` в `.env`) кнопкой внутри мини-аппа.
+- Ростер фиксирован в `ROSTER` (`src/scheduleModel.js`) — 7 Telegram-юзернеймов,
+  сверяются с данными, которые Telegram сам подписывает при открытии мини-аппа
+  (`initData`, проверяется в `src/telegramAuth.js`) — никто не может открыть
+  его под чужим именем.
+
+### Хостинг мини-аппа (Caddy + DuckDNS)
+
+Telegram открывает `web_app`-кнопки только по HTTPS. Самый лёгкий вариант без
+покупки домена — бесплатный поддомен [DuckDNS](https://www.duckdns.org/) +
+[Caddy](https://caddyserver.com/) (сам получает и продлевает сертификат
+Let's Encrypt):
+
+```bash
+# автообновление IP на DuckDNS (на случай смены IP у VPS)
+mkdir -p ~/duckdns
+cat > ~/duckdns/duck.sh <<'EOF'
+echo url="https://www.duckdns.org/update?domains=<поддомен>&token=<токен>&ip=" | curl -k -o ~/duckdns/duck.log -K -
+EOF
+chmod 700 ~/duckdns/duck.sh
+(crontab -l 2>/dev/null; echo "*/5 * * * * ~/duckdns/duck.sh >/dev/null 2>&1") | crontab -
+
+# Caddy
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update && sudo apt install -y caddy
+
+cat <<'EOF' | sudo tee /etc/caddy/Caddyfile
+<поддомен>.duckdns.org {
+    reverse_proxy localhost:3001
+}
+EOF
+sudo systemctl restart caddy
+```
+
+Порт (`3001`) должен совпадать с `MINIAPP_PORT` в `.env`.
 
 ## Установка на VPS (Ubuntu/Debian)
 

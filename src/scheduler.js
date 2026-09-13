@@ -1,3 +1,5 @@
+import { currentWeekStart, weekResetInstant } from './scheduleModel.js';
+
 // Premier matches only happen Saturday 21:00 and 23:00 Moscow time, so the bot
 // only ever needs to wake up twice a week — no benefit to polling more often.
 // Moscow has used a fixed UTC+3 offset (no DST) since 2014, so working in UTC
@@ -33,6 +35,24 @@ export function scheduleNext(runTrigger) {
       console.error('[scheduler] run failed:', err);
     } finally {
       scheduleNext(runTrigger);
+    }
+  }, delayMs);
+}
+
+// The schedule mini app's week rolls over every Sunday 20:00 MSK — the exact
+// instant currentWeekStart() itself uses to decide "has this week already
+// ended", so a trigger fired right at that point and a lazy check on the
+// next read always agree on what the current week is.
+export function scheduleWeeklyReset(runReset) {
+  const delayMs = weekResetInstant(currentWeekStart()).getTime() - Date.now();
+  console.log(`[scheduler] next weekly schedule reset in ${Math.round(delayMs / 60000)} min`);
+  setTimeout(async () => {
+    try {
+      await runReset();
+    } catch (err) {
+      console.error('[scheduler] weekly reset failed:', err);
+    } finally {
+      scheduleWeeklyReset(runReset);
     }
   }, delayMs);
 }
