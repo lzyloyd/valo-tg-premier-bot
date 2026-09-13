@@ -122,6 +122,14 @@ function signedColor(value) {
   return value > 0 ? 'var(--win)' : value < 0 ? 'var(--loss)' : 'var(--muted)';
 }
 
+// tracker.gg's own TRS grade badge — the API only ever gives the raw score,
+// so the value->grade cutoffs here are reverse-engineered by comparing a
+// sample of scores against the badge actually rendered on tracker.gg's page.
+function trsRatingIconUrl(trs) {
+  const tier = trs >= 1000 ? '1k' : trs >= 700 ? 'a' : trs >= 500 ? 'b' : trs >= 300 ? 'c' : 'd';
+  return `https://trackercdn.com/cdn/tracker.gg/img/tracker-score/trn-rating-${tier}.svg`;
+}
+
 function playerRow(p) {
   return `
     <div class="sb-row">
@@ -130,6 +138,7 @@ function playerRow(p) {
         <img class="sb-rank-badge" src="${escapeHtml(p.rankIconUrl)}" title="${escapeHtml(p.rankName)}" alt="" />
       </div>
       <div class="sb-name">${escapeHtml(p.name)}</div>
+      <div class="sb-trs-badge"><img src="${trsRatingIconUrl(p.trs)}" alt="" /></div>
       <div class="sb-trs">${p.trs}</div>
       <div></div>
       <div class="sb-acs">${p.acs}</div>
@@ -166,7 +175,7 @@ function teamBlock({ side, teamName, logoUrl, rank, divisionName, players, avgRa
           <img src="${escapeHtml(avgRankIconUrl)}" alt="" />
         </div>
       </div>
-      <div class="sb-row sb-hd"><span></span><span>Игрок</span><span class="sb-trs">TRS</span><span></span><span class="sb-acs">ACS</span><span class="sb-num">K</span><span class="sb-num">D</span><span class="sb-num">A</span><span class="sb-num">+/-</span><span class="sb-num">ADR</span><span class="sb-num">DDΔ</span><span class="sb-num">HS%</span><span class="sb-num">KAST</span><span class="sb-num">FK</span><span class="sb-num">FD</span></div>
+      <div class="sb-row sb-hd"><span></span><span>Игрок</span><span></span><span class="sb-trs">TRS</span><span></span><span class="sb-acs">ACS</span><span class="sb-num">K</span><span class="sb-num">D</span><span class="sb-num">A</span><span class="sb-num">+/-</span><span class="sb-num">ADR</span><span class="sb-num">DDΔ</span><span class="sb-num">HS%</span><span class="sb-num">KAST</span><span class="sb-num">FK</span><span class="sb-num">FD</span></div>
       ${players.map(playerRow).join('')}
     </div>`;
 }
@@ -235,11 +244,13 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-team-rank-label{font-size:9px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);line-height:1;}
 .sb-team-rank-value{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#c9d4e0;margin-top:2px;}
 .sb-team-rank img{width:22px;height:22px;flex-shrink:0;}
-.sb-row{display:grid;grid-template-columns:32px 1fr 38px 10px 42px 28px 28px 28px 38px 38px 38px 34px 42px 26px 26px;gap:11px;align-items:center;padding:7px 22px;font-size:13.5px;font-family:'JetBrains Mono',monospace;color:#c9d4e0;}
+.sb-row{display:grid;grid-template-columns:32px 1fr 18px 38px 10px 42px 28px 28px 28px 38px 38px 38px 34px 42px 26px 26px;gap:11px;align-items:center;padding:7px 22px;font-size:13.5px;font-family:'JetBrains Mono',monospace;color:#c9d4e0;}
 .sb-avatar-wrap{position:relative;width:32px;height:32px;}
 .sb-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;}
 .sb-rank-badge{position:absolute;bottom:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#141b26;border:1px solid #141b26;object-fit:contain;}
 .sb-name{font-family:'Manrope',sans-serif;font-weight:700;color:#e8ecf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-trs-badge{display:flex;align-items:center;justify-content:center;}
+.sb-trs-badge img{width:15px;height:15px;}
 .sb-trs{font-weight:800;color:#eef2f6;text-align:center;font-variant-numeric:tabular-nums;}
 .sb-acs{font-weight:800;color:#eef2f6;text-align:center;font-variant-numeric:tabular-nums;}
 .sb-num{text-align:center;font-variant-numeric:tabular-nums;}
