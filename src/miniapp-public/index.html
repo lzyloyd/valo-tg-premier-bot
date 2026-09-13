@@ -102,6 +102,26 @@ function initials(name) {
   return name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2);
 }
 
+const DAY_ABBR = { tue: 'Вт', wed: 'Ср', thu: 'Чт', fri: 'Пт', sat: 'Сб', sun: 'Вс' };
+const SHORT_MONTHS = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+const FULL_MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+function dateParts(dateIso) {
+  const [, m, d] = dateIso.split('-').map(Number);
+  return { day: d, month: m };
+}
+
+function shortDate(dateIso) {
+  const { day, month } = dateParts(dateIso);
+  return `${day} ${SHORT_MONTHS[month - 1]}`;
+}
+
+function weekLabel(days) {
+  const first = days[0];
+  const last = days[5];
+  return `${DAY_ABBR[first.key]} ${dateParts(first.dateIso).day} — ${DAY_ABBR[last.key]} ${dateParts(last.dateIso).day} ${FULL_MONTHS[dateParts(last.dateIso).month - 1]}`;
+}
+
 async function loadState() {
   state = await api('/api/state');
   draft = {};
@@ -134,7 +154,7 @@ function renderMeScreen() {
       return `<div class="day-card">
         <div class="day-id">
           <div class="day-name">${d.label}</div>
-          <div class="day-date">${d.dateIso.slice(8, 10)}.${d.dateIso.slice(5, 7)}</div>
+          <div class="day-date">${shortDate(d.dateIso)}</div>
           <div class="day-kind">${d.kind}</div>
         </div>
         <div class="avail-toggle">
@@ -146,7 +166,7 @@ function renderMeScreen() {
     })
     .join('');
   return `<div class="screen">
-    <div class="week-label">${state.days[0].dateIso} — ${state.days[5].dateIso}</div>
+    <div class="week-label">${weekLabel(state.days)}</div>
     <div class="day-list">${cards}</div>
     <div class="save-status" id="saveStatus">Сохранено автоматически</div>
   </div>`;
@@ -175,7 +195,7 @@ function teamCell(names) {
 
 function renderTeamScreen() {
   const header = `<div class="team-row"><div></div>${state.days
-    .map((d) => `<div><div class="team-day">${d.label.slice(0, 2)}</div><div class="team-date">${d.dateIso.slice(8, 10)}.${d.dateIso.slice(5, 7)}</div></div>`)
+    .map((d) => `<div><div class="team-day">${DAY_ABBR[d.key]}</div><div class="team-date">${shortDate(d.dateIso)}</div></div>`)
     .join('')}</div>`;
   const rowFor = (time) => {
     const cells = state.days
