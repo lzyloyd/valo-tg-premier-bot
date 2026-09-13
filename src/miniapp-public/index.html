@@ -139,6 +139,41 @@ async function loadState() {
   render();
 }
 
+const POLL_MS = 5000;
+let pollTimer = null;
+
+// Only refreshes `state` (what "Команда"/"Админ" show) — never touches
+// `draft`, so a background refresh can never clobber a click on
+// "Расписание" that hasn't round-tripped yet. Your own answers only ever
+// change from your own clicks, which already update state directly.
+async function refreshState() {
+  try {
+    state = await api('/api/state');
+    render();
+  } catch (err) {
+    console.error('[schedule] background refresh failed:', err);
+  }
+}
+
+function startPolling() {
+  stopPolling();
+  pollTimer = setInterval(refreshState, POLL_MS);
+}
+
+function stopPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = null;
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopPolling();
+  } else {
+    refreshState();
+    startPolling();
+  }
+});
+
 function renderHeader() {
   return `<div class="app-header">
     <div class="app-header-title">Overthinkers</div>
@@ -307,9 +342,11 @@ async function saveDay(day) {
   if (status) status.textContent = saveStatusText;
 }
 
-loadState().catch((err) => {
-  document.getElementById('app').innerHTML = `<div class="loading">${err.message}</div>`;
-});
+loadState()
+  .then(startPolling)
+  .catch((err) => {
+    document.getElementById('app').innerHTML = `<div class="loading">${err.message}</div>`;
+  });
 </script>
 </body>
 </html>
