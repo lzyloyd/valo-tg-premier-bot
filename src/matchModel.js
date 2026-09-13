@@ -72,12 +72,31 @@ export function buildMatchView(raw, teamsInfo = {}) {
   const ourAvgRankTierId = averageTierId(ourTeam.players.map((p) => p.rankTierId));
   const theirAvgRankTierId = averageTierId(theirTeam.players.map((p) => p.rankTierId));
 
+  // tracker.gg's round-summary segments don't say which side a team played —
+  // that only shows up per-player, on the "player-round" segments (one per
+  // player per round, metadata.teamSide: 'attacker' | 'defender').
+  const ourSideByRound = new Map();
+  for (const s of raw.segments) {
+    if (s.type !== 'player-round') continue;
+    if (s.attributes.platformUserIdentifier.toLowerCase() === config.trackedRiotId.toLowerCase()) {
+      ourSideByRound.set(s.attributes.round, s.metadata.teamSide);
+    }
+  }
+  const oppositeSide = (side) => (side === 'attacker' ? 'defender' : 'attacker');
+
   const rounds = roundSummaries
-    .map((r) => ({
-      round: r.attributes.round,
-      won: r.stats.winningTeam?.value === ourTeamId,
-      result: r.stats.roundResult?.value ?? 'Elimination',
-    }))
+    .map((r) => {
+      const won = r.stats.winningTeam?.value === ourTeamId;
+      const ourSide = ourSideByRound.get(r.attributes.round) ?? 'attacker';
+      return {
+        round: r.attributes.round,
+        won,
+        result: r.stats.roundResult?.value ?? 'Elimination',
+        // Side of whichever team actually won this round — that's the row
+        // the timeline renders an icon into.
+        winnerSide: won ? ourSide : oppositeSide(ourSide),
+      };
+    })
     .sort((a, b) => a.round - b.round);
 
   return {

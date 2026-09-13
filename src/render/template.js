@@ -32,9 +32,11 @@ const ROUND_ICON_FILES = {
   Time: 'time',
 };
 
-function roundIconUrl(result, won) {
+// tracker.gg only ships these icons pre-tinted win(teal)/loss(red) — repurposed
+// here as defense(cyan)/attack(red) by side rather than by who won the round.
+function roundIconUrl(result, isDefense) {
   const file = ROUND_ICON_FILES[result] ?? ROUND_ICON_FILES.Elimination;
-  return `${ROUND_ICON_BASE}/${file}${won ? 'win' : 'loss'}1.png`;
+  return `${ROUND_ICON_BASE}/${file}${isDefense ? 'win' : 'loss'}1.png`;
 }
 
 const ROUND_LABEL = 140;
@@ -82,8 +84,9 @@ function roundsStrip(match) {
       return;
     }
     const { round } = s;
-    const ourIcon = round.won ? `<img src="${roundIconUrl(round.result, true)}" alt="" />` : '';
-    const theirIcon = round.won ? '' : `<img src="${roundIconUrl(round.result, false)}" alt="" />`;
+    const isDefense = round.winnerSide === 'defender';
+    const ourIcon = round.won ? `<img src="${roundIconUrl(round.result, isDefense)}" alt="" />` : '';
+    const theirIcon = round.won ? '' : `<img src="${roundIconUrl(round.result, isDefense)}" alt="" />`;
     ourCells.push(
       `<div class="sb-round-cell${round.won ? '' : ' empty'}" style="grid-column:${col};grid-row:1">${ourIcon}</div>`,
     );
