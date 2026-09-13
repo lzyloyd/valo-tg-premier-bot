@@ -17,8 +17,10 @@ const HEALTHCHECK_RE = /^healthcheck$/i;
 const SCHEDULE_RE = /^расписание$/i;
 // "покажи премьер матч" must match before the more general "покажи матч" —
 // both start with "покажи", only one has "премьер" in the middle.
-const PREMIER_MATCH_RE = /^покажи\s+премьер\s+матч\b/i;
-const ANY_MATCH_RE = /^покажи\s+матч\b/i;
+// Note: no \b here — \b is defined via \w, which is ASCII-only ([A-Za-z0-9_]),
+// so it never finds a boundary next to Cyrillic text. (?=\s|$) instead.
+const PREMIER_MATCH_RE = /^покажи\s+премьер\s+матч(?=\s|$)/i;
+const ANY_MATCH_RE = /^покажи\s+матч(?=\s|$)/i;
 
 async function loadOffset() {
   try {
@@ -83,7 +85,6 @@ function healthcheckReply() {
 async function handleCommand(commandText, message) {
   const trimmed = commandText.trim();
   const urlMatch = commandText.match(MATCH_URL_RE);
-  console.log('[listener] parsed commandText:', JSON.stringify(trimmed), 'premierMatch:', PREMIER_MATCH_RE.test(trimmed), 'anyMatch:', ANY_MATCH_RE.test(trimmed), 'urlMatch:', Boolean(urlMatch));
   try {
     if (HEALTHCHECK_RE.test(trimmed)) {
       await sendTextTo(message.chat.id, message.message_thread_id, healthcheckReply());
