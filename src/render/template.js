@@ -240,7 +240,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-acs{font-weight:800;color:#eef2f6;text-align:right;font-variant-numeric:tabular-nums;}
 .sb-num{text-align:right;font-variant-numeric:tabular-nums;}
 .sb-muted{color:var(--muted);}
-.sb-hd{color:#4c5a70;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;padding-top:4px;padding-bottom:6px;}
+.sb-hd{color:#4c5a70;font-size:10.5px;text-transform:uppercase;padding-top:4px;padding-bottom:6px;}
 .sb-hd .sb-num,.sb-hd .sb-acs,.sb-hd .sb-trs{font-weight:600;color:inherit;}
 .sb-mvp{margin:14px 22px 18px;background:linear-gradient(135deg,rgba(255,209,102,.14),rgba(255,209,102,.04));border:1px solid rgba(255,209,102,.35);border-radius:10px;padding:12px 16px;}
 .sb-mvp-label{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#ffd166;margin-bottom:8px;}
