@@ -36,6 +36,17 @@ try {
   await fs.writeFile(outPath, JSON.stringify(raw, null, 2));
   console.log(`wrote ${outPath}`);
 
+  const playerRounds = raw.segments.filter((s) => s.type === 'player-round');
+  const sampleIdentifier = playerRounds[0]?.attributes?.platformUserIdentifier;
+  console.log(`\n--- player-round samples for ${sampleIdentifier}, first 6 rounds ---`);
+  console.log(
+    playerRounds
+      .filter((s) => s.attributes.platformUserIdentifier === sampleIdentifier)
+      .slice(0, 6)
+      .map((s) => JSON.stringify({ attributes: s.attributes, metadata: s.metadata }))
+      .join('\n'),
+  );
+
   const bySegmentType = new Map();
   for (const segment of raw.segments) {
     const keys = bySegmentType.get(segment.type) ?? new Set();
