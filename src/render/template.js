@@ -40,7 +40,6 @@ function roundIconUrl(result, won) {
 const ROUND_LABEL = 140;
 const ROUND_SWITCH = 15;
 const ROUND_GAP = 4;
-const ROUND_CELL_MIN = 18;
 const ROUND_CELL_MAX = 26;
 // #card is CARD_WIDTH wide with 22px padding on each side (see below).
 const ROUNDS_INNER_WIDTH = 840 - 44;
@@ -57,9 +56,11 @@ function roundsStrip(match) {
   // overflowing the fixed-width card — sized to always fit ROUNDS_INNER_WIDTH.
   const switchCount = slots.filter((s) => s.kind === 'switch').length;
   const roundCount = slots.length - switchCount;
+  // No floor on the low end — a long/overtime match must keep shrinking to
+  // stay flush with the table's right edge rather than overflow past it.
   const gapTotal = slots.length * ROUND_GAP;
   const availableForCells = ROUNDS_INNER_WIDTH - ROUND_LABEL - gapTotal - switchCount * ROUND_SWITCH;
-  const cellSize = Math.min(ROUND_CELL_MAX, Math.max(ROUND_CELL_MIN, Math.floor(availableForCells / roundCount)));
+  const cellSize = Math.min(ROUND_CELL_MAX, Math.max(1, Math.floor(availableForCells / roundCount)));
 
   const colWidths = slots.map((s) => (s.kind === 'switch' ? ROUND_SWITCH : cellSize));
   const gridTemplateColumns = `${ROUND_LABEL}px ${colWidths.map((w) => `${w}px`).join(' ')}`;
