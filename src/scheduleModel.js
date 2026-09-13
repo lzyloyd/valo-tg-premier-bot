@@ -2,15 +2,22 @@
 // mini app — matched against Telegram WebApp initData, not self-registered.
 export const ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'yozhee', 'natomatrixx', 'mania_boo', 'lzyloyd'];
 
+// The 5 starters and their 2 subs — who actually plays a session is resolved
+// from these, not from raw availability (see resolveLineup below).
+export const MAIN_ROSTER = ['qu1ly', 'yozhee', 'toshir0000', 'natomatrixx', 'lzyloyd'];
+export const SUB_ROSTER = ['men4ikcs', 'mania_boo']; // in preference order — Men4ikcs fills a single gap first
+
 export const QUORUM = 5;
 
-// A week runs Tue-Sun. Practice days share the same two slots; Saturday is
-// Premier; Sunday's tournament is optional and only ever has one slot.
+// A week runs Tue-Sun. Practice days share the same two slots but only one
+// of them actually happens (pickOneSlot); Saturday's Premier plays both
+// times as independent sessions; Sunday's tournament is optional and only
+// ever has one slot.
 export const DAYS = [
-  { key: 'tue', label: 'Вторник', kind: 'Праки', slots: ['20:00', '22:00'] },
-  { key: 'wed', label: 'Среда', kind: 'Праки', slots: ['20:00', '22:00'] },
-  { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00', '22:00'] },
-  { key: 'fri', label: 'Пятница', kind: 'Праки', slots: ['20:00', '22:00'] },
+  { key: 'tue', label: 'Вторник', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
+  { key: 'wed', label: 'Среда', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
+  { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
+  { key: 'fri', label: 'Пятница', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
   { key: 'sat', label: 'Суббота', kind: 'Премьер', slots: ['20:00', '22:00'] },
   { key: 'sun', label: 'Воскресенье', kind: 'МСК турнир', slots: ['18:00'] },
 ];
@@ -123,9 +130,72 @@ function formatDayDate(dateIso) {
 }
 
 /**
- * The text posted to "Сборы" — a checkmark only means a slot actually has
- * enough people (QUORUM) to run; fewer than that still lists who's in, just
- * without implying the session is happening.
+ * Who actually plays a slot, given who's available for it — a team needs
+ * exactly 5. All 5 starters present: no subs, even if one's also free.
+ * One starter missing: whichever sub is available fills in (Men4ikcs
+ * preferred when both are). Two starters missing: both subs have to be
+ * available, or there's no team. Fewer than 3 starters: never enough subs
+ * to cover it. Returns the 5 usernames, or null if no viable lineup.
+ */
+export function resolveLineup(available) {
+  const mains = MAIN_ROSTER.filter((u) => available.includes(u));
+  const subs = SUB_ROSTER.filter((u) => available.includes(u));
+
+  if (mains.length === 5) return [...mains];
+  if (mains.length === 4) return subs.length >= 1 ? [...mains, subs[0]] : null;
+  if (mains.length === 3) return subs.length === 2 ? [...mains, ...subs] : null;
+  return null;
+}
+
+function mainsAvailableCount(responses, day, slot) {
+  return MAIN_ROSTER.filter((u) => responses[u]?.[day]?.avail === 'yes' && responses[u]?.[day]?.slots?.includes(slot)).length;
+}
+
+/**
+ * The session(s) a day actually produces: for a pickOneSlot day (practice),
+ * the single time with the better starter turnout (earlier time wins ties)
+ * — but only if that time actually resolves to a full lineup; if it doesn't
+ * while the other slot would, the other slot is used instead. Everything
+ * else (Premier, МСК) resolves each of its slots independently.
+ */
+export function computeDaySessions(day, responses) {
+  const candidates = day.slots
+    .map((slot) => ({ slot, lineup: resolveLineup(availableFor(responses, day.key, slot)) }))
+    .filter((c) => c.lineup);
+
+  if (!day.pickOneSlot) return candidates;
+  if (candidates.length <= 1) return candidates;
+  // Both slots are viable — pick by starter turnout, earlier time on a tie.
+  const [a, b] = day.slots;
+  const countA = mainsAvailableCount(responses, day.key, a);
+  const countB = mainsAvailableCount(responses, day.key, b);
+  const winner = countB > countA ? b : a;
+  return candidates.filter((c) => c.slot === winner);
+}
+
+// The absolute instant (UTC) a given day+slot within a week actually starts.
+export function slotInstant(weekStart, dayKey, time) {
+  const dayIndex = DAYS.findIndex((d) => d.key === dayKey);
+  const [hh, mm] = time.split(':').map(Number);
+  return new Date(weekStart.getTime() + dayIndex * DAY_MS + hh * 60 * 60 * 1000 + mm * 60 * 1000);
+}
+
+// Every session the whole week actually produces, flattened across days —
+// what the 60/10-minute-before reminders are scheduled from.
+export function computeWeekSessions(week) {
+  const weekStart = weekStartFromIso(week.weekStart);
+  const sessions = [];
+  for (const day of DAYS) {
+    for (const { slot, lineup } of computeDaySessions(day, week.responses)) {
+      sessions.push({ dayKey: day.key, dayLabel: day.label, slot, lineup, startsAt: slotInstant(weekStart, day.key, slot) });
+    }
+  }
+  return sessions;
+}
+
+/**
+ * The text posted to "Сборы" — shows the actual resolved lineup per session
+ * (see resolveLineup/computeDaySessions), not just raw availability.
  */
 export function buildSummaryText(week) {
   const days = weekDayDates(weekStartFromIso(week.weekStart));
@@ -133,21 +203,13 @@ export function buildSummaryText(week) {
 
   for (const day of days) {
     lines.push(`${day.label} ${formatDayDate(day.dateIso)} · ${day.kind}`);
-    for (const slot of day.slots) {
-      const names = availableFor(week.responses, day.key, slot);
-      let mark;
-      let text;
-      if (names.length === 0) {
-        mark = '▫️';
-        text = 'нет доступных';
-      } else if (names.length >= QUORUM) {
-        mark = '✅';
-        text = names.length === ROSTER.length ? `все ${ROSTER.length}/${ROSTER.length}` : names.map((n) => `@${n}`).join(', ');
-      } else {
-        mark = '•';
-        text = names.map((n) => `@${n}`).join(', ');
+    const sessions = computeDaySessions(day, week.responses);
+    if (sessions.length === 0) {
+      lines.push('▫️ сессии не будет');
+    } else {
+      for (const s of sessions) {
+        lines.push(`✅ ${s.slot} — играют: ${s.lineup.map((u) => `@${u}`).join(', ')}`);
       }
-      lines.push(`${mark} ${slot} — ${text}`);
     }
     lines.push('');
   }

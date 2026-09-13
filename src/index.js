@@ -3,7 +3,7 @@ import { scheduleNext, scheduleWeeklyReset, scheduleDeadlineReminder, scheduleAu
 import { runTelegramListener } from './telegramListener.js';
 import { closeBrowser } from './browser.js';
 import { startMiniAppServer } from './miniappServer.js';
-import { resetWeekAndAnnounce, sendDeadlineReminder, sendAutoSummary } from './scheduleNotifications.js';
+import { resetWeekAndAnnounce, sendDeadlineReminder, sendAutoSummary, scheduleUpcomingSessionReminders } from './scheduleNotifications.js';
 import { config } from './config.js';
 
 const once = process.argv.includes('--once');
@@ -19,6 +19,10 @@ if (once) {
     scheduleWeeklyReset(resetWeekAndAnnounce);
     scheduleDeadlineReminder(sendDeadlineReminder);
     scheduleAutoSummary(sendAutoSummary);
+    // Recomputes from scratch on every boot — a mid-week restart would
+    // otherwise silently lose the rest of that week's session reminders,
+    // since they're plain in-memory timers, not persisted anywhere.
+    scheduleUpcomingSessionReminders().catch((err) => console.error('[index] scheduling session reminders failed:', err));
   }
   startMiniAppServer();
   runTelegramListener().catch((err) => {
