@@ -17,7 +17,8 @@
     "debug-round": "node scripts/debug-round.mjs",
     "test-notifications": "node scripts/test-notifications.mjs",
     "debug-playlist": "node scripts/debug-playlist.mjs",
-    "debug-roster": "node scripts/debug-roster.mjs"
+    "debug-roster": "node scripts/debug-roster.mjs",
+    "debug-poller-once": "node scripts/debug-poller-once.mjs"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
