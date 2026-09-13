@@ -15,7 +15,8 @@
     "debug-match": "node scripts/debug-match.mjs",
     "check-pending": "node scripts/check-pending.mjs",
     "debug-round": "node scripts/debug-round.mjs",
-    "test-notifications": "node scripts/test-notifications.mjs"
+    "test-notifications": "node scripts/test-notifications.mjs",
+    "debug-playlist": "node scripts/debug-playlist.mjs"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
