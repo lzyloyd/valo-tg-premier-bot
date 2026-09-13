@@ -2,15 +2,6 @@ import { config } from './config.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
 
-function caption(match) {
-  const icon = match.won ? '✅' : '❌';
-  const date = new Date(match.dateStarted).toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow' });
-  return (
-    `${icon} ${date} · ${match.mapName} · Premier — ${match.ourScore}:${match.theirScore}\n` +
-    `tracker.gg/valorant/match/${match.matchId}`
-  );
-}
-
 async function callApi(method, form) {
   const res = await fetch(`${API_BASE}/${method}`, { method: 'POST', body: form });
   if (!res.ok) {
@@ -19,11 +10,10 @@ async function callApi(method, form) {
   }
 }
 
-export async function sendPhotoTo(chatId, threadId, captionText, pngBuffer) {
+export async function sendPhotoTo(chatId, threadId, pngBuffer) {
   const form = new FormData();
   form.append('chat_id', chatId);
   if (threadId) form.append('message_thread_id', threadId);
-  form.append('caption', captionText);
   form.append('photo', new Blob([pngBuffer], { type: 'image/png' }), 'scoreboard.png');
   await callApi('sendPhoto', form);
 }
@@ -37,7 +27,5 @@ export async function sendTextTo(chatId, threadId, text) {
 }
 
 export async function sendMatchReport(match, pngBuffer) {
-  await sendPhotoTo(config.telegramChatId, config.telegramMessageThreadId, caption(match), pngBuffer);
+  await sendPhotoTo(config.telegramChatId, config.telegramMessageThreadId, pngBuffer);
 }
-
-export { caption as matchCaption };

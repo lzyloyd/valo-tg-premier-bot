@@ -5,7 +5,7 @@ import { getBrowser } from './browser.js';
 import { fetchMatchDetail, fetchTeamStandings, gotoTrackerProfile } from './trackerClient.js';
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
-import { sendPhotoTo, sendTextTo, matchCaption } from './telegram.js';
+import { sendPhotoTo, sendTextTo } from './telegram.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
 const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
@@ -42,7 +42,7 @@ async function summarizeMatch(matchId, message) {
     const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
     const match = buildMatchView(raw, teamsInfo);
     const png = await renderScoreboardPng(browser, match);
-    await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
+    await sendPhotoTo(message.chat.id, message.message_thread_id, png);
   } finally {
     await page.close();
   }
