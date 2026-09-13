@@ -38,9 +38,11 @@ async function saveOffset(offset) {
   await fs.writeFile(OFFSET_PATH, JSON.stringify({ offset }));
 }
 
-// "Резалтик, покажи премьер матч <ссылка>" — unchanged logic: looks up the
-// tracked player's Premier team standings, throws if they're not in this
-// match (buildMatchView's default behavior).
+// "Резалтик, покажи премьер матч <ссылка>" — looks up the tracked player's
+// Premier team standings when they're in the match; if they're not (subbed
+// out, or someone pastes a link where they didn't play), falls back to
+// treating the first team as "our" side instead of failing outright —
+// the same fallback "покажи матч" already uses.
 async function summarizePremierMatch(matchId, message) {
   const browser = await getBrowser();
   const page = await browser.newPage();
@@ -51,7 +53,7 @@ async function summarizePremierMatch(matchId, message) {
     await gotoTrackerProfile(page);
     const raw = await fetchMatchDetail(page, matchId);
     const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
-    const match = buildMatchView(raw, teamsInfo);
+    const match = buildMatchView(raw, teamsInfo, { trackedRiotId: config.trackedRiotId, requireTracked: false });
     match.playlistName = 'Premier'; // this command is specifically for Premier matches — pin it regardless of tracker.gg's raw queueId
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
@@ -61,7 +63,8 @@ async function summarizePremierMatch(matchId, message) {
 }
 
 // "Резалтик, покажи прак <ссылка>" — for custom (scrim) matches: same
-// Premier roster lookup as "покажи премьер матч" (team name + rank/standing),
+// Premier roster lookup as "покажи премьер матч" (team name + rank/standing,
+// gracefully falling back if the tracked player isn't in this match either),
 // but no playlistName override — the match's own queueId is null for a
 // custom lobby, so buildMatchView's isCustom kicks in on its own (no TRS
 // column, MVP by ACS, "Кастомка" label) exactly like "покажи матч" already does.
@@ -72,7 +75,7 @@ async function summarizePracticeMatch(matchId, message) {
     await gotoTrackerProfile(page);
     const raw = await fetchMatchDetail(page, matchId);
     const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
-    const match = buildMatchView(raw, teamsInfo);
+    const match = buildMatchView(raw, teamsInfo, { trackedRiotId: config.trackedRiotId, requireTracked: false });
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
   } finally {
