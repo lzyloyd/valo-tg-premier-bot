@@ -8,6 +8,7 @@ function emptyWeek(weekStart) {
     responses: {},
     lastSaved: {}, // username -> ISO timestamp of their last save, for the "Расписание" tab's save status
     edits: [], // post-deadline changes, newest first — shown on the admin tab
+    summaryMessageId: null, // the sent summary message, kept in sync as post-deadline edits come in
   };
 }
 
@@ -86,4 +87,12 @@ export async function setResponse(username, day, avail, slots, now = new Date())
 
   await writeFile(week);
   return { week, isPostDeadlineEdit };
+}
+
+// Remembers which sent Telegram message is "the" summary for this week, so
+// a later edit can update it in place instead of only alerting separately.
+export async function saveSummaryMessageId(messageId) {
+  const week = await loadCurrentWeek();
+  week.summaryMessageId = messageId;
+  await writeFile(week);
 }

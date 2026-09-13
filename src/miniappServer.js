@@ -3,9 +3,9 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { config } from './config.js';
 import { verifyInitData } from './telegramAuth.js';
-import { DAYS, ROSTER, QUORUM, weekDayDates, weekStartFromIso, buildSummaryText, buildEditAlertText, hasFullyAnswered } from './scheduleModel.js';
+import { DAYS, ROSTER, QUORUM, weekDayDates, weekStartFromIso, buildSummaryText, hasFullyAnswered } from './scheduleModel.js';
 import { loadCurrentWeek, setResponse } from './scheduleStore.js';
-import { sendTextTo } from './telegram.js';
+import { sendSummary, handlePostDeadlineEdit } from './scheduleNotifications.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -74,9 +74,8 @@ export function startMiniAppServer() {
     try {
       const { week, isPostDeadlineEdit } = await setResponse(auth.username, day, avail, slots);
       if (isPostDeadlineEdit) {
-        const edit = week.edits[0];
-        sendTextTo(config.scheduleChatId, config.scheduleThreadId, buildEditAlertText(edit)).catch((err) =>
-          console.error('[miniapp] failed to post edit alert:', err),
+        handlePostDeadlineEdit(week.edits[0]).catch((err) =>
+          console.error('[miniapp] failed to handle post-deadline edit:', err),
         );
       }
       res.json(weekView(week, auth));
@@ -94,8 +93,7 @@ export function startMiniAppServer() {
       return;
     }
     try {
-      const week = await loadCurrentWeek();
-      await sendTextTo(config.scheduleChatId, config.scheduleThreadId, buildSummaryText(week));
+      await sendSummary();
       res.json({ ok: true });
     } catch (err) {
       console.error('[miniapp] send-summary failed:', err);
