@@ -7,12 +7,12 @@ export const QUORUM = 5;
 // A week runs Tue-Sun. Practice days share the same two slots; Saturday is
 // Premier; Sunday's tournament is optional and only ever has one slot.
 export const DAYS = [
-  { key: 'tue', label: 'Вторник', kind: 'Праки, до 00:00 МСК', slots: ['20:00', '22:00'] },
-  { key: 'wed', label: 'Среда', kind: 'Праки, до 00:00 МСК', slots: ['20:00', '22:00'] },
-  { key: 'thu', label: 'Четверг', kind: 'Праки, до 00:00 МСК', slots: ['20:00', '22:00'] },
-  { key: 'fri', label: 'Пятница', kind: 'Праки, до 00:00 МСК', slots: ['20:00', '22:00'] },
+  { key: 'tue', label: 'Вторник', kind: 'Праки', slots: ['20:00', '22:00'] },
+  { key: 'wed', label: 'Среда', kind: 'Праки', slots: ['20:00', '22:00'] },
+  { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00', '22:00'] },
+  { key: 'fri', label: 'Пятница', kind: 'Праки', slots: ['20:00', '22:00'] },
   { key: 'sat', label: 'Суббота', kind: 'Премьер', slots: ['20:00', '22:00'] },
-  { key: 'sun', label: 'Воскресенье', kind: 'МСК турнир, если есть', slots: ['18:00'] },
+  { key: 'sun', label: 'Воскресенье', kind: 'МСК турнир', slots: ['18:00'] },
 ];
 
 const MSK_OFFSET_MS = 3 * 60 * 60 * 1000;
@@ -132,7 +132,7 @@ export function buildSummaryText(week) {
   const lines = [`📅 Расписание — ${formatDayDate(days[0].dateIso)}–${formatDayDate(days[5].dateIso)}`, ''];
 
   for (const day of days) {
-    lines.push(`${day.label} ${formatDayDate(day.dateIso)} · ${day.kind.split(',')[0]}`);
+    lines.push(`${day.label} ${formatDayDate(day.dateIso)} · ${day.kind}`);
     for (const slot of day.slots) {
       const names = availableFor(week.responses, day.key, slot);
       let mark;

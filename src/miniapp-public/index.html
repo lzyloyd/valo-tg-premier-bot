@@ -25,13 +25,13 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .screen{padding:16px;flex:1;}
 .day-list{display:flex;flex-direction:column;gap:8px;}
-.day-card{border:1px solid var(--border);border-radius:12px;padding:18px 12px;display:grid;grid-template-columns:106px 1fr 130px;align-items:center;gap:10px;background:var(--surface);}
+.day-card{border:1px solid var(--border);border-radius:12px;padding:18px 12px;display:grid;grid-template-columns:80px 1fr 130px;align-items:center;gap:8px;background:var(--surface);}
 .day-name{font-weight:700;font-size:13px;}
 .day-date{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
 .day-kind{font-size:9.5px;color:var(--text-muted);margin-top:1px;white-space:nowrap;}
-.avail-toggle{display:flex;gap:4px;justify-self:center;}
+.avail-toggle{display:flex;flex-wrap:wrap;gap:4px;justify-self:center;justify-content:center;}
 .slots{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
-.avail-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;}
+.avail-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;}
 .avail-btn.yes.active{background:var(--on-bg);border-color:var(--on);color:var(--on);}
 .avail-btn.no.active{background:var(--surface-3);border-color:var(--text-muted);color:var(--text);}
 .slot-chip{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px;padding:6px 11px;border-radius:8px;cursor:pointer;}
