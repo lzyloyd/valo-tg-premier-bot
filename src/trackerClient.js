@@ -134,11 +134,24 @@ export async function fetchTeamStandings(page, raw, trackedRiotId) {
 
   const opponents = playerSummaries.filter((p) => p.metadata.teamId !== tracked.metadata.teamId);
 
-  const ourTeam = await fetchRosterInfoForPlayer(page, trackedRiotId);
+  let ourTeam = null;
+  try {
+    ourTeam = await fetchRosterInfoForPlayer(page, trackedRiotId);
+  } catch (err) {
+    console.error(`[trackerClient] roster lookup failed for ${trackedRiotId}:`, err.message);
+  }
 
+  // fetchRosterInfoForPlayer throws once its own retries are exhausted (a
+  // transient Cloudflare block on that one request) — that must not abort
+  // the whole lookup while there are still other opponents left to try.
   let theirTeam = null;
   for (const opponent of opponents) {
-    theirTeam = await fetchRosterInfoForPlayer(page, opponent.attributes.platformUserIdentifier);
+    try {
+      theirTeam = await fetchRosterInfoForPlayer(page, opponent.attributes.platformUserIdentifier);
+    } catch (err) {
+      console.error(`[trackerClient] roster lookup failed for ${opponent.attributes.platformUserIdentifier}:`, err.message);
+      continue;
+    }
     if (theirTeam) break;
   }
 
