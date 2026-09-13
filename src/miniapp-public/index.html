@@ -134,13 +134,17 @@ function applyLastSaved() {
   }
 }
 
-async function loadState() {
-  state = await api('/api/state');
+function rebuildDraft() {
   draft = {};
   for (const day of state.days) {
     const mine = state.responses[state.me.username]?.[day.key];
     draft[day.key] = mine ? { avail: mine.avail, slots: [...mine.slots] } : { avail: null, slots: [] };
   }
+}
+
+async function loadState() {
+  state = await api('/api/state');
+  rebuildDraft();
   applyLastSaved();
   render();
 }
@@ -148,13 +152,20 @@ async function loadState() {
 const POLL_MS = 5000;
 let pollTimer = null;
 
-// Only refreshes `state` (what "Команда"/"Админ" show) — never touches
-// `draft`, so a background refresh can never clobber a click on
-// "Расписание" that hasn't round-tripped yet. Your own answers only ever
-// change from your own clicks, which already update state directly.
+// A background refresh normally only touches `state` (what "Команда"/"Админ"
+// show) — never `draft` — so it can't clobber a click on "Расписание" that
+// hasn't round-tripped yet. But if the week itself rolled over server-side
+// (Sunday's reset) while the app sat open, `draft` would otherwise keep
+// showing the old week's selections forever; only rebuild it when that
+// actually happens.
 async function refreshState() {
   try {
+    const previousWeekStart = state?.days?.[0]?.dateIso;
     state = await api('/api/state');
+    if (state.days[0].dateIso !== previousWeekStart) {
+      rebuildDraft();
+      applyLastSaved();
+    }
     render();
   } catch (err) {
     console.error('[schedule] background refresh failed:', err);
