@@ -25,7 +25,7 @@ const QUEUE_LABELS = {
 };
 
 function playlistLabel(queueId) {
-  if (!queueId) return 'Матч';
+  if (!queueId) return 'Кастомка';
   return QUEUE_LABELS[queueId.toLowerCase()] ?? queueId;
 }
 
@@ -46,6 +46,11 @@ export function buildMatchView(raw, teamsInfo = {}, { trackedRiotId = config.tra
   const teamSummaries = raw.segments.filter((s) => s.type === 'team-summary');
   const playerSummaries = raw.segments.filter((s) => s.type === 'player-summary');
   const roundSummaries = raw.segments.filter((s) => s.type === 'round-summary');
+
+  // Custom (private lobby) matches aren't tied to any ranked queue — tracker.gg
+  // leaves queueId null for them, and TRS is meaningless (always 0) since it's
+  // computed against a queue's own rating system. MVP falls back to ACS.
+  const isCustom = !raw.metadata.queueId;
 
   const tracked = trackedRiotId
     ? playerSummaries.find((p) => p.attributes.platformUserIdentifier.toLowerCase() === trackedRiotId.toLowerCase())
@@ -94,7 +99,7 @@ export function buildMatchView(raw, teamsInfo = {}, { trackedRiotId = config.tra
   const ourTeam = buildTeam(ourTeamId);
   const theirTeam = buildTeam(otherTeamId);
 
-  const mvp = [...ourTeam.players].sort((a, b) => b.trs - a.trs)[0];
+  const mvp = [...ourTeam.players].sort((a, b) => (isCustom ? b.acs - a.acs : b.trs - a.trs))[0];
   const ourAvgRankTierId = averageTierId(ourTeam.players.map((p) => p.rankTierId));
   const theirAvgRankTierId = averageTierId(theirTeam.players.map((p) => p.rankTierId));
 
@@ -130,6 +135,7 @@ export function buildMatchView(raw, teamsInfo = {}, { trackedRiotId = config.tra
   return {
     matchId: raw.attributes.id,
     playlistName: playlistLabel(raw.metadata.queueId),
+    isCustom,
     mapName: raw.metadata.mapName,
     mapImageUrl: raw.metadata.mapImageUrl,
     dateStarted: raw.metadata.dateStarted,

@@ -130,17 +130,20 @@ function trsRatingIconUrl(trs) {
   return `https://trackercdn.com/cdn/tracker.gg/img/tracker-score/trn-rating-${tier}.svg`;
 }
 
-function playerRow(p) {
+function playerRow(p, isCustom) {
+  const trsCells = isCustom
+    ? ''
+    : `
+      <div class="sb-trs-badge"><img src="${trsRatingIconUrl(p.trs)}" alt="" /></div>
+      <div class="sb-trs">${p.trs}</div>
+      <div></div>`;
   return `
-    <div class="sb-row">
+    <div class="sb-row${isCustom ? ' no-trs' : ''}">
       <div class="sb-avatar-wrap">
         <img class="sb-avatar" src="${escapeHtml(p.agentImageUrl)}" style="background:${escapeHtml(p.agentColor)}" alt="" />
         <img class="sb-rank-badge" src="${escapeHtml(p.rankIconUrl)}" title="${escapeHtml(p.rankName)}" alt="" />
       </div>
-      <div class="sb-name">${escapeHtml(p.name)}</div>
-      <div class="sb-trs-badge"><img src="${trsRatingIconUrl(p.trs)}" alt="" /></div>
-      <div class="sb-trs">${p.trs}</div>
-      <div></div>
+      <div class="sb-name">${escapeHtml(p.name)}</div>${trsCells}
       <div class="sb-acs">${p.acs}</div>
       <div class="sb-num">${p.kills}</div>
       <div class="sb-num">${p.deaths}</div>
@@ -155,8 +158,9 @@ function playerRow(p) {
     </div>`;
 }
 
-function teamBlock({ side, teamName, logoUrl, rank, divisionName, players, avgRankName, avgRankIconUrl }) {
+function teamBlock({ side, teamName, logoUrl, rank, divisionName, players, avgRankName, avgRankIconUrl, isCustom }) {
   const standing = rank ? `#${rank}${divisionName ? ` · ${escapeHtml(divisionName)}` : ''}` : '';
+  const trsHeaderCells = isCustom ? '' : '<span></span><span class="sb-trs">TRS</span><span></span>';
   return `
     <div class="sb-team ${side}">
       <div class="sb-team-label">
@@ -175,12 +179,20 @@ function teamBlock({ side, teamName, logoUrl, rank, divisionName, players, avgRa
           <img src="${escapeHtml(avgRankIconUrl)}" alt="" />
         </div>
       </div>
-      <div class="sb-row sb-hd"><span></span><span>Игрок</span><span></span><span class="sb-trs">TRS</span><span></span><span class="sb-acs">ACS</span><span class="sb-num">K</span><span class="sb-num">D</span><span class="sb-num">A</span><span class="sb-num">+/-</span><span class="sb-num">ADR</span><span class="sb-num">DDΔ</span><span class="sb-num">HS%</span><span class="sb-num">KAST</span><span class="sb-num">FK</span><span class="sb-num">FD</span></div>
-      ${players.map(playerRow).join('')}
+      <div class="sb-row sb-hd${isCustom ? ' no-trs' : ''}"><span></span><span>Игрок</span>${trsHeaderCells}<span class="sb-acs">ACS</span><span class="sb-num">K</span><span class="sb-num">D</span><span class="sb-num">A</span><span class="sb-num">+/-</span><span class="sb-num">ADR</span><span class="sb-num">DDΔ</span><span class="sb-num">HS%</span><span class="sb-num">KAST</span><span class="sb-num">FK</span><span class="sb-num">FD</span></div>
+      ${players.map((p) => playerRow(p, isCustom)).join('')}
     </div>`;
 }
 
-function mvpBlock(mvp) {
+function mvpBlock(mvp, isCustom) {
+  // Custom matches don't have a meaningful TRS (always 0, no ranked queue to
+  // score it against) — MVP is picked by ACS instead, and shown as the
+  // headline stat instead of repeating it in the sub-line too.
+  const statValue = isCustom ? mvp.acs : mvp.trs;
+  const statLabel = isCustom ? 'ACS' : 'TRS';
+  const subLine = isCustom
+    ? `${escapeHtml(mvp.agentName)} · ${mvp.kills}/${mvp.deaths}/${mvp.assists} · KAST ${mvp.kast}%`
+    : `${escapeHtml(mvp.agentName)} · ACS ${mvp.acs} · ${mvp.kills}/${mvp.deaths}/${mvp.assists} · KAST ${mvp.kast}%`;
   return `
     <div class="sb-mvp">
       <div class="sb-mvp-label">Лучший игрок команды</div>
@@ -188,11 +200,11 @@ function mvpBlock(mvp) {
         <img class="sb-mvp-avatar" src="${escapeHtml(mvp.agentImageUrl)}" style="background:${escapeHtml(mvp.agentColor)}" alt="" />
         <div class="sb-mvp-info">
           <div class="sb-mvp-name">${escapeHtml(mvp.name)}</div>
-          <div class="sb-mvp-sub">${escapeHtml(mvp.agentName)} · ACS ${mvp.acs} · ${mvp.kills}/${mvp.deaths}/${mvp.assists} · KAST ${mvp.kast}%</div>
+          <div class="sb-mvp-sub">${subLine}</div>
         </div>
         <div class="sb-mvp-trs">
-          <div class="sb-mvp-trs-num">${mvp.trs}</div>
-          <div class="sb-mvp-trs-lbl">TRS</div>
+          <div class="sb-mvp-trs-num">${statValue}</div>
+          <div class="sb-mvp-trs-lbl">${statLabel}</div>
         </div>
       </div>
     </div>`;
@@ -245,6 +257,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-team-rank-value{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#c9d4e0;margin-top:2px;}
 .sb-team-rank img{width:22px;height:22px;flex-shrink:0;}
 .sb-row{display:grid;grid-template-columns:32px 1fr 24px 38px 10px 42px 28px 28px 28px 38px 38px 38px 34px 42px 26px 26px;gap:11px;align-items:center;padding:7px 22px;font-size:13.5px;font-family:'JetBrains Mono',monospace;color:#c9d4e0;}
+.sb-row.no-trs{grid-template-columns:32px 1fr 42px 28px 28px 28px 38px 38px 38px 34px 42px 26px 26px;}
 .sb-avatar-wrap{position:relative;width:32px;height:32px;}
 .sb-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;}
 .sb-rank-badge{position:absolute;bottom:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#141b26;border:1px solid #141b26;object-fit:contain;}
@@ -290,6 +303,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
     players: match.ourTeam,
     avgRankName: match.ourTeamAvgRankName,
     avgRankIconUrl: match.ourTeamAvgRankIconUrl,
+    isCustom: match.isCustom,
   })}
   ${teamBlock({
     side: match.won ? 'loser' : 'winner',
@@ -300,8 +314,9 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
     players: match.theirTeam,
     avgRankName: match.theirTeamAvgRankName,
     avgRankIconUrl: match.theirTeamAvgRankIconUrl,
+    isCustom: match.isCustom,
   })}
-  ${mvpBlock(match.mvp)}
+  ${mvpBlock(match.mvp, match.isCustom)}
 </div>
 </body></html>`;
 }
