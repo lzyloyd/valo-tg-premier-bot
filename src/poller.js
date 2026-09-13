@@ -1,4 +1,4 @@
-import { getBrowser, closeBrowser } from './browser.js';
+import { getBrowser } from './browser.js';
 import { fetchRecentMatches, fetchMatchDetail, fetchTeamStandings } from './trackerClient.js';
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
@@ -33,8 +33,8 @@ export async function runPollCycle() {
       console.log(`[poller] posted match ${id} (${match.won ? 'win' : 'loss'} ${match.ourScore}:${match.theirScore})`);
     }
   } finally {
+    // Leave the shared browser running — the command listener can reuse it,
+    // and closing it here would yank it out from under an in-flight command.
     await page.close();
-    // Free the VPS's resources between the twice-a-week polls.
-    await closeBrowser();
   }
 }
