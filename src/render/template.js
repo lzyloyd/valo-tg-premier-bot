@@ -235,7 +235,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;}
 .sb-rank-badge{position:absolute;bottom:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#141b26;border:1px solid #141b26;object-fit:contain;}
 .sb-name{font-family:'Manrope',sans-serif;font-weight:700;color:#e8ecf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sb-trs{font-weight:800;color:#ffd166;text-align:right;font-variant-numeric:tabular-nums;}
+.sb-trs{font-weight:800;color:#eef2f6;text-align:right;font-variant-numeric:tabular-nums;}
 .sb-acs{font-weight:800;color:#eef2f6;}
 .sb-num{text-align:right;font-variant-numeric:tabular-nums;}
 .sb-muted{color:var(--muted);}
