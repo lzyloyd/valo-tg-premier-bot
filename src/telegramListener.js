@@ -5,7 +5,7 @@ import { getBrowser } from './browser.js';
 import { fetchMatchDetail, fetchTeamStandings, gotoTrackerProfile } from './trackerClient.js';
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
-import { sendPhotoTo, sendTextTo, sendWebAppButtonTo, matchCaption } from './telegram.js';
+import { sendPhotoTo, sendTextTo, matchCaption } from './telegram.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
 const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
@@ -63,17 +63,13 @@ async function handleCommand(commandText, message) {
       return;
     }
     if (SCHEDULE_RE.test(trimmed)) {
-      if (!config.miniappPublicUrl) {
-        await sendTextTo(message.chat.id, message.message_thread_id, 'Мини-апп расписания ещё не настроен (нет MINIAPP_PUBLIC_URL).');
+      if (!config.miniappLaunchUrl) {
+        await sendTextTo(message.chat.id, message.message_thread_id, 'Мини-апп расписания ещё не настроен (нет MINIAPP_LAUNCH_URL).');
         return;
       }
-      await sendWebAppButtonTo(
-        message.chat.id,
-        message.message_thread_id,
-        '📅 Расписание команды',
-        'Открыть расписание',
-        config.miniappPublicUrl,
-      );
+      // A t.me/<bot>/<app> deep link, not a "web_app" button — those only
+      // work in private chats, and this needs to work from a group topic.
+      await sendTextTo(message.chat.id, message.message_thread_id, `📅 Расписание команды: ${config.miniappLaunchUrl}`);
       return;
     }
     if (urlMatch) {

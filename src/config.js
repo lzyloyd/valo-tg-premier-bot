@@ -23,9 +23,14 @@ export const config = {
 
   // "Расписание" mini app
   miniappPort: Number(process.env.MINIAPP_PORT || 3001),
-  // Public HTTPS URL Caddy/DuckDNS expose the mini app on — what the
-  // "web_app" launch button in Telegram points to.
+  // Public HTTPS URL Caddy/DuckDNS expose the mini app on (what Telegram
+  // actually loads once launched).
   miniappPublicUrl: process.env.MINIAPP_PUBLIC_URL || null,
+  // t.me/<bot>/<short name> deep link registered via BotFather's /newapp —
+  // this is what actually launches the mini app from a group chat. A
+  // "web_app" inline keyboard button can't: Telegram only allows those in
+  // private chats with the bot.
+  miniappLaunchUrl: process.env.MINIAPP_LAUNCH_URL || null,
   // Same NF // OVT group as everything else — the schedule summary and
   // post-deadline edit alerts both go into its "Сборы" topic.
   scheduleChatId: process.env.SCHEDULE_CHAT_ID || null,
