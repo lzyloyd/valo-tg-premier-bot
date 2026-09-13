@@ -121,7 +121,9 @@ async function fetchRosterInfoForPlayer(page, riotId) {
  * payload at all — it lives under a separate Premier roster API, keyed by a
  * roster id that a player's own standard profile happens to carry
  * (metadata.premierRosterId). Any player on a side works to look their
- * roster up, so this doesn't depend on the match being recent.
+ * roster up, so this doesn't depend on the match being recent — but a given
+ * player might not currently have one (subbed in, left their roster since),
+ * so try each of the five in turn instead of betting on just one.
  */
 export async function fetchTeamStandings(page, raw, trackedRiotId) {
   const playerSummaries = raw.segments.filter((s) => s.type === 'player-summary');
@@ -130,10 +132,15 @@ export async function fetchTeamStandings(page, raw, trackedRiotId) {
   );
   if (!tracked) return { ourTeam: null, theirTeam: null };
 
-  const opponent = playerSummaries.find((p) => p.metadata.teamId !== tracked.metadata.teamId);
+  const opponents = playerSummaries.filter((p) => p.metadata.teamId !== tracked.metadata.teamId);
 
   const ourTeam = await fetchRosterInfoForPlayer(page, trackedRiotId);
-  const theirTeam = opponent ? await fetchRosterInfoForPlayer(page, opponent.attributes.platformUserIdentifier) : null;
+
+  let theirTeam = null;
+  for (const opponent of opponents) {
+    theirTeam = await fetchRosterInfoForPlayer(page, opponent.attributes.platformUserIdentifier);
+    if (theirTeam) break;
+  }
 
   return { ourTeam, theirTeam };
 }
