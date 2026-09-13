@@ -14,12 +14,20 @@ const page = await browser.newPage();
 try {
   await gotoTrackerProfile(page);
   const raw = await fetchMatchDetail(page, matchId);
-  const rounds = raw.segments.filter((s) => s.type === 'round-summary');
-  const first = rounds[0];
-  console.log('attributes:', JSON.stringify(first.attributes, null, 2));
-  console.log('metadata:', JSON.stringify(first.metadata, null, 2));
-  console.log('stats keys:', Object.keys(first.stats));
-  console.log('full stats:', JSON.stringify(first.stats, null, 2));
+  const types = [...new Set(raw.segments.map((s) => s.type))];
+  console.log('segment types:', types);
+
+  console.log('top-level raw.attributes:', JSON.stringify(raw.attributes, null, 2));
+  console.log('top-level raw.metadata keys:', Object.keys(raw.metadata));
+
+  for (const type of types) {
+    if (type === 'round-summary') continue;
+    const sample = raw.segments.find((s) => s.type === type);
+    console.log(`\n--- sample "${type}" ---`);
+    console.log('attributes:', JSON.stringify(sample.attributes, null, 2));
+    console.log('metadata:', JSON.stringify(sample.metadata, null, 2));
+    console.log('stats keys:', Object.keys(sample.stats ?? {}));
+  }
 } finally {
   await page.close();
   await closeBrowser();
