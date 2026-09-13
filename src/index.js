@@ -1,9 +1,9 @@
 import { runPollCycle } from './poller.js';
-import { scheduleNext, scheduleWeeklyReset, scheduleDeadlineReminder } from './scheduler.js';
+import { scheduleNext, scheduleWeeklyReset, scheduleDeadlineReminder, scheduleAutoSummary } from './scheduler.js';
 import { runTelegramListener } from './telegramListener.js';
 import { closeBrowser } from './browser.js';
 import { startMiniAppServer } from './miniappServer.js';
-import { resetWeekAndAnnounce, sendDeadlineReminder } from './scheduleNotifications.js';
+import { resetWeekAndAnnounce, sendDeadlineReminder, sendAutoSummary } from './scheduleNotifications.js';
 import { config } from './config.js';
 
 const once = process.argv.includes('--once');
@@ -18,6 +18,7 @@ if (once) {
   if (config.scheduleChatId && config.scheduleThreadId) {
     scheduleWeeklyReset(resetWeekAndAnnounce);
     scheduleDeadlineReminder(sendDeadlineReminder);
+    scheduleAutoSummary(sendAutoSummary);
   }
   startMiniAppServer();
   runTelegramListener().catch((err) => {

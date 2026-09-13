@@ -95,6 +95,12 @@ export function nextReminderInstant(now = new Date()) {
   return nextOccurrence(now, reminderInstant);
 }
 
+// The deadline itself (Monday 24:00 MSK = Tuesday 00:00 MSK) — when
+// submissions close, the automatic summary goes out unprompted.
+export function nextDeadlineInstant(now = new Date()) {
+  return nextOccurrence(now, weekDeadline);
+}
+
 export function weekDayDates(weekStart) {
   return DAYS.map((d, i) => ({ ...d, dateIso: mskIsoDate(new Date(weekStart.getTime() + i * DAY_MS)) }));
 }

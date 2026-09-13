@@ -1,5 +1,5 @@
 import { config } from './config.js';
-import { ROSTER, hasFullyAnswered } from './scheduleModel.js';
+import { ROSTER, hasFullyAnswered, buildSummaryText } from './scheduleModel.js';
 import { loadCurrentWeek, runWeeklyReset } from './scheduleStore.js';
 import { sendTextTo } from './telegram.js';
 
@@ -26,4 +26,12 @@ export async function sendDeadlineReminder() {
     config.scheduleThreadId,
     `⏰ Осталось 4 часа до дедлайна (Пн 24:00 МСК) — ещё не заполнил(и) расписание: ${missing.map((u) => `@${u}`).join(', ')}`,
   );
+}
+
+// Fires right at the deadline (Monday 24:00 / Tuesday 00:00 MSK) — the same
+// summary the admin can send by hand from the app, just automatic so it
+// doesn't get missed if nobody presses the button in time.
+export async function sendAutoSummary() {
+  const week = await loadCurrentWeek();
+  await sendTextTo(config.scheduleChatId, config.scheduleThreadId, buildSummaryText(week));
 }

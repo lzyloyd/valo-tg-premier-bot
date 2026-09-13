@@ -1,4 +1,4 @@
-import { nextResetInstant, nextReminderInstant } from './scheduleModel.js';
+import { nextResetInstant, nextReminderInstant, nextDeadlineInstant } from './scheduleModel.js';
 
 // Premier matches only happen Saturday 21:00 and 23:00 Moscow time, so the bot
 // only ever needs to wake up twice a week — no benefit to polling more often.
@@ -64,4 +64,10 @@ export function scheduleWeeklyReset(runReset) {
 // Monday 20:00 MSK — 4 hours before the Tuesday 00:00 deadline.
 export function scheduleDeadlineReminder(runReminder) {
   scheduleRecurring('schedule deadline reminder', nextReminderInstant, runReminder);
+}
+
+// Monday 24:00 / Tuesday 00:00 MSK — submissions close, the summary that
+// would otherwise need a manual button press goes out on its own.
+export function scheduleAutoSummary(runAutoSummary) {
+  scheduleRecurring('schedule auto-summary', nextDeadlineInstant, runAutoSummary);
 }
