@@ -126,39 +126,38 @@
       {
         "title": "Лучшая команда Fusion Burst",
         "slots": [
-          { "main": 1210 },
-          { "main": 1211 },
-          { "main": 1508, "alts": [1110, 1207] }
+          [1210],
+          [1211],
+          [1508, 1110, 1207]
         ],
         "text": "С Lupa — держите её на Moonlit Clouds рядом с Denia на Flaming Clawprint. Аутро Lupa усиливает Aemeath, а Denia уходит в ротацию первой, чтобы передать аутро-баф на Lupa."
       },
       {
         "title": "Лучшая команда Tune Rupture",
         "slots": [
-          { "main": 1210 },
-          { "main": 1509 },
-          { "main": 1209 }
+          [1210],
+          [1509],
+          [1209]
         ],
         "text": "Слот 3 гибкий — подойдёт много саппортов: любые баферы урона Liberation, Shorekeeper и Verina жизнеспособны, Lupa сильна в quickswap, а Chisa может играть и в режиме Fusion Burst. Собирайте под то, что есть в наличии."
       },
       {
         "title": "Mono Fusion",
         "slots": [
-          { "main": 1210 },
-          { "main": 1207 },
-          { "main": 1209, "alts": [1206, 1205, 1208] }
+          [1210],
+          [1207],
+          [1209, 1206, 1205, 1208]
         ],
         "text": "Brant и Changli играют во 2 слоте команды, пока аутро Lupa усиливает их, а сама Lupa вместе с Mornye и Galbrena усиливает Aemeath. Changli выгоднее Brant только в quickswap-командах; Galbrena работает исключительно в quickswap и представляет собой куда более продвинутый стиль игры на два дамагера."
       }
     ],
     "calculations": {
-      "scenario": "1 цель, ротация 10.61с — расчёт без баффов от команды (соло-показатели персонажа, оружия и эхо)",
-      "note": "Числа ниже показывают DPS и суммарный урон за идеальную ротацию (интро + Liberation доступны с начала) без учёта командных баффов — это метрика для сравнения констов и ротаций самой Aemeath, не тир-лист и не повод её тянуть.",
+      "scenario": "1 цель, ротация 10.61с",
+      "note": "Числа ниже — DPS и суммарный урон именно Aemeath (без урона тиммейтов) за идеальную ротацию с доступными интро и Liberation с начала, и они СЧИТАЮТСЯ с баффами от команды из блока выше. Это метрика для сравнения констов и ротаций самой Aemeath, не тир-лист и не повод её тянуть.",
       "variants": [
         {
           "id": "tuneRupture",
           "name": "Tune Rupture",
-          "teamNote": "Расчёт включает баффы от Lynae + Spectrum Blaster + Pact of Neonlight Leap + Hyvatia, и Mornye + Discord + Halo of Starry Radiance + Reactor Husk.",
           "characterBuild": {
             "weaponId": 21020076,
             "echoSet": "Trailblazing Star",
@@ -195,7 +194,6 @@
         {
           "id": "fusionBurst",
           "name": "Fusion Burst",
-          "teamNote": "Расчёт включает баффы от Denia + Forged Dwarf Star + Chromatic Foam + Reminiscence: Denia, и Chisa + Kumokiri + Rejuvenating Glow + Fallacy of No Return.",
           "characterBuild": {
             "weaponId": 21020076,
             "echoSet": "Trailblazing Star",

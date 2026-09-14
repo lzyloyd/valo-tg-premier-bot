@@ -1,0 +1,77 @@
+{
+  "tiers": [
+    {
+      "tier": "T0",
+      "class": "t0",
+      "teams": [
+        { "title": "Aemeath Rupture", "slots": [[1210], [1509], [1209, 1505, 1503]] },
+        { "title": "Hiyuki Hypercarry", "slots": [[1108], [1109, 1509], [1110, 1508, 1209]] },
+        { "title": "Jingran Hypercarry", "slots": [[1212], [1410, 1204], [1505, 1207]] },
+        { "title": "Qingxiao Hypercarry", "slots": [[1413], [1211, 1509], [1209]] },
+        { "title": "Xuanling Hypercarry", "slots": [[1610], [1508, 1308, 1608, 1509], [1110, 1508]] }
+      ]
+    },
+    {
+      "tier": "T0.5",
+      "class": "t05",
+      "teams": [
+        { "title": "Aemeath Fusion Burst", "slots": [[1210], [1211], [1508, 1110, 1207]] },
+        { "title": "Luuk Hypercarry", "slots": [[1510], [1211, 1509, 1102], [1209, 1505, 1503]] },
+        { "title": "Sigrika Hypercarry", "slots": [[1412], [1411, 1109], [1407, 1505]] }
+      ]
+    },
+    {
+      "tier": "T1",
+      "class": "t1",
+      "teams": [
+        { "title": "Aemeath Mono Fusion", "slots": [[1210], [1207], [1209, 1206, 1205]] },
+        { "title": "Augusta Hypercarry", "slots": [[1306], [1410, 1509, 1204], [1505, 1503]] },
+        { "title": "Cartethyia Hypercarry", "slots": [[1409], [1407], [1508, 1406]] },
+        { "title": "Galbrena Hypercarry", "slots": [[1208], [1207, 1411, 1109], [1209, 1505, 1503]] },
+        { "title": "Iuno Hypercarry", "slots": [[1410], [1509], [1209, 1407, 1505]] },
+        { "title": "Lucy Hypercarry", "slots": [[1511], [1308], [1209, 1505, 1503]] },
+        { "title": "Phrolova Echo", "slots": [[1608], [1109, 1607, 1412, 1509], [1411, 1606, 1505]] }
+      ]
+    },
+    {
+      "tier": "T1.5",
+      "class": "t15",
+      "teams": [
+        { "title": "Carlotta Hypercarry", "slots": [[1107], [1509, 1105], [1209, 1505, 1503]] },
+        { "title": "Tri-DPS Fusion", "slots": [[1208, 1205], [1206], [1207]] }
+      ]
+    },
+    {
+      "tier": "T2",
+      "class": "t2",
+      "teams": [
+        { "title": "Brant Hypercarry", "slots": [[1206], [1207], [1209, 1505, 1503]] },
+        { "title": "Jiyan Mono Aero", "slots": [[1404], [1410], [1407]] },
+        { "title": "Phoebe Hypercarry", "slots": [[1506], [1509, 1508, 1204], [1501]] },
+        { "title": "Phrolova Dual DPS", "slots": [[1608], [1208, 1306, 1404], [1505, 1503]] },
+        { "title": "Zani Hypercarry", "slots": [[1507], [1506], [1501, 1505]] }
+      ]
+    },
+    {
+      "tier": "T3",
+      "class": "t3",
+      "teams": [
+        { "title": "Camellya Hypercarry", "slots": [[1603], [1509, 1606, 1102], [1209, 1505, 1503]] },
+        { "title": "Encore Hypercarry", "slots": [[1203], [1207], [1209, 1505, 1206]] },
+        { "title": "Jinhsi Hypercarry", "slots": [[1304], [1105, 1302], [1503, 1505]] },
+        { "title": "Jiyan Dual DPS", "slots": [[1404], [1407], [1505, 1503]] },
+        { "title": "Lingyang Hypercarry", "slots": [[1104], [1509, 1105], [1209, 1505, 1503]] },
+        { "title": "Xiangli Yao Hypercarry", "slots": [[1305], [1509, 1302], [1209, 1505, 1503]] }
+      ]
+    },
+    {
+      "tier": "T4",
+      "class": "t4",
+      "teams": [
+        { "title": "Calcharo Dual DPS", "slots": [[1301], [1305], [1505, 1503]] },
+        { "title": "Chixia Mono Fusion", "slots": [[1202], [1206, 1209], [1207]] },
+        { "title": "Havoc Rover Hypercarry", "slots": [[1604], [1509, 1606, 1602], [1209, 1505, 1503]] }
+      ]
+    }
+  ]
+}

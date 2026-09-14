@@ -141,11 +141,11 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-badge.t4{background:var(--tier-4);color:var(--text);}
 .tier-items{display:flex;flex-wrap:wrap;gap:8px;flex:1;align-content:flex-start;}
 
-/* character tier-list gets its own roomier layout: badge as a pill header
-   above a proper grid, instead of a thin bar squeezed next to wrapped
-   small portraits (felt cramped) */
-#view-tierlist .tier-row{flex-direction:column;align-items:stretch;gap:0;padding:16px;margin-bottom:16px;}
-#view-tierlist .tier-badge{width:auto;align-self:flex-start;padding:6px 16px;border-radius:20px;margin-bottom:14px;}
+/* character tier-list: badge is a full-height vertical block beside the
+   tier's content (same treatment as the team tier list), now that each
+   tier is tall enough (3 role rows) for that to look proportionate again */
+#view-tierlist .tier-row{align-items:stretch;padding:16px;margin-bottom:16px;}
+#view-tierlist .tier-content{flex:1;min-width:0;}
 #view-tierlist .tier-items{display:grid;grid-template-columns:repeat(var(--tier-grid-cols),1fr);gap:10px;}
 #view-tierlist .tier-items .portrait.sm{width:100%;}
 @media (max-width:380px){#view-tierlist .tier-items{grid-template-columns:repeat(3,1fr);}}
@@ -356,7 +356,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.70</div>
+    <div class="app-sub">WUTHERING WAVES · v1.80</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -389,6 +389,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 
       <div class="tier-row">
         <div class="tier-badge t0">T0</div>
+        <div class="tier-content">
         <div class="tier-role-group" data-role="dps">
           <div class="tier-role-label">DPS</div>
           <div class="tier-items">
@@ -417,10 +418,12 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
             <div class="portrait sm spectro" data-role="support" onclick="openChar(1505)"><img class="portrait-img" src="assets/characters/1505.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Shorekeeper</span></div>
           </div>
         </div>
+        </div>
       </div>
 
       <div class="tier-row">
         <div class="tier-badge t05">T0.5</div>
+        <div class="tier-content">
         <div class="tier-role-group" data-role="dps">
           <div class="tier-role-label">DPS</div>
           <div class="tier-items">
@@ -443,9 +446,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           </div>
         </div>
       </div>
+        </div>
 
       <div class="tier-row">
         <div class="tier-badge t1">T1</div>
+        <div class="tier-content">
         <div class="tier-role-group" data-role="dps">
           <div class="tier-role-label">DPS</div>
           <div class="tier-items">
@@ -464,9 +469,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           </div>
         </div>
       </div>
+        </div>
 
       <div class="tier-row">
         <div class="tier-badge t15">T1.5</div>
+        <div class="tier-content">
         <div class="tier-role-group" data-role="dps">
           <div class="tier-role-label">DPS</div>
           <div class="tier-items">
@@ -487,9 +494,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           </div>
         </div>
       </div>
+        </div>
 
       <div class="tier-row">
         <div class="tier-badge t2">T2</div>
+        <div class="tier-content">
         <div class="tier-role-group" data-role="dps">
           <div class="tier-role-label">DPS</div>
           <div class="tier-items">
@@ -515,9 +524,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           </div>
         </div>
       </div>
+        </div>
 
       <div class="tier-row">
         <div class="tier-badge t3">T3</div>
+        <div class="tier-content">
         <div class="tier-role-group" data-role="dps">
           <div class="tier-role-label">DPS</div>
           <div class="tier-items">
@@ -544,9 +555,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           </div>
         </div>
       </div>
+        </div>
 
       <div class="tier-row">
         <div class="tier-badge t4">T4</div>
+        <div class="tier-content">
         <div class="tier-role-group" data-role="dps">
           <div class="tier-role-label">DPS</div>
           <div class="tier-items">
@@ -574,6 +587,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
             <div class="portrait sm glacio" data-role="support" onclick="openChar(1106)"><img class="portrait-img" src="assets/characters/1106.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Youhu</span></div>
             <div class="portrait sm electro" data-role="support" onclick="openChar(1303)"><img class="portrait-img" src="assets/characters/1303.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Yuanwu</span></div>
           </div>
+        </div>
         </div>
       </div>
     </div>
