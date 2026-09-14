@@ -75,6 +75,34 @@ const HEADER_BG = { red: 0.0627451, green: 0.30588236, blue: 0.28235295 };
 const DATA_BG = { red: 0.10588235, green: 0.11764706, blue: 0.15686275 };
 const WHITE = { red: 1, green: 1, blue: 1 };
 
+// HS%/KAST land in the same columns in both tables regardless of mode.
+const TABLE1_PERCENT_COLS = ['L', 'M'];
+const TABLE2_PERCENT_COLS = ['H', 'I'];
+
+/**
+ * Writing "-" (or a formula) via values.batchUpdate's USER_ENTERED mode can
+ * silently reset a cell's number format to "Automatic" — seen on HS%/KAST
+ * cells that ended up showing a plain fraction (0.25) instead of "25%".
+ * Explicitly reapplying PERCENT format on every write sidesteps that
+ * regardless of why the format got lost in the first place.
+ */
+function percentFormatRequests(sheetId, row0List) {
+  const requests = [];
+  for (const { row0, cols } of row0List) {
+    for (const col of cols) {
+      const col0 = colToIndex(col) - 1;
+      requests.push({
+        repeatCell: {
+          range: { sheetId, startRowIndex: row0, endRowIndex: row0 + 1, startColumnIndex: col0, endColumnIndex: col0 + 1 },
+          cell: { userEnteredFormat: { numberFormat: { type: 'PERCENT', pattern: '0%' } } },
+          fields: 'userEnteredFormat.numberFormat',
+        },
+      });
+    }
+  }
+  return requests;
+}
+
 /**
  * A "Game N" column's cells are supposed to read white-on-dark — but at
  * least one tab turned out to have the light text color set with no
@@ -172,7 +200,7 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   // happened to have (real ones for players who'd played that map before) —
   // now-orphaned since their source data is gone. Reset every player's
   // heatmap cells to "-" so nothing shows #DIV/0! before it has data.
-  await resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode);
+  await resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode, newSheetId);
 
   return { sheetId: newSheetId, title: tabTitle, index: sheets.length };
 }
@@ -192,10 +220,11 @@ async function hasHeatmapErrors(spreadsheetId, tabTitle, mode) {
   return values.some((v) => typeof v === 'string' && v.startsWith('#'));
 }
 
-export async function resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode) {
+export async function resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode, sheetId = null) {
   const table1Cols = mode === 'Premier' ? TABLE1_COLUMNS_PREMIER : TABLE1_COLUMNS_PRAKTIKA;
   const table2Cols = mode === 'Premier' ? TABLE2_COLUMNS_PREMIER : TABLE2_COLUMNS_PRAKTIKA;
   const data = [];
+  const percentRows = [];
   for (let i = 0; i < ROSTER_SIZE; i++) {
     const t1Row = TABLE1_FIRST_ROW + i;
     const t2Row = TABLE2_FIRST_ROW + i;
@@ -207,8 +236,12 @@ export async function resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode) {
       range: `'${tabTitle}'!${table2Cols[0]}${t2Row}:${table2Cols[table2Cols.length - 1]}${t2Row}`,
       values: [table2Cols.map(() => '-')],
     });
+    percentRows.push({ row0: t1Row - 1, cols: TABLE1_PERCENT_COLS }, { row0: t2Row - 1, cols: TABLE2_PERCENT_COLS });
   }
   await batchUpdateValues(spreadsheetId, data);
+
+  const resolvedSheetId = sheetId ?? (await getTabSheetId(spreadsheetId, tabTitle));
+  await batchUpdate(spreadsheetId, percentFormatRequests(resolvedSheetId, percentRows));
 }
 
 /**
@@ -306,7 +339,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
 
   const sheet = await findOrCreateTab(spreadsheetId, tabTitle, mode);
   if (await hasHeatmapErrors(spreadsheetId, tabTitle, mode)) {
-    await resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode);
+    await resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode, sheet.sheetId);
   }
   const anchorRows = await getPlayerAnchorRows(spreadsheetId, tabTitle);
   if (anchorRows.size === 0) throw new Error(`Tab "${tabTitle}" has no recognizable player rows`);
@@ -337,6 +370,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
   const written = [];
   const skipped = [];
   const data = [{ range: `'${tabTitle}'!${col}1`, values: [[`Game ${gameNumber}\n(${mapName})`]] }];
+  const percentRows = [];
 
   const firstStatOffset = statRows[0] === null ? 1 : 0;
   for (const p of players) {
@@ -362,10 +396,13 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
     const t2Row = TABLE2_FIRST_ROW + playerIndex;
     const t2Values = table2Stats.map((key) => averageFormula(anchorRow + statOffset(mode, key), endColLetter));
     data.push({ range: `'${tabTitle}'!${table2Cols[0]}${t2Row}:${table2Cols[table2Cols.length - 1]}${t2Row}`, values: [t2Values] });
+
+    percentRows.push({ row0: t1Row - 1, cols: TABLE1_PERCENT_COLS }, { row0: t2Row - 1, cols: TABLE2_PERCENT_COLS });
   }
 
   await batchUpdateValues(spreadsheetId, data);
   await formatGameColumn(spreadsheetId, sheet.sheetId, colIndex, matchId);
+  if (percentRows.length) await batchUpdate(spreadsheetId, percentFormatRequests(sheet.sheetId, percentRows));
   return { tabTitle, gameNumber, written, skipped, sheetId: sheet.sheetId };
 }
 
