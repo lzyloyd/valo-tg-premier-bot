@@ -6,7 +6,7 @@ import { fetchMatchDetail, fetchTeamStandings, gotoTrackerProfile } from './trac
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
 import { sendPhotoTo, sendTextTo, matchCaption } from './telegram.js';
-import { appendMatchToStatsSheet } from './sheetsStats.js';
+import { appendMatchToStatsSheet, OVERALL_PREMIER_TAB } from './sheetsStats.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
 const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
@@ -144,6 +144,18 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
         });
         const skippedNote = skipped.length ? `, не найдены в таблице: ${skipped.join(', ')}` : '';
         lines.push(`✅ ${matchId.slice(0, 8)}… → "${tabTitle}", Game ${gameNumber} (${written.length} игроков${skippedNote})`);
+
+        // Every Premier map also feeds one running "overall" tab that isn't
+        // derived from the per-map tabs — it needs its own write.
+        if (mode === 'Premier') {
+          const overall = await appendMatchToStatsSheet({
+            mapName: match.mapName,
+            mode,
+            players: match.ourTeam,
+            tabTitle: OVERALL_PREMIER_TAB,
+          });
+          lines.push(`   ↳ "${OVERALL_PREMIER_TAB}", Game ${overall.gameNumber}`);
+        }
       } catch (err) {
         console.error(`[listener] failed to log match ${matchId} to stats sheet:`, err);
         lines.push(`❌ ${matchId.slice(0, 8)}… — ${err.message}`);
