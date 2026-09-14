@@ -69,6 +69,39 @@ function averageFormula(rawRow, endColLetter) {
   return `=AVERAGE($${FIRST_GAME_COLUMN}$${rawRow}:$${endColLetter}$${rawRow})`;
 }
 
+// Matches the main heatmap header band's color (read off an existing tab).
+const HEADER_BG = { red: 0.0627451, green: 0.30588236, blue: 0.28235295 };
+const DATA_BG = { red: 0.10588235, green: 0.11764706, blue: 0.15686275 };
+const WHITE = { red: 1, green: 1, blue: 1 };
+
+/**
+ * A "Game N" column's cells are supposed to read white-on-dark — but at
+ * least one tab turned out to have the light text color set with no
+ * matching background (probably lost to a manual "clear formatting" at some
+ * point), making it unreadable. Every write reapplies both explicitly
+ * rather than trusting whatever the tab already has.
+ */
+async function formatGameColumn(spreadsheetId, sheetId, colIndex) {
+  const col0 = colIndex - 1;
+  const lastRow0 = ANCHOR_FIRST_ROW - 1 + BLOCK_SIZE * ROSTER_SIZE;
+  await batchUpdate(spreadsheetId, [
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: col0, endColumnIndex: col0 + 1 },
+        cell: { userEnteredFormat: { backgroundColor: HEADER_BG, textFormat: { foregroundColor: WHITE, bold: true } } },
+        fields: 'userEnteredFormat(backgroundColor,textFormat)',
+      },
+    },
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 1, endRowIndex: lastRow0, startColumnIndex: col0, endColumnIndex: col0 + 1 },
+        cell: { userEnteredFormat: { backgroundColor: DATA_BG, textFormat: { foregroundColor: WHITE } } },
+        fields: 'userEnteredFormat(backgroundColor,textFormat)',
+      },
+    },
+  ]);
+}
+
 function valueForStatKey(p, key) {
   switch (key) {
     case 'trs': return p.trs;
@@ -298,5 +331,6 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, tabTitle
   }
 
   await batchUpdateValues(spreadsheetId, data);
+  await formatGameColumn(spreadsheetId, sheet.sheetId, colIndex);
   return { tabTitle, gameNumber, written, skipped };
 }
