@@ -56,7 +56,6 @@ export const config = {
   statsChatId: process.env.STATS_CHAT_ID || null,
   statsThreadId: process.env.STATS_THREAD_ID || null,
   currentSplitLabel: process.env.CURRENT_SPLIT_LABEL || 'V26A5',
-  statsWeekCounterPath: path.join(dataDir, 'statsWeekCounter.json'),
 
   // "Резалтик, легенда" — random gif via Giphy's /gifs/random endpoint.
   giphyApiKey: process.env.GIPHY_API_KEY || null,

@@ -411,3 +411,22 @@ export async function getTabSheetId(spreadsheetId, tabTitle) {
   const sheets = await getSpreadsheetMeta(spreadsheetId);
   return sheets.find((s) => s.title === tabTitle)?.sheetId ?? null;
 }
+
+/**
+ * Week number for the map-week announcement, derived from the sheet itself
+ * rather than a separate persisted counter — a standalone counter kept
+ * climbing even after the sheet was wiped and rebuilt from scratch, since
+ * nothing tied it back to what the sheet actually contained. Counts every
+ * "<Map> - Premier" tab (the overall summary excluded) that has at least one
+ * logged game — so a freshly rebuilt sheet naturally starts back at 1.
+ */
+export async function countAnnouncedPremierWeeks(spreadsheetId) {
+  const sheets = await getSpreadsheetMeta(spreadsheetId);
+  let count = 0;
+  for (const s of sheets) {
+    if (s.title === OVERALL_PREMIER_TAB || !s.title.endsWith(' - Premier')) continue;
+    const row1 = (await getValues(spreadsheetId, `'${s.title}'!${FIRST_GAME_COLUMN}1:BZ1`))[0] ?? [];
+    if (row1.some((cell) => /Game \d+/.test(cell ?? ''))) count += 1;
+  }
+  return count;
+}

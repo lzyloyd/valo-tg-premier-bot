@@ -1,6 +1,6 @@
 import { config } from './config.js';
 import { sendPhotoTo } from './telegram.js';
-import { incrementStatsWeekCounter } from './statsWeekCounter.js';
+import { countAnnouncedPremierWeeks } from './sheetsStats.js';
 
 function escapeHtml(str) {
   return String(str).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -47,7 +47,7 @@ async function screenshotSheetRange(browser, spreadsheetId, gid) {
  */
 export async function announceMapWeekComplete(browser, { spreadsheetId, sheetId, tabTitle }) {
   if (!config.statsChatId) return; // not configured yet — skip quietly rather than error the whole command
-  const week = await incrementStatsWeekCounter();
+  const week = await countAnnouncedPremierWeeks(spreadsheetId);
   const png = await screenshotSheetRange(browser, spreadsheetId, sheetId);
   const link = sheetRangeUrl(spreadsheetId, sheetId, HEATMAP_RANGE);
   const caption = `${week} неделя ${escapeHtml(config.currentSplitLabel)} прем матчи (${escapeHtml(tabTitle)})\n${escapeHtml(link)}`;
