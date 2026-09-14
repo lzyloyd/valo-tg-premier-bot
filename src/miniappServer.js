@@ -6,6 +6,8 @@ import { verifyInitData } from './telegramAuth.js';
 import { DAYS, ROSTER, QUORUM, weekDayDates, weekStartFromIso, buildSummaryText, hasFullyAnswered } from './scheduleModel.js';
 import { loadCurrentWeek, setResponse } from './scheduleStore.js';
 import { sendSummary, handlePostDeadlineEdit } from './scheduleNotifications.js';
+import { WUVOCHKA_ROSTER } from './wuvochkaModel.js';
+import { loadProfile, toggleFavorite, toggleOwned, setAvatar } from './wuvochkaStore.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -21,6 +23,20 @@ function authenticate(req, res) {
     return null;
   }
   return { username, id: user.id, isAdmin: user.id === config.adminUserId };
+}
+
+function authenticateWuvochka(req, res) {
+  const user = verifyInitData(req.body?.initData);
+  if (!user) {
+    res.status(401).json({ error: 'Не удалось подтвердить, что это ты — открой мини-апп заново из Telegram.' });
+    return null;
+  }
+  const username = (user.username || '').toLowerCase();
+  if (!WUVOCHKA_ROSTER.includes(username)) {
+    res.status(403).json({ error: 'Доступа нет — обратись к @lzyloyd.' });
+    return null;
+  }
+  return { username, id: user.id };
 }
 
 function weekView(week, auth) {
@@ -98,6 +114,35 @@ export function startMiniAppServer() {
     } catch (err) {
       console.error('[miniapp] send-summary failed:', err);
       res.status(500).json({ error: 'Не получилось отправить сводку.' });
+    }
+  });
+
+  app.post('/api/wuvochka/state', async (req, res) => {
+    const auth = authenticateWuvochka(req, res);
+    if (!auth) return;
+    const profile = await loadProfile(auth.id);
+    res.json(profile);
+  });
+
+  app.post('/api/wuvochka/update', async (req, res) => {
+    const auth = authenticateWuvochka(req, res);
+    if (!auth) return;
+    const { action, charId } = req.body ?? {};
+    if (!['favorite', 'owned', 'avatar'].includes(action) || !Number.isInteger(charId)) {
+      res.status(400).json({ error: 'Некорректные данные.' });
+      return;
+    }
+    try {
+      const profile =
+        action === 'favorite'
+          ? await toggleFavorite(auth.id, charId)
+          : action === 'owned'
+            ? await toggleOwned(auth.id, charId)
+            : await setAvatar(auth.id, charId);
+      res.json(profile);
+    } catch (err) {
+      console.error('[miniapp] wuvochka update failed:', err);
+      res.status(500).json({ error: 'Не получилось сохранить, попробуй ещё раз.' });
     }
   });
 

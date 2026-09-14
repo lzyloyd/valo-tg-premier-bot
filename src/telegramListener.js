@@ -19,6 +19,7 @@ const MATCH_URL_RE = /tracker\.gg\/valorant\/match\/([0-9a-f-]{36})/i;
 const MATCH_URL_RE_G = /tracker\.gg\/valorant\/match\/([0-9a-f-]{36})/gi;
 const HEALTHCHECK_RE = /^healthcheck$/i;
 const SCHEDULE_RE = /^расписание$/i;
+const WUVOCHKA_RE = /^вувочка$/i;
 // "покажи премьер матч" must match before the more general "покажи матч" —
 // both start with "покажи", only one has "премьер" in the middle.
 // Note: no \b here — \b is defined via \w, which is ASCII-only ([A-Za-z0-9_]),
@@ -283,6 +284,14 @@ async function handleCommand(commandText, message) {
       // A t.me/<bot>/<app> deep link, not a "web_app" button — those only
       // work in private chats, and this needs to work from a group topic.
       await sendTextTo(message.chat.id, message.message_thread_id, `📅 Расписание команды: ${config.miniappLaunchUrl}`);
+      return;
+    }
+    if (WUVOCHKA_RE.test(trimmed)) {
+      if (!config.miniappWuvochkaLaunchUrl) {
+        await sendTextTo(message.chat.id, message.message_thread_id, 'Мини-апп Вувочка ещё не настроен (нет MINIAPP_WUVOCHKA_LAUNCH_URL).');
+        return;
+      }
+      await sendTextTo(message.chat.id, message.message_thread_id, `🎐 Вувочка: ${config.miniappWuvochkaLaunchUrl}`);
       return;
     }
     if (PREMIER_MATCH_RE.test(trimmed)) {

@@ -47,6 +47,11 @@ export const config = {
   adminUserId: process.env.ADMIN_USER_ID ? Number(process.env.ADMIN_USER_ID) : null,
   scheduleDataPath: path.join(dataDir, 'schedule.json'),
 
+  // "Вувочка" (Wuthering Waves companion) mini app — shares the same
+  // MINIAPP_PORT/MINIAPP_PUBLIC_URL server above, served from /wuvochka/.
+  miniappWuvochkaLaunchUrl: process.env.MINIAPP_WUVOCHKA_LAUNCH_URL || null,
+  wuvochkaDataPath: path.join(dataDir, 'wuvochka.json'),
+
   // "добавь в таблицу статистики" — writes per-match player stats into the
   // team's Google Sheet (one tab per map+mode, see sheetsStats.js).
   googleServiceAccountKeyPath: path.join(dataDir, 'google-service-account.json'),
