@@ -100,6 +100,14 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .char-hero{display:flex;gap:14px;align-items:center;padding:16px;background:linear-gradient(135deg,var(--surface-2),var(--surface));border-radius:16px;border:1px solid var(--border);margin-bottom:16px;}
 .char-hero h2{margin:0;font-size:19px;font-weight:800;}
 .hero-tags{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;}
+.fav-row{display:flex;gap:8px;margin-bottom:16px;}
+.fav-row[hidden]{display:none;}
+.fav-btn,.own-btn{flex:1;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12px;padding:10px 6px;border-radius:10px;cursor:pointer;}
+.fav-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
+.own-btn.active{background:rgba(61,219,168,.14);border-color:var(--good);color:var(--good);}
+.profile-empty{font-size:12.5px;color:var(--text-muted);padding:6px 0 16px;}
+.profile-section h3{margin:0 0 11px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;}
+.profile-section{margin-bottom:22px;}
 .hero-tag{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:4px 8px;border-radius:6px;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;gap:4px;}
 .hero-tag.tier{background:var(--accent-soft);color:var(--accent);}
 
@@ -175,6 +183,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
     <button class="tab active" data-view="tierlist">Тир-лист</button>
     <button class="tab" data-view="teams">Команды</button>
     <button class="tab" data-view="characters">Персонажи</button>
+    <button class="tab" data-view="profile">Профиль</button>
   </div>
 
   <!-- TIER LIST -->
@@ -751,6 +760,28 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
     </div>
   </div>
 
+  <!-- PROFILE -->
+  <div class="view" id="view-profile">
+    <div class="screen">
+      <div class="profile-empty">
+        Пока хранится в этом браузере. В приложении внутри Telegram профиль
+        будет привязан к вашему Telegram ID.
+      </div>
+      <div id="profile-content">
+        <div class="profile-section">
+          <h3>Мои персонажи</h3>
+          <div class="char-grid" id="profile-owned-grid"></div>
+          <div class="profile-empty" id="profile-owned-empty">Пока никого не отметили — откройте персонажа и нажмите «Отметить как мой».</div>
+        </div>
+        <div class="profile-section">
+          <h3>Избранное</h3>
+          <div class="char-grid" id="profile-fav-grid"></div>
+          <div class="profile-empty" id="profile-fav-empty">Пока пусто — добавляйте персонажей в избранное с их страницы.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- CHARACTER DETAIL -->
   <div class="view" id="view-detail">
     <div class="screen">
@@ -770,6 +801,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
             <div class="hero-tag tier">T0.5 · DPS</div>
           </div>
         </div>
+      </div>
+
+      <div class="fav-row" id="fav-row-real">
+        <button class="fav-btn" id="fav-btn-real" onclick="toggleFavorite()">☆ В избранное</button>
+        <button class="own-btn" id="own-btn-real" onclick="toggleOwned()">+ Отметить как «мой»</button>
       </div>
 
       <div class="subtabs">
@@ -971,6 +1007,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         </div>
       </div>
 
+      <div class="fav-row" id="fav-row-generic">
+        <button class="fav-btn" id="fav-btn-generic" onclick="toggleFavorite()">☆ В избранное</button>
+        <button class="own-btn" id="own-btn-generic" onclick="toggleOwned()">+ Отметить как «мой»</button>
+      </div>
+
       <div class="subtabs">
         <button class="subtab-g active" data-subg="kit">Кит</button>
         <button class="subtab-g" data-subg="review">Обзор</button>
@@ -1053,6 +1094,7 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
   document.getElementById('view-' + t.dataset.view).classList.add('active');
+  if (t.dataset.view === 'profile') renderProfile();
 }));
 document.querySelectorAll('.subtab').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.subtab').forEach(x => x.classList.remove('active'));
@@ -1090,10 +1132,12 @@ document.querySelectorAll('.filters').forEach(group => {
 
 const SHOWCASE_CHAR_ID = 1210; // Aemeath — the one character with a hand-written full page so far
 let lastCharViewId = 'view-characters';
+let currentCharId = null;
 
 function openChar(id){
   const character = CHARACTERS.find(c => c.id === id);
   if (!character) return;
+  currentCharId = id;
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
 
@@ -1120,6 +1164,7 @@ function openChar(id){
     document.getElementById('subg-kit').classList.add('active');
     document.getElementById('view-detail-generic').classList.add('active');
   }
+  refreshFavToggleUI();
   window.scrollTo(0,0);
 }
 function closeChar(){
@@ -1145,5 +1190,86 @@ function openWeapon(id){
 function closeWeapon(){
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   document.getElementById(lastCharViewId).classList.add('active');
+}
+
+// ---- Profile: "my characters" + favorites. This prototype runs as a
+// Claude Artifact, which has no per-account identity of its own to key a
+// real profile on — so for now this is saved per-browser (localStorage).
+// In the real production mini-app this same favorites/owned data would be
+// keyed by Telegram user id instead (see telegramAuth.js's initData
+// pattern already used by the "Расписание" mini-app) and stored server-side.
+const PROFILE_STORAGE_KEY = 'wuvochka-profile-v1';
+let favorites = new Set();
+let owned = new Set();
+
+function loadProfile() {
+  try {
+    const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    favorites = new Set(data.favorites || []);
+    owned = new Set(data.owned || []);
+  } catch (e) {
+    // private browsing / storage blocked — just start empty, no persistence this session
+  }
+}
+loadProfile();
+
+function persistProfile() {
+  try {
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify({ favorites: [...favorites], owned: [...owned] }));
+  } catch (e) {
+    // best effort only
+  }
+}
+
+function toggleFavorite() {
+  if (currentCharId == null) return;
+  if (favorites.has(currentCharId)) favorites.delete(currentCharId); else favorites.add(currentCharId);
+  refreshFavToggleUI();
+  persistProfile();
+}
+function toggleOwned() {
+  if (currentCharId == null) return;
+  if (owned.has(currentCharId)) owned.delete(currentCharId); else owned.add(currentCharId);
+  refreshFavToggleUI();
+  persistProfile();
+}
+
+function refreshFavToggleUI() {
+  const isFav = currentCharId != null && favorites.has(currentCharId);
+  const isOwned = currentCharId != null && owned.has(currentCharId);
+  ['fav-btn-real', 'fav-btn-generic'].forEach((id) => {
+    const el = document.getElementById(id);
+    el.classList.toggle('active', isFav);
+    el.textContent = isFav ? '★ В избранном' : '☆ В избранное';
+  });
+  ['own-btn-real', 'own-btn-generic'].forEach((id) => {
+    const el = document.getElementById(id);
+    el.classList.toggle('active', isOwned);
+    el.textContent = isOwned ? '✓ Мой персонаж' : '+ Отметить как «мой»';
+  });
+}
+
+function renderProfileGrid(gridId, emptyId, idSet) {
+  const grid = document.getElementById(gridId);
+  const empty = document.getElementById(emptyId);
+  const ids = [...idSet];
+  if (ids.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = ids.map((id) => {
+    const c = CHARACTERS.find((x) => x.id === id);
+    if (!c) return '';
+    const el = c.element.toLowerCase();
+    return '<div class="portrait lg ' + el + '" onclick="openChar(' + id + ')"><img class="portrait-img" src="assets/characters/' + id + '.webp" alt=""><span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="p-name">' + c.name + '</span></div>';
+  }).join('');
+}
+function renderProfile() {
+  renderProfileGrid('profile-owned-grid', 'profile-owned-empty', owned);
+  renderProfileGrid('profile-fav-grid', 'profile-fav-empty', favorites);
 }
 </script>
