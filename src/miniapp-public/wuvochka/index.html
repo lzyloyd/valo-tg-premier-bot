@@ -20,17 +20,15 @@
 
   --good:#3ddba8; --bad:#ff5a6e;
 
-  --app-max-width:480px;
-  --char-grid-cols:3;
-  --tier-grid-cols:4;
+  /* scales continuously with viewport width instead of jumping between
+     fixed breakpoints - 70vw grows smoothly, clamped to a phone-width
+     floor and a comfortable desktop ceiling */
+  --app-max-width:clamp(480px, 70vw, 1080px);
 }
-@media (min-width:700px){:root{--app-max-width:640px;--char-grid-cols:4;--tier-grid-cols:5;}}
-@media (min-width:1000px){:root{--app-max-width:860px;--char-grid-cols:5;--tier-grid-cols:6;}}
-@media (min-width:1300px){:root{--app-max-width:1080px;--char-grid-cols:6;--tier-grid-cols:8;}}
 *{box-sizing:border-box;}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:'PT Sans',sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:hidden;}
 h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
-#app{max-width:var(--app-max-width);margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);transition:max-width .15s ease;}
+#app{max-width:var(--app-max-width);margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);}
 
 /* header + nav */
 .app-header{padding:20px 16px 14px;background:var(--surface);position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;z-index:6;border-bottom:1px solid var(--border);box-sizing:border-box;max-width:var(--app-max-width);}
@@ -147,9 +145,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
    tier is tall enough (3 role rows) for that to look proportionate again */
 #view-tierlist .tier-row{align-items:stretch;padding:16px;margin-bottom:16px;}
 #view-tierlist .tier-content{flex:1;min-width:0;}
-#view-tierlist .tier-items{display:grid;grid-template-columns:repeat(var(--tier-grid-cols),1fr);gap:10px;}
+#view-tierlist .tier-items{display:grid;grid-template-columns:repeat(auto-fill, minmax(96px, 1fr));gap:10px;}
 #view-tierlist .tier-items .portrait.sm{width:100%;}
-@media (max-width:380px){#view-tierlist .tier-items{grid-template-columns:repeat(3,1fr);}}
 .tier-role-group{margin-top:16px;}
 .tier-role-group:first-of-type{margin-top:0;}
 .tier-role-group.hidden-by-filter{display:none;}
@@ -173,7 +170,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .teams-legend b{color:var(--accent);font-weight:700;}
 
 /* character grid */
-.char-grid{display:grid;grid-template-columns:repeat(var(--char-grid-cols),1fr);gap:11px;}
+.char-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(108px, 1fr));gap:11px;}
 
 /* character detail */
 .back-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;color:var(--text-muted);font-size:12.5px;font-weight:700;font-family:'Exo 2',sans-serif;transition:color .15s ease;width:fit-content;}
@@ -380,7 +377,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.92</div>
+    <div class="app-sub">WUTHERING WAVES · v1.93</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
