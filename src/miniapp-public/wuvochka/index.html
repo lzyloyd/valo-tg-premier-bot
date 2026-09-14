@@ -368,7 +368,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.50</div>
+    <div class="app-sub">WUTHERING WAVES · v1.60</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1675,6 +1675,19 @@ function renderCalcTab(rootEl, charId){
     html += '<div class="card"><h3>Урон по константам (S0—S6)</h3><div class="calc-variant-note">' + variant.teamNote + '</div><table class="stat-table seq-table"><tr><th>Конст</th><th>Урон</th><th>DPS</th><th>%</th></tr>'
       + variant.sequences.map((s) => '<tr class="' + (s.seq === 'S6' ? 'seq-highlight' : '') + '"><td>' + s.seq + '</td><td>' + s.dmg + '</td><td>' + s.dps + '</td><td>' + s.pct.toFixed(1) + '%</td></tr>').join('')
       + '</table></div>';
+    if (variant.characterBuild) {
+      const cb = variant.characterBuild;
+      const w = WEAPONS.find((x) => x.id === cb.weaponId);
+      const setBase = ECHOES.find((x) => x.name === cb.echoSet);
+      const echoSetAttr = cb.echoSet.replace(/'/g, "\\'");
+      const mainEchoAttr = cb.mainEcho.name.replace(/'/g, "\\'");
+      html += '<div class="card"><h3>Сборка на момент расчёта</h3>'
+        + (w ? '<div class="item-card clickable" onclick="openWeapon(' + cb.weaponId + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + cb.weaponId + '.webp" alt=""></div><div class="item-info"><div class="iname">' + w.name + '</div></div></div>' : '')
+        + (setBase ? '<div class="item-card clickable" onclick="openEcho(\'' + echoSetAttr + '\')"><div class="item-icon"><img class="item-icon-img" src="' + setBase.badge + '" alt=""></div><div class="item-info"><div class="iname">' + cb.echoSet + '</div></div></div>' : '')
+        + '<div class="item-card clickable" onclick="openEchoItem(\'' + mainEchoAttr + '\')"><div class="item-icon"><img class="item-icon-img" src="' + cb.mainEcho.icon + '" alt=""></div><div class="item-info"><div class="iname">' + cb.mainEcho.name + '</div></div></div>'
+        + '<div class="pill-list" style="margin-top:10px">' + cb.costSlots.map((s) => '<div class="pill">' + s.slot + ': ' + s.stat + '</div>').join('') + '</div>'
+        + '<div class="calc-variant-note" style="margin-top:8px">Сабстаты: ' + cb.substats + '</div></div>';
+    }
     const maxPct = Math.max(...variant.damageSources.map((d) => d.pct));
     html += '<div class="card"><h3>Откуда берётся урон</h3>' + variant.damageSources.map((d) => {
       return '<div class="dmg-bar-row"><div class="dmg-bar-top"><span>' + d.label + '</span><span>' + d.pct.toFixed(1) + '%</span></div><div class="dmg-bar-track"><div class="dmg-bar-fill" style="width:' + (maxPct ? (d.pct / maxPct * 100) : 0) + '%"></div></div></div>';

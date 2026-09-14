@@ -147,6 +147,19 @@
           "id": "tuneRupture",
           "name": "Tune Rupture",
           "teamNote": "Расчёт включает баффы от Lynae + Spectrum Blaster + Pact of Neonlight Leap + Hyvatia, и Mornye + Discord + Halo of Starry Radiance + Reactor Husk.",
+          "characterBuild": {
+            "weaponId": 21020076,
+            "echoSet": "Trailblazing Star",
+            "mainEcho": { "name": "Sigillum", "icon": "/wuwa-assets/echoes/6000191.webp" },
+            "costSlots": [
+              { "slot": "4-cost", "stat": "Крит. урон" },
+              { "slot": "3-cost", "stat": "АТК%" },
+              { "slot": "3-cost", "stat": "Бонус Fusion" },
+              { "slot": "1-cost", "stat": "АТК%" },
+              { "slot": "1-cost", "stat": "АТК%" }
+            ],
+            "substats": "Восст. энергии (27.5%), Крит. шанс (40.4%), Крит. урон (80.7%), АТК (17.2%), Бонус урона Liberation (8.6%)"
+          },
           "sequences": [
             { "seq": "S0", "dmg": "1 531 409", "dps": "144 336", "pct": 100.0 },
             { "seq": "S1", "dmg": "1 663 676", "dps": "156 802", "pct": 108.64 },
@@ -171,6 +184,19 @@
           "id": "fusionBurst",
           "name": "Fusion Burst",
           "teamNote": "Расчёт включает баффы от Denia + Forged Dwarf Star + Chromatic Foam + Reminiscence: Denia, и Chisa + Kumokiri + Rejuvenating Glow + Fallacy of No Return.",
+          "characterBuild": {
+            "weaponId": 21020076,
+            "echoSet": "Trailblazing Star",
+            "mainEcho": { "name": "Sigillum", "icon": "/wuwa-assets/echoes/6000191.webp" },
+            "costSlots": [
+              { "slot": "4-cost", "stat": "Крит. урон" },
+              { "slot": "3-cost", "stat": "АТК%" },
+              { "slot": "3-cost", "stat": "Бонус Fusion" },
+              { "slot": "1-cost", "stat": "АТК%" },
+              { "slot": "1-cost", "stat": "АТК%" }
+            ],
+            "substats": "Восст. энергии (18.3%), Крит. шанс (40.4%), Крит. урон (80.7%), АТК (25.8%), Бонус урона Liberation (8.6%)"
+          },
           "sequences": [
             { "seq": "S0", "dmg": "1 457 829", "dps": "137 401", "pct": 100.0 },
             { "seq": "S1", "dmg": "1 570 410", "dps": "148 012", "pct": 107.72 },
