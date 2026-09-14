@@ -6,6 +6,7 @@ import { fetchMatchDetail, fetchTeamStandings, gotoTrackerProfile } from './trac
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
 import { sendPhotoTo, sendTextTo, matchCaption } from './telegram.js';
+import { appendMatchToStatsSheet } from './sheetsStats.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
 const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
@@ -13,6 +14,7 @@ const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
 // How you get the bot's attention — "Резалтик, ..." with or without the comma.
 const TRIGGER = /^рез[аa]лтик[\s,:-]*/i;
 const MATCH_URL_RE = /tracker\.gg\/valorant\/match\/([0-9a-f-]{36})/i;
+const MATCH_URL_RE_G = /tracker\.gg\/valorant\/match\/([0-9a-f-]{36})/gi;
 const HEALTHCHECK_RE = /^healthcheck$/i;
 const SCHEDULE_RE = /^расписание$/i;
 // "покажи премьер матч" must match before the more general "покажи матч" —
@@ -22,6 +24,13 @@ const SCHEDULE_RE = /^расписание$/i;
 const PREMIER_MATCH_RE = /^покажи\s+премьер\s+матч(?=\s|$)/i;
 const ANY_MATCH_RE = /^покажи\s+матч(?=\s|$)/i;
 const PRACTICE_MATCH_RE = /^покажи\s+прак(?=\s|$)/i;
+// "добавь в таблицу статистики следующие премьер матчи:\n<ссылка>\n<ссылка>..."
+const STATS_PREMIER_RE = /^добавь\s+в\s+таблицу\s+статистики\s+следующие\s+премьер\s+матч/i;
+const STATS_PRACTICE_RE = /^добавь\s+в\s+таблицу\s+статистики\s+следующие\s+прак/i;
+
+function extractAllMatchIds(text) {
+  return [...text.matchAll(MATCH_URL_RE_G)].map((m) => m[1]);
+}
 
 async function loadOffset() {
   try {
@@ -108,6 +117,44 @@ async function summarizeAnyMatch(matchId, message) {
   }
 }
 
+// "Резалтик, добавь в таблицу статистики следующие премьер матчи:"/"...праки:"
+// — logs each match's per-player stats as a new "Game N" column on the
+// relevant "<Map> - <Mode>" tab of the Google Sheet, instead of rendering a
+// scoreboard. "Our team" is resolved the same permissive way as "покажи
+// матч" (tracked player first, falling back to any known roster member) so
+// a match Space didn't play still gets logged correctly.
+async function addMatchesToStatsSheet(matchIds, mode, message) {
+  const browser = await getBrowser();
+  const page = await browser.newPage();
+  const lines = [];
+  try {
+    await gotoTrackerProfile(page);
+    for (const matchId of matchIds) {
+      try {
+        const raw = await fetchMatchDetail(page, matchId);
+        const match = buildMatchView(raw, {}, {
+          trackedRiotId: config.trackedRiotId,
+          requireTracked: false,
+          ourRosterRiotIds: config.teamRosterRiotIds,
+        });
+        const { tabTitle, gameNumber, written, skipped } = await appendMatchToStatsSheet({
+          mapName: match.mapName,
+          mode,
+          players: match.ourTeam,
+        });
+        const skippedNote = skipped.length ? `, не найдены в таблице: ${skipped.join(', ')}` : '';
+        lines.push(`✅ ${matchId.slice(0, 8)}… → "${tabTitle}", Game ${gameNumber} (${written.length} игроков${skippedNote})`);
+      } catch (err) {
+        console.error(`[listener] failed to log match ${matchId} to stats sheet:`, err);
+        lines.push(`❌ ${matchId.slice(0, 8)}… — ${err.message}`);
+      }
+    }
+  } finally {
+    await page.close();
+  }
+  await sendTextTo(message.chat.id, message.message_thread_id, lines.join('\n'));
+}
+
 function healthcheckReply() {
   const uptimeMin = Math.floor(process.uptime() / 60);
   return `✅ На связи, вижу сообщения. Аптайм процесса: ${uptimeMin} мин.`;
@@ -153,6 +200,16 @@ async function handleCommand(commandText, message) {
         return;
       }
       await summarizeAnyMatch(urlMatch[1], message);
+      return;
+    }
+    if (STATS_PREMIER_RE.test(trimmed) || STATS_PRACTICE_RE.test(trimmed)) {
+      const matchIds = extractAllMatchIds(commandText);
+      if (matchIds.length === 0) {
+        await sendTextTo(message.chat.id, message.message_thread_id, 'Нужна хотя бы одна ссылка на матч tracker.gg.');
+        return;
+      }
+      const mode = STATS_PREMIER_RE.test(trimmed) ? 'Premier' : 'Праки';
+      await addMatchesToStatsSheet(matchIds, mode, message);
       return;
     }
     await sendTextTo(message.chat.id, message.message_thread_id, 'Не знаю такой команды пока.');

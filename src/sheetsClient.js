@@ -31,9 +31,16 @@ export async function getSpreadsheetMeta(spreadsheetId) {
   return json.sheets.map((s) => s.properties);
 }
 
-/** A1-style range, e.g. "'Haven - Premier'!A1:Z50". Returns a raw values matrix (rows of cells; missing trailing cells are simply absent from that row's array). */
-export async function getValues(spreadsheetId, range) {
-  const json = await authedFetch(`${BASE}/${spreadsheetId}/values/${encodeURIComponent(range)}`);
+/**
+ * A1-style range, e.g. "'Haven - Premier'!A1:Z50". Returns a raw values matrix
+ * (rows of cells; missing trailing cells are simply absent from that row's
+ * array). `valueRenderOption: 'FORMULA'` reads formulas instead of computed
+ * values — used to find an AVERAGE range's current end column.
+ */
+export async function getValues(spreadsheetId, range, valueRenderOption = 'FORMATTED_VALUE') {
+  const json = await authedFetch(
+    `${BASE}/${spreadsheetId}/values/${encodeURIComponent(range)}?valueRenderOption=${valueRenderOption}`,
+  );
   return json.values ?? [];
 }
 
@@ -42,6 +49,18 @@ export async function updateValues(spreadsheetId, range, values) {
     `${BASE}/${spreadsheetId}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`,
     { method: 'PUT', body: JSON.stringify({ range, values }) },
   );
+}
+
+/** data: [{range, values}] — writes several disjoint ranges in one call. */
+export async function batchUpdateValues(spreadsheetId, data) {
+  return authedFetch(`${BASE}/${spreadsheetId}/values:batchUpdate`, {
+    method: 'POST',
+    body: JSON.stringify({ valueInputOption: 'USER_ENTERED', data }),
+  });
+}
+
+export async function clearValues(spreadsheetId, range) {
+  return authedFetch(`${BASE}/${spreadsheetId}/values/${encodeURIComponent(range)}:clear`, { method: 'POST' });
 }
 
 export async function batchUpdate(spreadsheetId, requests) {

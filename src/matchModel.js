@@ -95,6 +95,9 @@ export function buildMatchView(
     firstKills: p.stats.firstKills?.value ?? 0,
     firstDeaths: p.stats.firstDeaths?.value ?? 0,
     trs: Math.round(p.stats.trnPerformanceScore?.value ?? 0),
+    kdRatio: p.stats.kdRatio?.value ?? 0,
+    multiKills: p.stats.multiKills?.value ?? 0,
+    riotId: p.attributes.platformUserIdentifier,
   });
 
   const buildTeam = (teamId) => {

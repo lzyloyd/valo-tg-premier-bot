@@ -19,7 +19,8 @@
     "debug-playlist": "node scripts/debug-playlist.mjs",
     "debug-roster": "node scripts/debug-roster.mjs",
     "debug-poller-once": "node scripts/debug-poller-once.mjs",
-    "debug-sheet": "node scripts/debug-sheet.mjs"
+    "debug-sheet": "node scripts/debug-sheet.mjs",
+    "debug-add-match-stats": "node scripts/debug-add-match-stats.mjs"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
