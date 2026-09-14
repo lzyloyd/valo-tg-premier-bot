@@ -329,7 +329,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.00</div>
+    <div class="app-sub">WUTHERING WAVES · v1.10</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1519,9 +1519,23 @@ function closeChar(){
   document.getElementById('view-characters').classList.add('active');
 }
 
+// A single lastCharViewId variable broke down once users could bounce between
+// several detail-style pages in a row (echo -> single echo -> echo again via a
+// set pill), since each open would blindly overwrite it and "back" could end up
+// pointing at the page it was opened from -> itself. A real history stack fixes it.
+let viewHistory = [];
+function pushViewHistory(){
+  const active = document.querySelector('.view.active');
+  if (active) viewHistory.push(active.id);
+}
+function popViewHistory(fallbackId){
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+  const prev = viewHistory.length ? viewHistory.pop() : (fallbackId || 'view-characters');
+  document.getElementById(prev).classList.add('active');
+}
+
 function openWeapon(id){
-  const activeView = document.querySelector('.view.active');
-  if (activeView) lastCharViewId = activeView.id;
+  pushViewHistory();
   const base = WEAPONS.find((x) => x.id === id);
   if (!base) return;
   const w = WEAPON_FACTS[id];
@@ -1537,13 +1551,11 @@ function openWeapon(id){
   window.scrollTo(0,0);
 }
 function closeWeapon(){
-  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  document.getElementById(lastCharViewId).classList.add('active');
+  popViewHistory('view-weapons');
 }
 
 function openEcho(setName){
-  const activeView = document.querySelector('.view.active');
-  if (activeView) lastCharViewId = activeView.id;
+  pushViewHistory();
   const base = ECHOES.find((x) => x.name === setName);
   if (!base) return;
   const facts = ECHO_FACTS[setName];
@@ -1566,33 +1578,27 @@ function openEcho(setName){
   window.scrollTo(0,0);
 }
 function closeEcho(){
-  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  document.getElementById(lastCharViewId).classList.add('active');
+  popViewHistory('view-echoes');
 }
-let echoSetsOrigin = 'view-echoes';
 function goToEchoSets(){
-  const activeView = document.querySelector('.view.active');
-  if (activeView) { lastCharViewId = activeView.id; echoSetsOrigin = activeView.id; }
+  pushViewHistory();
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   document.getElementById('view-echo-sets').classList.add('active');
   document.getElementById('view-echo-sets').querySelectorAll('.char-grid').forEach(applyStagger);
   window.scrollTo(0,0);
 }
 function closeEchoSets(){
-  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  document.getElementById(echoSetsOrigin).classList.add('active');
+  popViewHistory('view-echoes');
 }
 
 function openEchoItem(itemName){
-  const activeView = document.querySelector('.view.active');
-  if (activeView) lastCharViewId = activeView.id;
+  pushViewHistory();
   const item = ECHO_ITEMS.find((x) => x.n === itemName);
   if (!item) return;
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   const firstSet = item.s.length ? ECHOES.find((x) => x.name === item.s[0]) : null;
   document.getElementById('ei-portrait').className = 'portrait hero' + (firstSet ? '' : ' noset-hero');
-  document.getElementById('ei-portrait-img').src = firstSet ? ('assets/sets/' + firstSet.icon + '.webp') : '';
-  document.getElementById('ei-portrait-img').style.display = firstSet ? '' : 'none';
+  document.getElementById('ei-portrait').innerHTML = (firstSet ? echoArtHtml(firstSet) : '') + '<span class="ring"></span>';
   document.getElementById('ei-name').textContent = item.n;
   document.getElementById('ei-el-dot').className = 'el-dot' + (item.e ? ' el-' + item.e.toLowerCase() : '');
   document.getElementById('ei-element').textContent = item.e || '—';
@@ -1605,8 +1611,7 @@ function openEchoItem(itemName){
   window.scrollTo(0,0);
 }
 function closeEchoItem(){
-  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  document.getElementById(lastCharViewId).classList.add('active');
+  popViewHistory('view-echoes');
 }
 
 let currentEchoSetFilter = 'all';
@@ -1620,7 +1625,6 @@ function selectEchoSet(val){
   document.getElementById('echo-set-trigger-icon').innerHTML = opt ? opt.querySelector('.echo-set-option-icon').innerHTML : '';
   document.querySelectorAll('.echo-set-option').forEach((o) => o.classList.toggle('active', o.dataset.val === val));
   document.getElementById('echo-set-dropdown').classList.remove('open');
-  echoItemsPage = 1;
   renderEchoItemsGrid();
 }
 function renderEchoSetOptions(){
@@ -1675,48 +1679,68 @@ function echoArtHtml(setObj){
   return '<img class="echo-icon-solo" src="assets/sets/' + setObj.icon + '.webp" alt="">';
 }
 const ECHO_PAGE_SIZE = 40;
-let echoItemsPage = 1;
+let echoFilteredItems = [];
+let echoRenderedCount = 0;
+function echoCardHtml(it){
+  const firstSet = it.s.length ? ECHOES.find((x) => x.name === it.s[0]) : null;
+  const setsHtml = it.s.length
+    ? it.s.map((name) => '<span class="echo-set-pill" onclick="event.stopPropagation();openEcho(\'' + name.replace(/'/g, "\\'") + '\')">' + name + '</span>').join('')
+    : '<span class="noset-label">Без сета</span>';
+  const nameAttr = it.n.replace(/'/g, "\\'");
+  return '<div class="echo-item-row" onclick="openEchoItem(\'' + nameAttr + '\')">' +
+    '<div class="echo-icon' + (firstSet ? '' : ' noset') + '">' + echoArtHtml(firstSet) + '</div>' +
+    '<div class="echo-item-info">' +
+      '<div class="echo-item-name">' + it.n + '</div>' +
+      '<div class="echo-item-meta">' +
+        (it.co != null ? '<span class="hero-tag">Cost ' + it.co + '</span>' : '') +
+        (it.cl ? '<span class="hero-tag">' + (CLASS_RU[it.cl] || it.cl) + '</span>' : '') +
+      '</div>' +
+      '<div class="echo-item-sets">' + setsHtml + '</div>' +
+    '</div>' +
+  '</div>';
+}
 function renderEchoItemsGrid(){
   const setVal = currentEchoSetFilter;
   const costChip = document.querySelector('#echo-cost-filters .chip.active');
   const costVal = costChip ? costChip.dataset.val : 'all';
-  const items = ECHO_ITEMS.filter((it) => {
+  echoFilteredItems = ECHO_ITEMS.filter((it) => {
     if (setVal === 'none' && it.s.length) return false;
     if (setVal !== 'all' && setVal !== 'none' && !it.s.includes(setVal)) return false;
     if (costVal !== 'all' && String(it.co) !== costVal) return false;
     return true;
   });
-  document.getElementById('echo-count').textContent = 'Найдено: ' + items.length;
-  const visible = items.slice(0, echoItemsPage * ECHO_PAGE_SIZE);
+  document.getElementById('echo-count').textContent = 'Найдено: ' + echoFilteredItems.length;
+  echoRenderedCount = 0;
+  document.getElementById('echoes-grid').innerHTML = '';
+  appendMoreEchoItems();
+}
+function appendMoreEchoItems(){
+  // Appends only the next page instead of rebuilding the whole grid, so cards
+  // already on screen (and the user's scroll position) aren't disturbed —
+  // rebuilding everything each click was what made "Показать больше" jump.
   const grid = document.getElementById('echoes-grid');
-  grid.innerHTML = visible.map((it) => {
-    const firstSet = it.s.length ? ECHOES.find((x) => x.name === it.s[0]) : null;
-    const setsHtml = it.s.length
-      ? it.s.map((name) => '<span class="echo-set-pill" onclick="event.stopPropagation();openEcho(\'' + name.replace(/'/g, "\\'") + '\')">' + name + '</span>').join('')
-      : '<span class="noset-label">Без сета</span>';
-    const nameAttr = it.n.replace(/'/g, "\\'");
-    return '<div class="echo-item-row" onclick="openEchoItem(\'' + nameAttr + '\')">' +
-      '<div class="echo-icon' + (firstSet ? '' : ' noset') + '">' + echoArtHtml(firstSet) + '</div>' +
-      '<div class="echo-item-info">' +
-        '<div class="echo-item-name">' + it.n + '</div>' +
-        '<div class="echo-item-meta">' +
-          (it.co != null ? '<span class="hero-tag">Cost ' + it.co + '</span>' : '') +
-          (it.cl ? '<span class="hero-tag">' + (CLASS_RU[it.cl] || it.cl) + '</span>' : '') +
-        '</div>' +
-        '<div class="echo-item-sets">' + setsHtml + '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-  if (visible.length < items.length) {
-    grid.innerHTML += '<button type="button" class="echo-load-more" onclick="echoItemsPage++;renderEchoItemsGrid();">Показать больше (' + (items.length - visible.length) + ')</button>';
+  const oldBtn = grid.querySelector('.echo-load-more');
+  if (oldBtn) oldBtn.remove();
+  const nextSlice = echoFilteredItems.slice(echoRenderedCount, echoRenderedCount + ECHO_PAGE_SIZE);
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = nextSlice.map(echoCardHtml).join('');
+  const newCards = [...wrapper.children];
+  newCards.forEach((card) => grid.appendChild(card));
+  echoRenderedCount += nextSlice.length;
+  if (echoRenderedCount < echoFilteredItems.length) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'echo-load-more';
+    btn.textContent = 'Показать больше (' + (echoFilteredItems.length - echoRenderedCount) + ')';
+    btn.addEventListener('click', appendMoreEchoItems);
+    grid.appendChild(btn);
   }
-  applyStagger(grid);
+  applyStagger({children: newCards});
 }
 document.getElementById('echo-cost-filters').querySelectorAll('.chip').forEach((chip) => {
   chip.addEventListener('click', () => {
     document.getElementById('echo-cost-filters').querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
     chip.classList.add('active');
-    echoItemsPage = 1;
     renderEchoItemsGrid();
   });
 });
