@@ -1706,7 +1706,7 @@ function setPillHtml(setName, stopProp){
   return '<span class="echo-set-pill" onclick="' + (stopProp ? 'event.stopPropagation();' : '') + 'openEcho(\'' + nameAttr + '\')">' + iconHtml + setName + '</span>';
 }
 function echoCostCompare(a, b){
-  return (a.cost == null ? 99 : a.cost) - (b.cost == null ? 99 : b.cost);
+  return (b.cost ?? -1) - (a.cost ?? -1);
 }
 const ECHO_PAGE_SIZE = 40;
 let echoFilteredItems = [];
