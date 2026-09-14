@@ -59,7 +59,17 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 
 .screen{padding:16px 16px 12px;flex:1;}
 .view{display:none;}
-.view.active{display:block;}
+.view.active{display:block;animation:viewFadeIn .3s ease;}
+#view-detail.active,#view-detail-generic.active,#view-weapon.active,#view-echo.active{animation:viewSlideIn .32s cubic-bezier(.16,1,.3,1);}
+@keyframes viewFadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes viewSlideIn{from{opacity:0;transform:translateX(28px);}to{opacity:1;transform:translateX(0);}}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.96);}to{opacity:1;transform:none;}}
+.char-grid>*,.tier-items>.portrait{animation:cardIn .4s ease backwards;}
+@keyframes pop{0%{transform:scale(1);}45%{transform:scale(1.1);}100%{transform:scale(1);}}
+.fav-btn.pop,.own-btn.pop{animation:pop .35s ease;}
+@keyframes avatarFlash{0%{box-shadow:0 0 0 0 var(--accent);}100%{box-shadow:0 0 0 9px rgba(66,232,212,0);}}
+.avatar-picker-preview.flash,.account-avatar.flash{animation:avatarFlash .55s ease;}
+@media (prefers-reduced-motion:reduce){.char-grid>*,.tier-items>.portrait{animation:none!important;}}
 
 /* element dots (small badges on portraits + filter chips) */
 .el-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block;}
@@ -79,7 +89,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
   transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
 .portrait:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 10px 22px rgba(0,0,0,.35);border-color:#324566;z-index:2;}
-@media (prefers-reduced-motion:reduce){.portrait,.portrait-img{transition:none!important;}}
+@media (prefers-reduced-motion:reduce){.portrait,.portrait-img,.view.active,.tier-badge.t0,.portrait.r5::after,.fav-btn,.own-btn,.avatar-picker-preview{animation:none!important;transition:none!important;}}
 .portrait.fusion{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-fusion) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.glacio{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-glacio) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.electro{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-electro) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
@@ -88,6 +98,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .portrait.havoc{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-havoc) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.physical{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-physical) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.r5{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r5) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
+.portrait.r5::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.22) 35%,transparent 50%);transform:translateX(-120%);animation:shimmer 4s ease-in-out infinite;pointer-events:none;}
+@keyframes shimmer{0%,55%,100%{transform:translateX(-120%);}75%{transform:translateX(120%);}}
 .portrait.r4{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r4) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.r3{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r3) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.r2{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r2) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
@@ -112,7 +124,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 /* tier list */
 .tier-row{display:flex;gap:10px;margin-bottom:12px;border-radius:14px;background:var(--surface);border:1px solid var(--border);padding:12px;}
 .tier-badge{width:40px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-weight:800;font-size:13px;color:#0a0e17;align-self:stretch;}
-.tier-badge.t0{background:var(--tier-0);} .tier-badge.t05{background:var(--tier-05);}
+.tier-badge.t0{background:var(--tier-0);animation:t0Pulse 2.4s ease-in-out infinite;} .tier-badge.t05{background:var(--tier-05);}
+@keyframes t0Pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,176,32,.45);}50%{box-shadow:0 0 0 5px rgba(255,176,32,0);}}
 .tier-badge.t1{background:var(--tier-1);} .tier-badge.t15{background:var(--tier-15);}
 .tier-badge.t2{background:var(--tier-2);} .tier-badge.t3{background:var(--tier-3);color:var(--text);}
 .tier-badge.t4{background:var(--tier-4);color:var(--text);}
@@ -176,10 +189,11 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .hero-tag{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:4px 8px;border-radius:6px;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;gap:4px;}
 .hero-tag.tier{background:var(--accent-soft);color:var(--accent);}
 
-.subtabs{display:flex;gap:2px;overflow-x:auto;margin-bottom:16px;border-bottom:1px solid var(--border);}
+.subtabs{position:relative;display:flex;gap:2px;overflow-x:auto;margin-bottom:16px;border-bottom:1px solid var(--border);}
+.subtab-indicator{position:absolute;left:0;bottom:-1px;width:0;height:2px;background:var(--accent);border-radius:2px;transition:left .25s cubic-bezier(.4,0,.2,1),width .25s cubic-bezier(.4,0,.2,1);pointer-events:none;}
 .subtab,.subtab-g{flex-shrink:0;border:none;background:none;color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12px;padding:9px 11px 11px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s ease;}
 .subtab:not(.active):hover,.subtab-g:not(.active):hover{color:var(--text);}
-.subtab.active,.subtab-g.active{color:var(--accent);border-bottom-color:var(--accent);}
+.subtab.active,.subtab-g.active{color:var(--accent);}
 .subview{display:none;} .subview.active{display:block;}
 .subview-g{display:none;} .subview-g.active{display:block;}
 .item-card.clickable{cursor:pointer;border-radius:10px;transition:background-color .15s ease;}
@@ -254,7 +268,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v0.6</div>
+    <div class="app-sub">WUTHERING WAVES · v0.7</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -960,6 +974,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <button class="subtab" data-sub="build">Билд</button>
         <button class="subtab" data-sub="gameplay">Геймплей</button>
         <button class="subtab" data-sub="calc">Расчёты</button>
+        <span class="subtab-indicator"></span>
       </div>
 
       <!-- KIT -->
@@ -1164,6 +1179,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <button class="subtab-g" data-subg="build">Билд</button>
         <button class="subtab-g" data-subg="gameplay">Геймплей</button>
         <button class="subtab-g" data-subg="calc">Расчёты</button>
+        <span class="subtab-indicator"></span>
       </div>
 
       <div class="subview-g active" id="subg-kit">
@@ -1295,17 +1311,26 @@ function goToProfile(){
 function goToTierList(){
   document.querySelector('.tab[data-view="tierlist"]').click();
 }
+function moveSubtabIndicator(btn){
+  const bar = btn.closest('.subtabs');
+  const indicator = bar && bar.querySelector('.subtab-indicator');
+  if (!indicator) return;
+  indicator.style.left = btn.offsetLeft + 'px';
+  indicator.style.width = btn.offsetWidth + 'px';
+}
 document.querySelectorAll('.subtab').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.subtab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.subview').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
   document.getElementById('sub-' + t.dataset.sub).classList.add('active');
+  moveSubtabIndicator(t);
 }));
 document.querySelectorAll('.subtab-g').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.subtab-g').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.subview-g').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
   document.getElementById('subg-' + t.dataset.subg).classList.add('active');
+  moveSubtabIndicator(t);
 }));
 document.querySelectorAll('.skill-kind').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.skill-kind').forEach(x => x.classList.remove('active'));
@@ -1346,6 +1371,8 @@ function openChar(id){
   if (id === SHOWCASE_CHAR_ID) {
     lastCharViewId = 'view-detail';
     document.getElementById('view-detail').classList.add('active');
+    const activeSubtab = document.querySelector('#view-detail .subtab.active') || document.querySelector('#view-detail .subtab');
+    if (activeSubtab) moveSubtabIndicator(activeSubtab);
   } else {
     lastCharViewId = 'view-detail-generic';
     const el = character.element.toLowerCase();
@@ -1365,6 +1392,7 @@ function openChar(id){
     document.querySelector('.subtab-g[data-subg="kit"]').classList.add('active');
     document.getElementById('subg-kit').classList.add('active');
     document.getElementById('view-detail-generic').classList.add('active');
+    moveSubtabIndicator(document.querySelector('.subtab-g[data-subg="kit"]'));
   }
   refreshFavToggleUI();
   window.scrollTo(0,0);
@@ -1421,11 +1449,16 @@ function closeEcho(){
   document.getElementById(lastCharViewId).classList.add('active');
 }
 
+function applyStagger(container){
+  if (!container) return;
+  [...container.children].forEach((el, i) => { el.style.animationDelay = (i % 14) * 25 + 'ms'; });
+}
 function renderWeaponsGrid(){
   const grid = document.getElementById('weapons-grid');
   grid.innerHTML = WEAPONS.map((w) => {
     return '<div class="portrait lg r' + w.rarity + '" data-type="' + w.weaponType + '" onclick="openWeapon(' + w.id + ')"><img class="portrait-img" src="assets/weapons/' + w.id + '.webp" alt=""><span class="ring"></span><span class="p-name">' + w.name + '</span></div>';
   }).join('');
+  applyStagger(grid);
 }
 function renderEchoesGrid(){
   const grid = document.getElementById('echoes-grid');
@@ -1434,9 +1467,11 @@ function renderEchoesGrid(){
     const nameAttr = e.name.replace(/'/g, "\\'");
     return '<div class="portrait lg ' + el + '" data-el="' + el + '" onclick="openEcho(\'' + nameAttr + '\')"><img class="portrait-img" src="assets/echoes/' + e.icon + '.webp" alt=""><span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="p-name">' + e.name + '</span></div>';
   }).join('');
+  applyStagger(grid);
 }
 renderWeaponsGrid();
 renderEchoesGrid();
+document.querySelectorAll('#view-characters .char-grid, #view-tierlist .tier-items').forEach(applyStagger);
 
 // ---- Profile: "my characters" + favorites. This prototype runs as a
 // Claude Artifact, which has no per-account identity of its own to key a
@@ -1472,18 +1507,27 @@ function persistProfile() {
   }
 }
 
+function bounce(el){
+  if (!el) return;
+  el.classList.remove('pop','flash');
+  void el.offsetWidth; // restart the animation even if it's still mid-play
+  el.classList.add(el.classList.contains('account-avatar') || el.classList.contains('avatar-picker-preview') ? 'flash' : 'pop');
+}
+
 function toggleFavorite() {
   if (currentCharId == null) return;
   if (favorites.has(currentCharId)) favorites.delete(currentCharId); else favorites.add(currentCharId);
   refreshFavToggleUI();
   updateAccountAvatar();
   persistProfile();
+  ['fav-btn-real', 'fav-btn-generic'].forEach((id) => bounce(document.getElementById(id)));
 }
 function toggleOwned() {
   if (currentCharId == null) return;
   if (owned.has(currentCharId)) owned.delete(currentCharId); else owned.add(currentCharId);
   refreshFavToggleUI();
   persistProfile();
+  ['own-btn-real', 'own-btn-generic'].forEach((id) => bounce(document.getElementById(id)));
 }
 
 function setAvatar(id) {
@@ -1492,6 +1536,8 @@ function setAvatar(id) {
   renderAvatarPicker();
   persistProfile();
   document.getElementById('avatar-picker-grid').hidden = true;
+  bounce(document.getElementById('account-avatar'));
+  bounce(document.getElementById('avatar-picker-preview'));
 }
 
 function toggleAvatarPicker() {
@@ -1522,6 +1568,7 @@ function renderAvatarPicker() {
     const ring = c.id === chosenId ? ' style="border-color:var(--accent)"' : '';
     return '<div class="portrait sm ' + el + '"' + ring + ' onclick="setAvatar(' + c.id + ')"><img class="portrait-img" src="assets/characters/' + c.id + '.webp" alt=""><span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="p-name">' + c.name + '</span></div>';
   }).join('');
+  applyStagger(grid);
 }
 
 function refreshFavToggleUI() {
@@ -1555,6 +1602,7 @@ function renderProfileGrid(gridId, emptyId, idSet) {
     const el = c.element.toLowerCase();
     return '<div class="portrait lg ' + el + '" onclick="openChar(' + id + ')"><img class="portrait-img" src="assets/characters/' + id + '.webp" alt=""><span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="p-name">' + c.name + '</span></div>';
   }).join('');
+  applyStagger(grid);
 }
 function renderProfile() {
   renderProfileGrid('profile-owned-grid', 'profile-owned-empty', owned);
