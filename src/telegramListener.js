@@ -35,6 +35,7 @@ const SEASON_STATS_RE = /^отправь\s+статистику\s+за\s+сез�
 // auto-trigger's 2nd game).
 const MAP_SUMMARY_RE = /^отправь\s+сводку\s+по\s+карте\s+(\S+)/i;
 const LEGEND_RE = /^легенда$/i;
+const SAD_RE = /^плохо$/i;
 
 function extractAllMatchIds(text) {
   return [...text.matchAll(MATCH_URL_RE_G)].map((m) => m[1]);
@@ -243,9 +244,9 @@ async function sendMapSummaryCommand(mapName, message) {
   await sendTextTo(message.chat.id, message.message_thread_id, `Отправлено в "Статистика": "${tabTitle}".`);
 }
 
-// "Резалтик, легенда" — a random "sigma" gif, just for fun.
-async function legendReply(message) {
-  const url = await fetchRandomGifUrl('sigma');
+// "Резалтик, легенда"/"Резалтик, плохо" — a random gif for a given tag, just for fun.
+async function sendRandomGif(message, tag) {
+  const url = await fetchRandomGifUrl(tag);
   if (!url) {
     await sendTextTo(message.chat.id, message.message_thread_id, 'Гифка не нашлась, попробуй ещё раз.');
     return;
@@ -267,7 +268,11 @@ async function handleCommand(commandText, message) {
       return;
     }
     if (LEGEND_RE.test(trimmed)) {
-      await legendReply(message);
+      await sendRandomGif(message, 'sigma');
+      return;
+    }
+    if (SAD_RE.test(trimmed)) {
+      await sendRandomGif(message, 'sad kitten');
       return;
     }
     if (SCHEDULE_RE.test(trimmed)) {
