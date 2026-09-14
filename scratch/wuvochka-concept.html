@@ -108,6 +108,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .portrait .ring{position:absolute;inset:7px;border:1.5px solid rgba(255,255,255,.16);border-radius:10px;pointer-events:none;}
 .portrait .glyph{font-family:'Exo 2',sans-serif;font-weight:800;color:rgba(255,255,255,.92);text-shadow:0 3px 14px rgba(0,0,0,.4);}
 .portrait .p-el{position:absolute;top:7px;right:7px;box-shadow:0 0 0 2px rgba(8,11,18,.7);}
+.set-badge-bottom{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:34px;height:34px;border-radius:50%;overflow:hidden;border:1.5px solid rgba(255,255,255,.25);background:var(--surface-3);box-shadow:0 2px 8px rgba(0,0,0,.5);z-index:1;}
+.set-badge-bottom img{width:100%;height:100%;object-fit:contain;display:block;}
 .portrait .p-name{position:absolute;left:0;right:0;bottom:0;text-align:center;font-weight:700;color:#fff;
   background:linear-gradient(0deg, rgba(6,9,15,.94) 5%, transparent 100%);}
 .portrait.hidden-by-filter{display:none;}
@@ -327,7 +329,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.11</div>
+    <div class="app-sub">WUTHERING WAVES · v1.12</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1658,7 +1660,9 @@ function renderEchoSetsGrid(){
   grid.innerHTML = ECHOES.map((e) => {
     const el = e.element.toLowerCase();
     const nameAttr = e.name.replace(/'/g, "\\'");
-    return '<div class="portrait lg ' + el + '" data-el="' + el + '" onclick="openEcho(\'' + nameAttr + '\')"><img class="portrait-img" src="assets/sets/' + e.icon + '.webp" alt=""><span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="p-name">' + e.name + '</span></div>';
+    const flagshipId = ECHO_SET_FLAGSHIP[e.name];
+    const bgHtml = flagshipId ? '<img class="portrait-img" src="assets/echo-art/' + flagshipId + '.webp" alt="">' : '';
+    return '<div class="portrait lg ' + el + '" data-el="' + el + '" onclick="openEcho(\'' + nameAttr + '\')">' + bgHtml + '<span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="set-badge-bottom"><img src="assets/sets/' + e.icon + '.webp" alt=""></span><span class="p-name">' + e.name + '</span></div>';
   }).join('');
 }
 function echoArtHtml(setObj){
