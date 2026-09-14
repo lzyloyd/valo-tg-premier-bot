@@ -9,75 +9,72 @@ import {
   batchUpdate,
 } from './sheetsClient.js';
 
-// Fixed template layout (shared by every "<Map> - <Mode>" tab): column Q
-// normally holds a player's label on the first row of their 14-row block —
-// one row per stat, in a fixed order the sheet's own =AVERAGE(...) heatmap
-// formulas read from — and columns R onward are one per played game.
-//
-// Premier tabs track TRS, so that first (label) row doubles as the TRS row.
-// Practice ("Праки") tabs don't — TRS is meaningless for customs — so their
-// block's first row is label-only (no stat lives there) and every stat
-// shifts down one row. `null` marks that skipped slot below.
-const ANCHOR_COLUMN = 'Q';
-const FIRST_GAME_COLUMN = 'R';
+// Every "<Map> - <Mode>" tab is cloned from the same single master tab (the
+// overall Premier summary — always exists, always has the right base
+// layout) rather than from "whichever existing tab happens to match this
+// mode" — that used to inherit whatever drift/inconsistency a given
+// existing tab had accumulated. Praки mode additionally deletes the master's
+// TRS column (meaningless for customs) right after cloning, which shifts
+// every later column one letter left — LAYOUT below reflects that shift.
+export const OVERALL_PREMIER_TAB = 'Статистика за V26A5';
+
 const BLOCK_SIZE = 14;
 const ANCHOR_FIRST_ROW = 2;
 const ROSTER_SIZE = 7;
-
-// Pools every map's Premier games into one running set of "Game N" columns,
-// alongside (not derived from) the per-map "<Map> - Premier" tabs — Praки
-// matches have no equivalent overall tab.
-export const OVERALL_PREMIER_TAB = 'Статистика за V26A5';
+const TABLE1_FIRST_ROW = 3;
+const TABLE2_FIRST_ROW = 13;
 
 const STAT_ROWS_PREMIER = [
   'trs', 'acs', 'kills', 'deaths', 'assists', 'plusMinus', 'kdRatio',
   'ddelta', 'adr', 'hsAccuracy', 'kast', 'firstKills', 'firstDeaths', 'multiKills',
 ];
+// offset 0 (the anchor/label row) carries no stat in Praки mode — TRS's
+// column got physically deleted, so there's nothing to shift into it.
 const STAT_ROWS_PRAKTIKA = [
   null, 'acs', 'kills', 'deaths', 'assists', 'plusMinus', 'kdRatio',
   'ddelta', 'adr', 'hsAccuracy', 'kast', 'firstKills', 'firstDeaths', 'multiKills',
 ];
-// Column probed to find the current AVERAGE(...) range's end column — must
-// be a stat that's actually present on offset 0/1 for that mode.
-const PROBE_COLUMN = { Premier: 'C', Праки: 'D' };
-const PROBE_OFFSET = { Premier: 0, Праки: 1 };
 
-// The two heatmap tables' per-player row numbers (fixed, same for every
-// tab) and which columns they show — table1 is every stat, table2 a
-// narrower "highlights" subset. Both read the exact same raw stat rows as
-// appendMatchToStatsSheet writes; a brand new tab has no data yet for
-// anyone, so every one of these cells starts out as a literal "-" (matching
-// the sheet's existing convention for "hasn't played this map/mode") and
-// only gets a real =AVERAGE(...) formula once that player actually has a
-// game logged — otherwise a cloned tab's inherited formula errors out to
-// #DIV/0! the moment its source data is cleared.
-const TABLE1_FIRST_ROW = 3;
-const TABLE1_COLUMNS_PREMIER = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
-const TABLE1_COLUMNS_PRAKTIKA = ['D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
-const TABLE2_FIRST_ROW = 13;
-const TABLE2_COLUMNS_PREMIER = ['C', 'D', 'E', 'F', 'G', 'H', 'I'];
-const TABLE2_STATS_PREMIER = ['trs', 'acs', 'kdRatio', 'ddelta', 'adr', 'hsAccuracy', 'kast'];
-const TABLE2_COLUMNS_PRAKTIKA = ['D', 'E', 'F', 'G', 'H', 'I'];
-const TABLE2_STATS_PRAKTIKA = ['acs', 'kdRatio', 'ddelta', 'adr', 'hsAccuracy', 'kast'];
+const LAYOUT = {
+  Premier: {
+    anchorColumn: 'Q',
+    firstGameColumn: 'R',
+    firstStatOffset: 0,
+    statRows: STAT_ROWS_PREMIER,
+    table1Columns: ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'],
+    table2Columns: ['C', 'D', 'E', 'F', 'G', 'H', 'I'],
+    table2Stats: ['trs', 'acs', 'kdRatio', 'ddelta', 'adr', 'hsAccuracy', 'kast'],
+    table1PercentCols: ['L', 'M'],
+    table2PercentCols: ['H', 'I'],
+    probeColumn: 'C',
+    probeOffset: 0,
+  },
+  Праки: {
+    anchorColumn: 'P',
+    firstGameColumn: 'Q',
+    firstStatOffset: 1,
+    statRows: STAT_ROWS_PRAKTIKA,
+    table1Columns: ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'],
+    table2Columns: ['C', 'D', 'E', 'F', 'G', 'H'],
+    table2Stats: ['acs', 'kdRatio', 'ddelta', 'adr', 'hsAccuracy', 'kast'],
+    table1PercentCols: ['K', 'L'],
+    table2PercentCols: ['G', 'H'],
+    probeColumn: 'C',
+    probeOffset: 1,
+  },
+};
 
-function statRowsForMode(mode) {
-  return mode === 'Premier' ? STAT_ROWS_PREMIER : STAT_ROWS_PRAKTIKA;
-}
 function statOffset(mode, key) {
-  return statRowsForMode(mode).indexOf(key);
+  return LAYOUT[mode].statRows.indexOf(key);
 }
-function averageFormula(rawRow, endColLetter) {
-  return `=AVERAGE($${FIRST_GAME_COLUMN}$${rawRow}:$${endColLetter}$${rawRow})`;
+function averageFormula(firstGameColumn, rawRow, endColLetter) {
+  return `=AVERAGE($${firstGameColumn}$${rawRow}:$${endColLetter}$${rawRow})`;
 }
 
 // Matches the main heatmap header band's color (read off an existing tab).
 const HEADER_BG = { red: 0.0627451, green: 0.30588236, blue: 0.28235295 };
 const DATA_BG = { red: 0.10588235, green: 0.11764706, blue: 0.15686275 };
 const WHITE = { red: 1, green: 1, blue: 1 };
-
-// HS%/KAST land in the same columns in both tables regardless of mode.
-const TABLE1_PERCENT_COLS = ['L', 'M'];
-const TABLE2_PERCENT_COLS = ['H', 'I'];
 
 /**
  * Writing "-" (or a formula) via values.batchUpdate's USER_ENTERED mode can
@@ -174,13 +171,13 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   const existing = sheets.find((s) => s.title === tabTitle);
   if (existing) return existing;
 
-  const template = sheets.find((s) => s.title.endsWith(` - ${mode}`)) ?? sheets.find((s) => s.title !== sheets[0].title);
-  if (!template) throw new Error(`No template tab found to clone for a new "${tabTitle}" tab`);
+  const template = sheets.find((s) => s.title === OVERALL_PREMIER_TAB);
+  if (!template) throw new Error(`Master template tab "${OVERALL_PREMIER_TAB}" not found`);
+  const layout = LAYOUT[mode];
 
-  // Always append at the very end (never right after the template) — tabs
-  // are only ever created the first time a map/mode is actually logged, so
-  // appending keeps them in the order matches actually happened, with the
-  // overall summary tab (created once, up front) staying first.
+  // Always append at the very end — tabs are only ever created the first
+  // time a map/mode is actually logged, so appending keeps them in the
+  // order matches actually happened, with the master tab staying first.
   const dupRes = await batchUpdate(spreadsheetId, [
     {
       duplicateSheet: {
@@ -192,12 +189,22 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   ]);
   const newSheetId = dupRes.replies[0].duplicateSheet.properties.sheetId;
 
-  // The clone still has the template map's old per-game data — wipe every
-  // game column's header + all 7 players' raw rows (column Q player labels
-  // are identical for every tab, so those stay).
-  await clearValues(spreadsheetId, `'${tabTitle}'!${FIRST_GAME_COLUMN}1:BZ${BLOCK_SIZE * ROSTER_SIZE + 2}`);
-  // The clone also still has whichever heatmap formulas the template
-  // happened to have (real ones for players who'd played that map before) —
+  if (mode === 'Праки') {
+    // The master template tracks TRS (column C) — meaningless for customs.
+    // Deleting it (rather than just leaving it blank) shifts every later
+    // column one letter left, which is what LAYOUT.Праки's column letters
+    // assume from here on.
+    await batchUpdate(spreadsheetId, [
+      { deleteDimension: { range: { sheetId: newSheetId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 } } },
+    ]);
+  }
+
+  // The clone still has the master's old per-game data — wipe every game
+  // column's header + all 7 players' raw rows (column Q/P player labels are
+  // identical for every tab, so those stay).
+  await clearValues(spreadsheetId, `'${tabTitle}'!${layout.firstGameColumn}1:BZ${BLOCK_SIZE * ROSTER_SIZE + 2}`);
+  // The clone also still has whichever heatmap formulas the master happened
+  // to have (real ones for players with games already logged there) —
   // now-orphaned since their source data is gone. Reset every player's
   // heatmap cells to "-" so nothing shows #DIV/0! before it has data.
   await resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode, newSheetId);
@@ -214,29 +221,29 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
  * before writing rather than adding new data on top of a broken sheet.
  */
 async function hasHeatmapErrors(spreadsheetId, tabTitle, mode) {
-  const probeCol = mode === 'Premier' ? TABLE1_COLUMNS_PREMIER[0] : TABLE1_COLUMNS_PRAKTIKA[0];
+  const layout = LAYOUT[mode];
+  const probeCol = layout.table1Columns[0];
   const lastRow = TABLE1_FIRST_ROW + ROSTER_SIZE - 1;
   const values = (await getValues(spreadsheetId, `'${tabTitle}'!${probeCol}${TABLE1_FIRST_ROW}:${probeCol}${lastRow}`)).flat();
   return values.some((v) => typeof v === 'string' && v.startsWith('#'));
 }
 
 export async function resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode, sheetId = null) {
-  const table1Cols = mode === 'Premier' ? TABLE1_COLUMNS_PREMIER : TABLE1_COLUMNS_PRAKTIKA;
-  const table2Cols = mode === 'Premier' ? TABLE2_COLUMNS_PREMIER : TABLE2_COLUMNS_PRAKTIKA;
+  const layout = LAYOUT[mode];
   const data = [];
   const percentRows = [];
   for (let i = 0; i < ROSTER_SIZE; i++) {
     const t1Row = TABLE1_FIRST_ROW + i;
     const t2Row = TABLE2_FIRST_ROW + i;
     data.push({
-      range: `'${tabTitle}'!${table1Cols[0]}${t1Row}:${table1Cols[table1Cols.length - 1]}${t1Row}`,
-      values: [table1Cols.map(() => '-')],
+      range: `'${tabTitle}'!${layout.table1Columns[0]}${t1Row}:${layout.table1Columns[layout.table1Columns.length - 1]}${t1Row}`,
+      values: [layout.table1Columns.map(() => '-')],
     });
     data.push({
-      range: `'${tabTitle}'!${table2Cols[0]}${t2Row}:${table2Cols[table2Cols.length - 1]}${t2Row}`,
-      values: [table2Cols.map(() => '-')],
+      range: `'${tabTitle}'!${layout.table2Columns[0]}${t2Row}:${layout.table2Columns[layout.table2Columns.length - 1]}${t2Row}`,
+      values: [layout.table2Columns.map(() => '-')],
     });
-    percentRows.push({ row0: t1Row - 1, cols: TABLE1_PERCENT_COLS }, { row0: t2Row - 1, cols: TABLE2_PERCENT_COLS });
+    percentRows.push({ row0: t1Row - 1, cols: layout.table1PercentCols }, { row0: t2Row - 1, cols: layout.table2PercentCols });
   }
   await batchUpdateValues(spreadsheetId, data);
 
@@ -247,16 +254,17 @@ export async function resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode, sh
 /**
  * Player-block anchor rows are always ANCHOR_FIRST_ROW, +BLOCK_SIZE, +2*BLOCK_SIZE...
  * (fixed by the template, not derived from where text happens to be) — that
- * sidesteps an inconsistency seen across real tabs where column Q is blank
- * on some rows, and different tabs label the same player under different
- * (old vs. current) Riot IDs. Every cell in the row is checked against every
- * known label for every player (LABEL_TO_RIOT_ID), and the match is recorded
- * under that player's canonical current Riot ID either way.
+ * sidesteps an inconsistency seen across real tabs where the anchor column
+ * is blank on some rows, and different tabs label the same player under
+ * different (old vs. current) Riot IDs. Every cell in the row is checked
+ * against every known label for every player (LABEL_TO_RIOT_ID), and the
+ * match is recorded under that player's canonical current Riot ID either way.
  */
-async function getPlayerAnchorRows(spreadsheetId, tabTitle) {
+async function getPlayerAnchorRows(spreadsheetId, tabTitle, mode) {
+  const anchorColumn = LAYOUT[mode].anchorColumn;
   const anchorRowNumbers = Array.from({ length: ROSTER_SIZE }, (_, i) => ANCHOR_FIRST_ROW + i * BLOCK_SIZE);
   const lastRow = anchorRowNumbers[anchorRowNumbers.length - 1];
-  const values = await getValues(spreadsheetId, `'${tabTitle}'!${ANCHOR_COLUMN}${ANCHOR_FIRST_ROW}:BZ${lastRow}`);
+  const values = await getValues(spreadsheetId, `'${tabTitle}'!${anchorColumn}${ANCHOR_FIRST_ROW}:BZ${lastRow}`);
 
   const map = new Map();
   for (const rowNumber of anchorRowNumbers) {
@@ -274,8 +282,9 @@ async function getPlayerAnchorRows(spreadsheetId, tabTitle) {
 }
 
 async function findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mode, matchId) {
-  const row1 = (await getValues(spreadsheetId, `'${tabTitle}'!${FIRST_GAME_COLUMN}1:BZ1`))[0] ?? [];
-  const row1Notes = (await getCellNotes(spreadsheetId, `'${tabTitle}'!${FIRST_GAME_COLUMN}1:BZ1`))[0] ?? [];
+  const layout = LAYOUT[mode];
+  const row1 = (await getValues(spreadsheetId, `'${tabTitle}'!${layout.firstGameColumn}1:BZ1`))[0] ?? [];
+  const row1Notes = (await getCellNotes(spreadsheetId, `'${tabTitle}'!${layout.firstGameColumn}1:BZ1`))[0] ?? [];
 
   let lastGameNumber = 0;
   let firstEmptyOffset = -1;
@@ -294,11 +303,11 @@ async function findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mod
   }
   if (firstEmptyOffset === -1) firstEmptyOffset = row1.length;
 
-  const candidateColIndex = colToIndex(FIRST_GAME_COLUMN) + firstEmptyOffset;
+  const candidateColIndex = colToIndex(layout.firstGameColumn) + firstEmptyOffset;
   const nextGameNumber = lastGameNumber + 1;
 
-  const probeRow = firstAnchorRow + PROBE_OFFSET[mode];
-  const formulaRow = (await getValues(spreadsheetId, `'${tabTitle}'!${PROBE_COLUMN[mode]}${probeRow}`, 'FORMULA'))[0];
+  const probeRow = firstAnchorRow + layout.probeOffset;
+  const formulaRow = (await getValues(spreadsheetId, `'${tabTitle}'!${layout.probeColumn}${probeRow}`, 'FORMULA'))[0];
   const formula = formulaRow?.[0] ?? '';
   const rangeMatch = /:\$?([A-Z]+)\$?\d+\)/.exec(formula);
   const endColIndex = rangeMatch ? colToIndex(rangeMatch[1]) : candidateColIndex;
@@ -320,28 +329,28 @@ async function findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mod
 
 /**
  * Appends one match's per-player stats as a new "Game N" column on a tab,
- * creating it (cloned from an existing same-mode tab) if it doesn't exist
- * yet. Defaults to the "<Map> - <Mode>" tab; pass `tabTitle` to target a
- * fixed tab instead (the "Статистика за V26A5" overall-premier summary,
- * which pools every map's Premier games into one running set of "Game N"
- * columns rather than per-map ones). `players` is buildMatchView's
- * ourTeam/theirTeam player list — only entries recognized as one of our own
- * roster (via statsRoster.js) actually get written; everyone else is
- * silently skipped. `matchId` is stashed as a note on the "Game N" header
- * cell — re-logging the same match (e.g. the same link pasted twice, or
- * across a manual re-run) is detected via that note and skipped rather than
- * added as a duplicate column.
+ * creating it (cloned from the master template) if it doesn't exist yet.
+ * Defaults to the "<Map> - <Mode>" tab; pass `tabTitle` to target a fixed
+ * tab instead (the "Статистика за V26A5" overall-premier summary, which
+ * pools every map's Premier games into one running set of "Game N" columns
+ * rather than per-map ones). `players` is buildMatchView's ourTeam/theirTeam
+ * player list — only entries recognized as one of our own roster (via
+ * statsRoster.js) actually get written; everyone else is silently skipped.
+ * `matchId` is stashed as a note on the "Game N" header cell — re-logging
+ * the same match (e.g. the same link pasted twice, or across a manual
+ * re-run) is detected via that note and skipped rather than added as a
+ * duplicate column.
  */
 export async function appendMatchToStatsSheet({ mapName, mode, players, matchId, tabTitle = `${mapName} - ${mode}` }) {
   const spreadsheetId = config.statsSpreadsheetId;
   if (!spreadsheetId) throw new Error('STATS_SPREADSHEET_ID is not configured');
-  const statRows = statRowsForMode(mode);
+  const layout = LAYOUT[mode];
 
   const sheet = await findOrCreateTab(spreadsheetId, tabTitle, mode);
   if (await hasHeatmapErrors(spreadsheetId, tabTitle, mode)) {
     await resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode, sheet.sheetId);
   }
-  const anchorRows = await getPlayerAnchorRows(spreadsheetId, tabTitle);
+  const anchorRows = await getPlayerAnchorRows(spreadsheetId, tabTitle, mode);
   if (anchorRows.size === 0) throw new Error(`Tab "${tabTitle}" has no recognizable player rows`);
   const firstAnchorRow = Math.min(...anchorRows.values());
 
@@ -363,24 +372,19 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
   const col = indexToCol(colIndex);
   const endColLetter = indexToCol(finalEndColIndex);
 
-  const table1Cols = mode === 'Premier' ? TABLE1_COLUMNS_PREMIER : TABLE1_COLUMNS_PRAKTIKA;
-  const table2Cols = mode === 'Premier' ? TABLE2_COLUMNS_PREMIER : TABLE2_COLUMNS_PRAKTIKA;
-  const table2Stats = mode === 'Premier' ? TABLE2_STATS_PREMIER : TABLE2_STATS_PRAKTIKA;
-
   const written = [];
   const skipped = [];
   const data = [{ range: `'${tabTitle}'!${col}1`, values: [[`Game ${gameNumber}\n(${mapName})`]] }];
   const percentRows = [];
 
-  const firstStatOffset = statRows[0] === null ? 1 : 0;
   for (const p of players) {
     const anchorRow = anchorRows.get(p.riotId.toLowerCase());
     if (!anchorRow) {
       skipped.push(p.riotId);
       continue;
     }
-    const values = statRows.slice(firstStatOffset).map((key) => [valueForStatKey(p, key)]);
-    const startRow = anchorRow + firstStatOffset;
+    const values = layout.statRows.slice(layout.firstStatOffset).map((key) => [valueForStatKey(p, key)]);
+    const startRow = anchorRow + layout.firstStatOffset;
     const endRow = anchorRow + BLOCK_SIZE - 1;
     data.push({ range: `'${tabTitle}'!${col}${startRow}:${col}${endRow}`, values });
     written.push(p.riotId);
@@ -390,14 +394,24 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
     // (idempotent: re-writing an already-live formula is harmless).
     const playerIndex = (anchorRow - ANCHOR_FIRST_ROW) / BLOCK_SIZE;
     const t1Row = TABLE1_FIRST_ROW + playerIndex;
-    const t1Values = table1Cols.map((_, k) => averageFormula(anchorRow + k + firstStatOffset, endColLetter));
-    data.push({ range: `'${tabTitle}'!${table1Cols[0]}${t1Row}:${table1Cols[table1Cols.length - 1]}${t1Row}`, values: [t1Values] });
+    const t1Values = layout.table1Columns.map((_, k) =>
+      averageFormula(layout.firstGameColumn, anchorRow + k + layout.firstStatOffset, endColLetter),
+    );
+    data.push({
+      range: `'${tabTitle}'!${layout.table1Columns[0]}${t1Row}:${layout.table1Columns[layout.table1Columns.length - 1]}${t1Row}`,
+      values: [t1Values],
+    });
 
     const t2Row = TABLE2_FIRST_ROW + playerIndex;
-    const t2Values = table2Stats.map((key) => averageFormula(anchorRow + statOffset(mode, key), endColLetter));
-    data.push({ range: `'${tabTitle}'!${table2Cols[0]}${t2Row}:${table2Cols[table2Cols.length - 1]}${t2Row}`, values: [t2Values] });
+    const t2Values = layout.table2Stats.map((key) =>
+      averageFormula(layout.firstGameColumn, anchorRow + statOffset(mode, key), endColLetter),
+    );
+    data.push({
+      range: `'${tabTitle}'!${layout.table2Columns[0]}${t2Row}:${layout.table2Columns[layout.table2Columns.length - 1]}${t2Row}`,
+      values: [t2Values],
+    });
 
-    percentRows.push({ row0: t1Row - 1, cols: TABLE1_PERCENT_COLS }, { row0: t2Row - 1, cols: TABLE2_PERCENT_COLS });
+    percentRows.push({ row0: t1Row - 1, cols: layout.table1PercentCols }, { row0: t2Row - 1, cols: layout.table2PercentCols });
   }
 
   await batchUpdateValues(spreadsheetId, data);
@@ -422,10 +436,11 @@ export async function getTabSheetId(spreadsheetId, tabTitle) {
  */
 export async function countAnnouncedPremierWeeks(spreadsheetId) {
   const sheets = await getSpreadsheetMeta(spreadsheetId);
+  const firstGameColumn = LAYOUT.Premier.firstGameColumn;
   let count = 0;
   for (const s of sheets) {
     if (s.title === OVERALL_PREMIER_TAB || !s.title.endsWith(' - Premier')) continue;
-    const row1 = (await getValues(spreadsheetId, `'${s.title}'!${FIRST_GAME_COLUMN}1:BZ1`))[0] ?? [];
+    const row1 = (await getValues(spreadsheetId, `'${s.title}'!${firstGameColumn}1:BZ1`))[0] ?? [];
     if (row1.some((cell) => /Game \d+/.test(cell ?? ''))) count += 1;
   }
   return count;
