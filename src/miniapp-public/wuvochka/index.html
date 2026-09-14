@@ -110,7 +110,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .portrait.r1{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r1) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait .ring{position:absolute;inset:7px;border:1.5px solid rgba(255,255,255,.16);border-radius:10px;pointer-events:none;}
 .portrait .glyph{font-family:'Exo 2',sans-serif;font-weight:800;color:rgba(255,255,255,.92);text-shadow:0 3px 14px rgba(0,0,0,.4);}
-.portrait .p-el{position:absolute;top:7px;right:7px;box-shadow:0 0 0 2px rgba(8,11,18,.7);}
+.portrait .p-el{position:absolute;top:2px;right:2px;padding:6px;background:radial-gradient(circle, rgba(0,0,0,.6) 0%, rgba(0,0,0,.32) 55%, transparent 80%);}
 .set-badge-bottom{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:34px;height:34px;border-radius:50%;overflow:hidden;border:1.5px solid rgba(255,255,255,.25);background:var(--surface-3);box-shadow:0 2px 8px rgba(0,0,0,.5);z-index:1;}
 .set-badge-bottom img{width:100%;height:100%;object-fit:contain;display:block;}
 .portrait .p-name{position:absolute;left:0;right:0;bottom:0;text-align:center;font-weight:700;color:#fff;
@@ -137,16 +137,23 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-badge.t4{background:var(--tier-4);color:var(--text);}
 .tier-items{display:flex;flex-wrap:wrap;gap:8px;flex:1;align-content:flex-start;}
 
-/* character tier-list: badge is a full-height vertical block beside the
-   tier's content (same treatment as the team tier list); DPS/Hybrid/
-   Support are always-visible side-by-side columns, not filterable rows */
-#view-tierlist .tier-row{align-items:stretch;padding:16px;margin-bottom:16px;}
-#view-tierlist .tier-content{flex:1;min-width:0;display:flex;}
-#view-tierlist .tier-role-col{flex:1;min-width:0;padding:0 8px;border-left:1px solid var(--border);}
-#view-tierlist .tier-role-col:first-child{padding-left:0;border-left:none;}
-#view-tierlist .tier-items{display:flex;flex-direction:column;gap:10px;}
+/* character tier-list: the tier is a full-width colored header bar, with
+   DPS/Hybrid/Support stacked below it as labeled sections, each a wrapping
+   grid of portraits - matches prydwen's own layout */
+.tier-block{border-radius:14px;overflow:hidden;background:var(--surface);border:1px solid var(--border);margin-bottom:16px;}
+.tier-header{padding:10px;text-align:center;font-family:'Exo 2',sans-serif;font-weight:800;font-size:15px;color:#0a0e17;}
+.tier-header.t0{background:var(--tier-0);} .tier-header.t05{background:var(--tier-05);}
+.tier-header.t1{background:var(--tier-1);} .tier-header.t15{background:var(--tier-15);}
+.tier-header.t2{background:var(--tier-2);} .tier-header.t3{background:var(--tier-3);color:var(--text);}
+.tier-header.t4{background:var(--tier-4);color:var(--text);}
+.tier-role-section{padding:14px 16px;border-top:1px solid var(--border);}
+.tier-role-section:first-of-type{border-top:none;}
+.tier-role-heading{display:flex;align-items:center;gap:6px;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:11px;}
+.tier-role-heading.dps{color:var(--bad);}
+.tier-role-heading.hybrid{color:var(--el-electro);}
+.tier-role-heading.support{color:var(--tier-0);}
+#view-tierlist .tier-items{display:grid;grid-template-columns:repeat(auto-fill, minmax(96px, 1fr));gap:10px;}
 #view-tierlist .tier-items .portrait.sm{width:100%;}
-.tier-role-label{font-size:10.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;}
 
 /* team tier list */
 .tier-teams{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
@@ -372,7 +379,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.01</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.1</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -927,12 +934,14 @@ function renderTierListView(){
     return '<div class="chip' + (m.id === tierlistMode ? ' active' : '') + '" onclick="setTierlistMode(\'' + m.id + '\')">' + m.name + '</div>';
   }).join('');
   const data = TIERLIST[tierlistMode];
+  const roleIcon = { dps: '🥊', hybrid: '✳️', support: '🧪' };
   rootEl.innerHTML = data.tiers.map((tierGroup) => {
     const rolesHtml = ['dps', 'hybrid', 'support'].map((role) => {
       const ids = tierGroup.roles[role] || [];
-      return '<div class="tier-role-col"><div class="tier-role-label">' + ROLE_LABEL_RU[role] + '</div><div class="tier-items">' + ids.map((id) => tierPortraitHtml(id, role)).join('') + '</div></div>';
+      if (!ids.length) return '';
+      return '<div class="tier-role-section"><div class="tier-role-heading ' + role + '"><span>' + roleIcon[role] + '</span>' + ROLE_LABEL_RU[role].toUpperCase() + '</div><div class="tier-items">' + ids.map((id) => tierPortraitHtml(id, role)).join('') + '</div></div>';
     }).join('');
-    return '<div class="tier-row"><div class="tier-badge ' + tierGroup.class + '">' + tierGroup.tier + '</div><div class="tier-content">' + rolesHtml + '</div></div>';
+    return '<div class="tier-block"><div class="tier-header ' + tierGroup.class + '">' + tierGroup.tier + '</div>' + rolesHtml + '</div>';
   }).join('');
 }
 function setTierlistMode(mode){
