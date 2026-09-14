@@ -173,6 +173,21 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   return { sheetId: newSheetId, title: tabTitle, index: template.index + 1 };
 }
 
+/**
+ * A tab can end up with stale heatmap formulas pointing at raw data that no
+ * longer exists — e.g. someone manually clears a tab back to a blank
+ * template without going through resetHeatmapPlaceholders — which shows as
+ * #DIV/0! instead of "-". Checking a probe cell per player catches that
+ * regardless of how it happened, so appendMatchToStatsSheet can self-heal
+ * before writing rather than adding new data on top of a broken sheet.
+ */
+async function hasHeatmapErrors(spreadsheetId, tabTitle, mode) {
+  const probeCol = mode === 'Premier' ? TABLE1_COLUMNS_PREMIER[0] : TABLE1_COLUMNS_PRAKTIKA[0];
+  const lastRow = TABLE1_FIRST_ROW + ROSTER_SIZE - 1;
+  const values = (await getValues(spreadsheetId, `'${tabTitle}'!${probeCol}${TABLE1_FIRST_ROW}:${probeCol}${lastRow}`)).flat();
+  return values.some((v) => typeof v === 'string' && v.startsWith('#'));
+}
+
 export async function resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode) {
   const table1Cols = mode === 'Premier' ? TABLE1_COLUMNS_PREMIER : TABLE1_COLUMNS_PRAKTIKA;
   const table2Cols = mode === 'Premier' ? TABLE2_COLUMNS_PREMIER : TABLE2_COLUMNS_PRAKTIKA;
@@ -286,6 +301,9 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
   const statRows = statRowsForMode(mode);
 
   const sheet = await findOrCreateTab(spreadsheetId, tabTitle, mode);
+  if (await hasHeatmapErrors(spreadsheetId, tabTitle, mode)) {
+    await resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode);
+  }
   const anchorRows = await getPlayerAnchorRows(spreadsheetId, tabTitle);
   if (anchorRows.size === 0) throw new Error(`Tab "${tabTitle}" has no recognizable player rows`);
   const firstAnchorRow = Math.min(...anchorRows.values());
