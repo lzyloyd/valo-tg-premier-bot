@@ -29,6 +29,10 @@ const PRACTICE_MATCH_RE = /^покажи\s+прак(?=\s|$)/i;
 const STATS_PREMIER_RE = /^добавь\s+в\s+таблицу\s+статистики\s+следующие\s+премьер\s+матч/i;
 const STATS_PRACTICE_RE = /^добавь\s+в\s+таблицу\s+статистики\s+следующие\s+прак/i;
 const SEASON_STATS_RE = /^отправь\s+статистику\s+за\s+сезон(?=\s|$)/i;
+// "отправь сводку по карте Split" — manual trigger for the same map-week
+// announcement, for a week that only had 1 premier match (never reaches the
+// auto-trigger's 2nd game).
+const MAP_SUMMARY_RE = /^отправь\s+сводку\s+по\s+карте\s+(\S+)/i;
 
 function extractAllMatchIds(text) {
   return [...text.matchAll(MATCH_URL_RE_G)].map((m) => m[1]);
@@ -220,6 +224,22 @@ async function sendSeasonStatsCommand(message) {
   await sendSeasonStats(browser, { spreadsheetId: config.statsSpreadsheetId, sheetId, tabTitle: OVERALL_PREMIER_TAB });
 }
 
+// "Резалтик, отправь сводку по карте <Map>" — manual version of the
+// map-week-complete announcement (same announceMapWeekComplete call the
+// auto-trigger uses at the tab's 2nd game), for a week that only had 1
+// premier match and so never reached that trigger on its own.
+async function sendMapSummaryCommand(mapName, message) {
+  const tabTitle = `${mapName} - Premier`;
+  const sheetId = await getTabSheetId(config.statsSpreadsheetId, tabTitle);
+  if (sheetId === null) {
+    await sendTextTo(message.chat.id, message.message_thread_id, `Вкладка "${tabTitle}" не найдена в таблице.`);
+    return;
+  }
+  const browser = await getBrowser();
+  await announceMapWeekComplete(browser, { spreadsheetId: config.statsSpreadsheetId, sheetId, tabTitle });
+  await sendTextTo(message.chat.id, message.message_thread_id, `Отправлено в "Статистика": "${tabTitle}".`);
+}
+
 function healthcheckReply() {
   const uptimeMin = Math.floor(process.uptime() / 60);
   return `✅ На связи, вижу сообщения. Аптайм процесса: ${uptimeMin} мин.`;
@@ -269,6 +289,11 @@ async function handleCommand(commandText, message) {
     }
     if (SEASON_STATS_RE.test(trimmed)) {
       await sendSeasonStatsCommand(message);
+      return;
+    }
+    const mapSummaryMatch = MAP_SUMMARY_RE.exec(trimmed);
+    if (mapSummaryMatch) {
+      await sendMapSummaryCommand(mapSummaryMatch[1], message);
       return;
     }
     if (STATS_PREMIER_RE.test(trimmed) || STATS_PRACTICE_RE.test(trimmed)) {
