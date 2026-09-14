@@ -18,14 +18,14 @@ if (sheetId === null) {
 const browser = await getBrowser();
 const page = await browser.newPage();
 try {
-  await page.setViewport({ width: 1500, height: 650 });
+  await page.setViewport({ width: 1600, height: 820 });
   const url = `https://docs.google.com/spreadsheets/d/${config.statsSpreadsheetId}/edit?gid=${sheetId}&range=${range}&rm=minimal`;
   console.log('navigating to', url);
   await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
   await new Promise((r) => setTimeout(r, 1500));
-  await page.mouse.click(105, 124);
+  await page.mouse.click(105, 780);
   await new Promise((r) => setTimeout(r, 200));
-  const png = await page.screenshot({ type: 'png' });
+  const png = await page.screenshot({ type: 'png', clip: { x: 34, y: 20, width: 1566, height: 645 } });
   fs.writeFileSync('/tmp/sheet-screenshot.png', png);
   console.log('saved to /tmp/sheet-screenshot.png');
 } finally {

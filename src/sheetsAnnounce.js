@@ -14,21 +14,27 @@ function sheetRangeUrl(spreadsheetId, gid, range) {
 // either mode uses) — same crop the team already takes by hand.
 const HEATMAP_RANGE = 'B1:P20';
 
+// Calibrated against the B1:P20 heatmap area at this exact viewport size:
+// trims Sheets' row-number/column-letter gutters and stops right at column
+// P / row 20, with no sliver of column Q bleeding in on the right.
+const CROP = { x: 34, y: 20, width: 1566, height: 645 };
+
 async function screenshotSheetRange(browser, spreadsheetId, gid, range) {
   const page = await browser.newPage();
   try {
-    await page.setViewport({ width: 1650, height: 650 });
+    await page.setViewport({ width: 1600, height: 820 });
     // rm=minimal drops Sheets' own menu/toolbar chrome — this is the same
     // param Google's "publish to the web" embeds use.
     const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit?gid=${gid}&range=${range}&rm=minimal`;
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
     await new Promise((resolve) => setTimeout(resolve, 1500)); // grid/heatmap colors finish painting after load fires
     // The range= param also selects it (blue highlight + a sum/count bar) —
-    // clicking a single already-visible cell clears that without disturbing
-    // scroll position the way Escape does (Escape recentered on A1 instead).
-    await page.mouse.click(105, 124);
+    // clicking a cell well below the cropped area clears that selection
+    // without it ever showing up in the final image (Escape instead reset
+    // scroll back to column A, cutting off the right side of the table).
+    await page.mouse.click(105, 780);
     await new Promise((resolve) => setTimeout(resolve, 200));
-    return await page.screenshot({ type: 'png' });
+    return await page.screenshot({ type: 'png', clip: CROP });
   } finally {
     await page.close();
   }
