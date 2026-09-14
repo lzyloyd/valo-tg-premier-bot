@@ -51,4 +51,10 @@ export const config = {
   // team's Google Sheet (one tab per map+mode, see sheetsStats.js).
   googleServiceAccountKeyPath: path.join(dataDir, 'google-service-account.json'),
   statsSpreadsheetId: process.env.STATS_SPREADSHEET_ID || null,
+  // Same group as everything else — its own "Статистика" topic gets the
+  // per-map-complete screenshot and the "статистика за сезон" command.
+  statsChatId: process.env.STATS_CHAT_ID || null,
+  statsThreadId: process.env.STATS_THREAD_ID || null,
+  currentSplitLabel: process.env.CURRENT_SPLIT_LABEL || 'V26A5',
+  statsWeekCounterPath: path.join(dataDir, 'statsWeekCounter.json'),
 };

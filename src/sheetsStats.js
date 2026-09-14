@@ -292,7 +292,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
 
   const targetColumn = await findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mode, matchId);
   if (targetColumn.alreadyLogged) {
-    return { tabTitle, gameNumber: targetColumn.gameNumber, written: [], skipped: [], alreadyLogged: true };
+    return { tabTitle, gameNumber: targetColumn.gameNumber, written: [], skipped: [], alreadyLogged: true, sheetId: sheet.sheetId };
   }
   const { colIndex, gameNumber, needsInsert, insertBeforeIndex, finalEndColIndex } = targetColumn;
   if (needsInsert) {
@@ -344,5 +344,11 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
 
   await batchUpdateValues(spreadsheetId, data);
   await formatGameColumn(spreadsheetId, sheet.sheetId, colIndex, matchId);
-  return { tabTitle, gameNumber, written, skipped };
+  return { tabTitle, gameNumber, written, skipped, sheetId: sheet.sheetId };
+}
+
+/** Looks up an existing tab's sheetId (gid) by title — for building sheet links / screenshots without re-deriving the write path. */
+export async function getTabSheetId(spreadsheetId, tabTitle) {
+  const sheets = await getSpreadsheetMeta(spreadsheetId);
+  return sheets.find((s) => s.title === tabTitle)?.sheetId ?? null;
 }

@@ -6,7 +6,8 @@ import { fetchMatchDetail, fetchTeamStandings, gotoTrackerProfile } from './trac
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
 import { sendPhotoTo, sendTextTo, matchCaption } from './telegram.js';
-import { appendMatchToStatsSheet, OVERALL_PREMIER_TAB } from './sheetsStats.js';
+import { appendMatchToStatsSheet, getTabSheetId, OVERALL_PREMIER_TAB } from './sheetsStats.js';
+import { announceMapWeekComplete, sendSeasonStats } from './sheetsAnnounce.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
 const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
@@ -27,6 +28,7 @@ const PRACTICE_MATCH_RE = /^покажи\s+прак(?=\s|$)/i;
 // "добавь в таблицу статистики следующие премьер матчи:\n<ссылка>\n<ссылка>..."
 const STATS_PREMIER_RE = /^добавь\s+в\s+таблицу\s+статистики\s+следующие\s+премьер\s+матч/i;
 const STATS_PRACTICE_RE = /^добавь\s+в\s+таблицу\s+статистики\s+следующие\s+прак/i;
+const SEASON_STATS_RE = /^отправь\s+статистику\s+за\s+сезон(?=\s|$)/i;
 
 function extractAllMatchIds(text) {
   return [...text.matchAll(MATCH_URL_RE_G)].map((m) => m[1]);
@@ -153,7 +155,7 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
           requireTracked: false,
           ourRosterRiotIds: config.teamRosterRiotIds,
         });
-        const { tabTitle, gameNumber, written, skipped, alreadyLogged } = await appendMatchToStatsSheet({
+        const { tabTitle, gameNumber, written, skipped, alreadyLogged, sheetId } = await appendMatchToStatsSheet({
           mapName: match.mapName,
           mode,
           players: match.ourTeam,
@@ -165,6 +167,19 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
         }
         const skippedNote = skipped.length ? `, не найдены в таблице: ${skipped.join(', ')}` : '';
         lines.push(`✅ ${short}… → "${tabTitle}", Game ${gameNumber} (${written.length} игроков${skippedNote})`);
+
+        // One map's Premier best-of-2 just completed — post its heatmap into
+        // the "Статистика" topic, numbered by how many maps have wrapped up
+        // so far this split.
+        if (mode === 'Premier' && gameNumber === 2) {
+          try {
+            await announceMapWeekComplete(browser, { spreadsheetId: config.statsSpreadsheetId, sheetId, tabTitle });
+            lines.push(`   📸 отправлено в топик "Статистика"`);
+          } catch (err) {
+            console.error(`[listener] failed to announce map week complete for ${tabTitle}:`, err);
+            lines.push(`   ⚠️ не удалось отправить скриншот в "Статистика": ${err.message}`);
+          }
+        }
 
         // Every Premier map also feeds one running "overall" tab that isn't
         // derived from the per-map tabs — it needs its own write.
@@ -191,6 +206,18 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
     await page.close();
   }
   await sendTextTo(message.chat.id, message.message_thread_id, lines.join('\n'));
+}
+
+// "Резалтик, отправь статистику за сезон" — posts a screenshot of the
+// overall "Статистика за V26A5" tab's heatmap into the "Статистика" topic.
+async function sendSeasonStatsCommand(message) {
+  const browser = await getBrowser();
+  const sheetId = await getTabSheetId(config.statsSpreadsheetId, OVERALL_PREMIER_TAB);
+  if (sheetId === null) {
+    await sendTextTo(message.chat.id, message.message_thread_id, `Вкладка "${OVERALL_PREMIER_TAB}" не найдена в таблице.`);
+    return;
+  }
+  await sendSeasonStats(browser, { spreadsheetId: config.statsSpreadsheetId, sheetId, tabTitle: OVERALL_PREMIER_TAB });
 }
 
 function healthcheckReply() {
@@ -238,6 +265,10 @@ async function handleCommand(commandText, message) {
         return;
       }
       await summarizeAnyMatch(urlMatch[1], message);
+      return;
+    }
+    if (SEASON_STATS_RE.test(trimmed)) {
+      await sendSeasonStatsCommand(message);
       return;
     }
     if (STATS_PREMIER_RE.test(trimmed) || STATS_PRACTICE_RE.test(trimmed)) {
@@ -290,11 +321,6 @@ export async function runTelegramListener() {
     for (const update of updates) {
       offset = update.update_id + 1;
       const text = update.message?.text;
-      if (update.message) {
-        console.log(
-          `[listener] DEBUG msg — chat_id=${update.message.chat.id} thread_id=${update.message.message_thread_id} text=${JSON.stringify((text || '').slice(0, 40))}`,
-        );
-      }
       if (!text) continue;
       const triggerMatch = TRIGGER.exec(text);
       if (!triggerMatch) continue;
