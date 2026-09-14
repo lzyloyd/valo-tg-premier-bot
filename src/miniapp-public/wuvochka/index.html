@@ -251,7 +251,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .noset-hero{display:flex;align-items:center;justify-content:center;background:var(--surface-3);color:var(--text-muted);font-size:26px;}
 .noset-hero::before{content:'∅';}
 
-.subtabs{position:relative;display:flex;gap:2px;overflow-x:auto;margin-bottom:16px;border-bottom:1px solid var(--border);}
+.subtabs{position:relative;display:flex;gap:2px;overflow-x:auto;overflow-y:hidden;margin-bottom:16px;border-bottom:1px solid var(--border);}
 .subtab-indicator{position:absolute;left:0;bottom:-1px;width:0;height:2px;background:var(--accent);border-radius:2px;transition:left .25s cubic-bezier(.4,0,.2,1),width .25s cubic-bezier(.4,0,.2,1);pointer-events:none;}
 .subtab,.subtab-g{flex-shrink:0;border:none;background:none;color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12px;padding:9px 11px 11px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s ease;}
 .subtab:not(.active):hover,.subtab-g:not(.active):hover{color:var(--text);}
@@ -276,6 +276,20 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .buff-pair{display:inline-flex;align-items:center;gap:4px;}
 .buff-name{font-weight:700;color:var(--accent);}
 .buff-weapon{font-weight:700;}
+.synergy-block{padding:11px 0;border-top:1px solid var(--border);}
+.synergy-block:first-child{border-top:none;padding-top:0;}
+.synergy-avatars{display:flex;gap:6px;margin-bottom:7px;}
+.synergy-avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--surface-2);margin-left:-10px;}
+.synergy-avatar:first-child{margin-left:0;}
+.synergy-block h4{font-size:13px;margin:0 0 4px;color:var(--accent);}
+.dmg-bar-row{padding:8px 0;border-top:1px solid var(--border);}
+.dmg-bar-row:first-child{border-top:none;padding-top:0;}
+.dmg-bar-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;}
+.dmg-bar-track{height:7px;border-radius:4px;background:var(--surface-3);overflow:hidden;}
+.dmg-bar-fill{height:100%;background:var(--accent);border-radius:4px;}
+.calc-variant-note{font-size:11.5px;color:var(--text-muted);margin-bottom:10px;}
+.seq-table td:first-child,.seq-table th:first-child{font-family:'JetBrains Mono',monospace;}
+.seq-table tr.seq-highlight td{color:var(--tier-0);font-weight:700;}
 .skill-item .sname{font-weight:700;font-size:13.5px;margin-bottom:3px;}
 .skill-item .sdesc{font-size:12.5px;color:var(--text-muted);line-height:1.55;}
 
@@ -347,7 +361,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.33</div>
+    <div class="app-sub">WUTHERING WAVES · v1.40</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1063,8 +1077,8 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       </div>
 
       <div class="subtabs">
-        <button class="subtab" data-sub="review">Обзор</button>
-        <button class="subtab active" data-sub="kit">Навыки</button>
+        <button class="subtab active" data-sub="review">Обзор</button>
+        <button class="subtab" data-sub="kit">Навыки</button>
         <button class="subtab" data-sub="build">Билд</button>
         <button class="subtab" data-sub="gameplay">Геймплей</button>
         <button class="subtab" data-sub="calc">Расчёты</button>
@@ -1072,7 +1086,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       </div>
 
       <!-- REVIEW -->
-      <div class="subview" id="sub-review">
+      <div class="subview active" id="sub-review">
         <div class="card">
           <h3>Оценки</h3>
           <div class="rating-row"><span class="rating-label">Tower of Adversity</span><span class="stars">★★★★☆</span></div>
@@ -1101,7 +1115,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       </div>
 
       <!-- KIT -->
-      <div class="subview active" id="sub-kit">
+      <div class="subview" id="sub-kit">
         <div class="card">
           <h3>Навыки</h3>
           <div class="skill-kind-tabs">
@@ -1165,60 +1179,12 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 
       <!-- GAMEPLAY -->
       <div class="subview" id="sub-gameplay">
-        <div class="card">
-          <h3>Ротация</h3>
-          <ol class="rotation-steps">
-            <li><span>Открыть окно ульты через Heavenfall Edict.</span></li>
-            <li><span>Провести серию тяжёлых атак, чтобы набрать заряд.</span></li>
-            <li><span>Переключиться в форму меха синхро-атакой.</span></li>
-            <li><span>Добить целью Finale, когда шкала резонанса заполнена.</span></li>
-          </ol>
-        </div>
-        <div class="card">
-          <h3>Синергии</h3>
-          <div class="review-text">Хорошо раскрывается с саппортами, усиливающими урон Fusion и подпитывающими энергию концерто, а также с теми, кто умеет щитовать — во время долгих анимаций смены формы Aemeath уязвима для урона.</div>
-        </div>
-        <div class="card">
-          <h3>Примеры команд</h3>
-          <div class="team-card">
-            <div class="mini-stack">
-              <div class="mini" style="background:var(--el-fusion)"><img class="mini-img" src="/wuwa-assets/characters/1210.webp" alt=""></div>
-              <div class="mini" style="background:var(--el-spectro)"><img class="mini-img" src="/wuwa-assets/characters/1509.webp" alt=""></div>
-              <div class="mini" style="background:var(--el-fusion)"><img class="mini-img" src="/wuwa-assets/characters/1209.webp" alt=""></div>
-              <div class="mini" style="background:var(--el-spectro)"><img class="mini-img" src="/wuwa-assets/characters/1505.webp" alt=""></div>
-            </div>
-            <div class="team-meta"><div class="name">Aemeath Rupture</div><div class="desc">Aemeath + Lynae + Mornye + Shorekeeper</div></div>
-          </div>
-        </div>
+        <div class="gameplay-dynamic" data-char-id="1210"></div>
       </div>
 
       <!-- CALCULATIONS -->
       <div class="subview" id="sub-calc">
-        <div class="card">
-          <h3>Урон за ротацию</h3>
-          <div class="chart-wrap">
-            <svg viewBox="0 0 320 170">
-              <line x1="30" y1="10" x2="30" y2="140" stroke="#223049" stroke-width="1"/>
-              <line x1="30" y1="140" x2="310" y2="140" stroke="#223049" stroke-width="1"/>
-              <text x="8" y="45" font-size="9" fill="#7488a8" font-family="JetBrains Mono, monospace">160k</text>
-              <text x="8" y="95" font-size="9" fill="#7488a8" font-family="JetBrains Mono, monospace">80k</text>
-              <text x="14" y="143" font-size="9" fill="#7488a8" font-family="JetBrains Mono, monospace">0</text>
-
-              <rect x="55" y="46" width="46" height="94" rx="4" fill="#42e8d4"/>
-              <text x="60" y="152" font-size="9.5" fill="#eef3fb" font-family="Exo 2, sans-serif" font-weight="700">Sig.</text>
-              <text x="63" y="38" font-size="9.5" fill="#42e8d4" font-family="JetBrains Mono, monospace">142k</text>
-
-              <rect x="130" y="66" width="46" height="74" rx="4" fill="#5fc7ff"/>
-              <text x="132" y="152" font-size="9.5" fill="#eef3fb" font-family="Exo 2, sans-serif" font-weight="700">Emerald</text>
-              <text x="138" y="58" font-size="9.5" fill="#5fc7ff" font-family="JetBrains Mono, monospace">112k</text>
-
-              <rect x="205" y="88" width="46" height="52" rx="4" fill="#3a4a63"/>
-              <text x="208" y="152" font-size="9.5" fill="#eef3fb" font-family="Exo 2, sans-serif" font-weight="700">R1 4★</text>
-              <text x="213" y="80" font-size="9.5" fill="#9fb0c8" font-family="JetBrains Mono, monospace">80k</text>
-            </svg>
-            <div class="chart-caption">Урон за полную ротацию Liberation → Concerto, сборка на 90 lvl, наш пересчёт по формулам игры</div>
-          </div>
-        </div>
+        <div class="calc-dynamic" data-char-id="1210"></div>
       </div>
     </div>
   </div>
@@ -1248,18 +1214,18 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       </div>
 
       <div class="subtabs">
-        <button class="subtab-g" data-subg="review">Обзор</button>
-        <button class="subtab-g active" data-subg="kit">Навыки</button>
+        <button class="subtab-g active" data-subg="review">Обзор</button>
+        <button class="subtab-g" data-subg="kit">Навыки</button>
         <button class="subtab-g" data-subg="build">Билд</button>
         <button class="subtab-g" data-subg="gameplay">Геймплей</button>
         <button class="subtab-g" data-subg="calc">Расчёты</button>
         <span class="subtab-indicator"></span>
       </div>
 
-      <div class="subview-g" id="subg-review">
+      <div class="subview-g active" id="subg-review">
         <div class="card"><h3>Обзор</h3><div class="review-text">Оценки, плюсы и минусы появятся здесь, когда мы разберём гайды по этому персонажу.</div></div>
       </div>
-      <div class="subview-g active" id="subg-kit">
+      <div class="subview-g" id="subg-kit">
         <div class="card">
           <h3>Основные данные</h3>
           <div class="pill-list">
@@ -1277,10 +1243,10 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div class="build-dynamic"></div>
       </div>
       <div class="subview-g" id="subg-gameplay">
-        <div class="card"><h3>Геймплей</h3><div class="review-text">Ротация и синергии с другими персонажами появятся здесь позже.</div></div>
+        <div class="gameplay-dynamic"></div>
       </div>
       <div class="subview-g" id="subg-calc">
-        <div class="card"><h3>Расчёты</h3><div class="review-text">Расчёты урона за ротацию появятся здесь позже.</div></div>
+        <div class="calc-dynamic"></div>
       </div>
     </div>
   </div>
@@ -1385,18 +1351,21 @@ let WEAPONS = [];
 let ECHOES = [];
 let ECHO_ITEMS = [];
 let BUILDS = {};
+let GAMEPLAY = {};
 async function loadGameData(){
-  const [characters, weapons, echoData, builds] = await Promise.all([
+  const [characters, weapons, echoData, builds, gameplay] = await Promise.all([
     fetch('/wuwa-assets/characters/index.json').then((r) => r.json()),
     fetch('/wuwa-assets/weapons/index.json').then((r) => r.json()),
     fetch('/wuvochka/echo-data.json').then((r) => r.json()),
     fetch('/wuvochka/builds.json').then((r) => r.json()),
+    fetch('/wuvochka/gameplay.json').then((r) => r.json()),
   ]);
   CHARACTERS = characters;
   WEAPONS = weapons;
   ECHOES = echoData.sets;
   ECHO_ITEMS = echoData.items;
   BUILDS = builds;
+  GAMEPLAY = gameplay;
 }
 </script>
 
@@ -1528,12 +1497,18 @@ function openChar(id){
     const buildEl = document.querySelector('#subg-build .build-dynamic');
     buildEl.dataset.charId = character.id;
     renderBuildTab(buildEl, character.id);
+    const gameplayEl = document.querySelector('#subg-gameplay .gameplay-dynamic');
+    gameplayEl.dataset.charId = character.id;
+    renderGameplayTab(gameplayEl, character.id);
+    const calcEl = document.querySelector('#subg-calc .calc-dynamic');
+    calcEl.dataset.charId = character.id;
+    renderCalcTab(calcEl, character.id);
     document.querySelectorAll('.subtab-g').forEach(x => x.classList.remove('active'));
     document.querySelectorAll('.subview-g').forEach(x => x.classList.remove('active'));
-    document.querySelector('.subtab-g[data-subg="kit"]').classList.add('active');
-    document.getElementById('subg-kit').classList.add('active');
+    document.querySelector('.subtab-g[data-subg="review"]').classList.add('active');
+    document.getElementById('subg-review').classList.add('active');
     document.getElementById('view-detail-generic').classList.add('active');
-    moveSubtabIndicator(document.querySelector('.subtab-g[data-subg="kit"]'));
+    moveSubtabIndicator(document.querySelector('.subtab-g[data-subg="review"]'));
   }
   refreshFavToggleUI();
   window.scrollTo(0,0);
@@ -1603,13 +1578,21 @@ function renderBuildTab(rootEl, charId){
     const base = WEAPONS.find((x) => x.id === w.id);
     if (!base) return '';
     const score = w.scores ? w.scores[variantId] : null;
+    if (w.scores && score == null) return '';
     const tier = tierFromScore(score);
-    const scoreLabel = score != null ? score.toFixed(1) + '%' : '—';
+    const scoreLabel = score.toFixed(1) + '%';
     return '<div class="item-card clickable" onclick="openWeapon(' + w.id + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + w.id + '.webp" alt=""></div><div class="item-info"><div class="iname">' + base.name + ' · <span class="weapon-score tier-' + tier + '">' + scoreLabel + '</span></div><div class="irole">' + w.note + '</div></div><div class="rank-badge tier-' + tier + '">' + tier + '</div></div>';
   }).join('') + '</div>';
   const setBase = ECHOES.find((x) => x.name === data.echoSet);
   const echoSetAttr = data.echoSet.replace(/'/g, "\\'");
-  html += '<div class="card"><h3>Лучший набор эхо</h3><div class="item-card clickable" onclick="openEcho(\'' + echoSetAttr + '\')"><div class="item-icon"><img class="item-icon-img" src="' + (setBase ? setBase.badge : '') + '" alt=""></div><div class="item-info"><div class="iname">' + data.echoSet + '</div><div class="irole">' + data.echoSetNote + '</div></div></div></div>';
+  let echoSetHtml = '<div class="card"><h3>Лучший набор эхо</h3><div class="item-card clickable" onclick="openEcho(\'' + echoSetAttr + '\')"><div class="item-icon"><img class="item-icon-img" src="' + (setBase ? setBase.badge : '') + '" alt=""></div><div class="item-info"><div class="iname">' + data.echoSet + '</div><div class="irole">' + data.echoSetNote + '</div></div></div>';
+  if (data.echoMainItems && data.echoMainItems.length) {
+    echoSetHtml += data.echoMainItems.map((it) => {
+      const itAttr = it.name.replace(/'/g, "\\'");
+      return '<div class="item-card clickable" onclick="openEchoItem(\'' + itAttr + '\')"><div class="item-icon"><img class="item-icon-img" src="' + it.icon + '" alt=""></div><div class="item-info"><div class="iname">' + it.name + '</div><div class="irole">' + it.note + '</div></div></div>';
+    }).join('');
+  }
+  html += echoSetHtml + '</div>';
   html += '<div class="card"><h3>Приоритет характеристик эхо</h3><table class="stat-table"><tr><th>Слот (стоимость)</th><th>Стата</th></tr>' + data.echoStatPriority.map((p) => '<tr><td>' + p.slot + '</td><td>' + p.stat + '</td></tr>').join('') + '</table></div>';
   html += '<div class="card"><h3>Характеристики на 90 уровне</h3><table class="stat-table"><tr><th>Параметр</th><th>Значение</th></tr>' + data.stats.map((s) => '<tr><td>' + s.label + '</td><td>' + s.value + '</td></tr>').join('') + '</table></div>';
   html += '<div class="card"><h3>Порядок прокачки навыков</h3><div class="pill-list">' + data.skillPriority.map((s, i) => '<div class="pill">' + (i + 1) + '. ' + s + '</div>').join('') + '</div></div>';
@@ -1618,6 +1601,70 @@ function renderBuildTab(rootEl, charId){
 function setBuildVariant(charId, variantId){
   buildActiveVariant[charId] = variantId;
   document.querySelectorAll('.build-dynamic[data-char-id="' + charId + '"]').forEach((el) => renderBuildTab(el, charId));
+  document.querySelectorAll('.calc-dynamic[data-char-id="' + charId + '"]').forEach((el) => renderCalcTab(el, charId));
+}
+
+function charMiniHtml(charId){
+  const c = CHARACTERS.find((x) => x.id === charId);
+  if (!c) return '';
+  const el = c.element.toLowerCase();
+  return '<div class="mini" style="background:var(--el-' + el + ')" title="' + c.name + '"><img class="mini-img" src="/wuwa-assets/characters/' + c.id + '.webp" alt=""></div>';
+}
+
+function renderGameplayTab(rootEl, charId){
+  const data = GAMEPLAY[charId];
+  if (!data) {
+    rootEl.innerHTML = '<div class="card"><h3>Геймплей</h3><div class="review-text">Ротация и синергии с другими персонажами появятся здесь позже.</div></div>';
+    return;
+  }
+  let html = '';
+  if (data.rotations && data.rotations.length) {
+    html += data.rotations.map((r) => {
+      return '<div class="card"><h3>' + r.title + '</h3>'
+        + (r.note ? '<div class="review-text" style="margin-bottom:10px">' + r.note + '</div>' : '')
+        + '<ol class="rotation-steps">' + r.steps.map((s) => '<li><span>' + s + '</span></li>').join('') + '</ol></div>';
+    }).join('');
+  }
+  if (data.synergies && data.synergies.length) {
+    html += '<div class="card"><h3>Синергии</h3>' + data.synergies.map((s) => {
+      return '<div class="synergy-block"><div class="synergy-avatars">' + s.charIds.map((id) => {
+        const c = CHARACTERS.find((x) => x.id === id);
+        return c ? '<img class="synergy-avatar" src="/wuwa-assets/characters/' + c.id + '.webp" alt="" title="' + c.name + '">' : '';
+      }).join('') + '</div><h4>' + s.title + '</h4><div class="review-text">' + s.text + '</div></div>';
+    }).join('') + '</div>';
+  }
+  if (data.teams && data.teams.length) {
+    html += '<div class="card"><h3>Примеры команд</h3>' + data.teams.map((t) => {
+      return '<div class="team-card" style="margin-bottom:10px"><div class="mini-stack">' + t.charIds.map((id) => charMiniHtml(id)).join('') + '</div><div class="team-meta"><div class="name">' + t.title + '</div><div class="desc">' + t.text + '</div></div></div>';
+    }).join('') + '</div>';
+  }
+  rootEl.innerHTML = html;
+}
+
+function renderCalcTab(rootEl, charId){
+  const data = GAMEPLAY[charId] && GAMEPLAY[charId].calculations;
+  if (!data) {
+    rootEl.innerHTML = '<div class="card"><h3>Расчёты</h3><div class="review-text">Расчёты урона за ротацию появятся здесь позже.</div></div>';
+    return;
+  }
+  const variantId = buildVariantId({ variants: data.variants }, charId);
+  const variant = data.variants.find((v) => v.id === variantId);
+  let html = '<div class="card"><h3>О расчётах</h3><div class="review-text">' + data.scenario + '. ' + data.note + '</div></div>';
+  if (data.variants.length > 1) {
+    html += '<div class="card"><h3>Расчёт под связку</h3><div class="skill-kind-tabs">' + data.variants.map((v) => {
+      return '<div class="skill-kind' + (v.id === variantId ? ' active' : '') + '" onclick="setBuildVariant(' + charId + ',\'' + v.id + '\')">' + v.name + '</div>';
+    }).join('') + '</div></div>';
+  }
+  if (variant) {
+    html += '<div class="card"><h3>Урон по константам (S0—S6)</h3><div class="calc-variant-note">' + variant.teamNote + '</div><table class="stat-table seq-table"><tr><th>Конст</th><th>Урон</th><th>DPS</th><th>%</th></tr>'
+      + variant.sequences.map((s) => '<tr class="' + (s.seq === 'S6' ? 'seq-highlight' : '') + '"><td>' + s.seq + '</td><td>' + s.dmg + '</td><td>' + s.dps + '</td><td>' + s.pct.toFixed(1) + '%</td></tr>').join('')
+      + '</table></div>';
+    const maxPct = Math.max(...variant.damageSources.map((d) => d.pct));
+    html += '<div class="card"><h3>Откуда берётся урон</h3>' + variant.damageSources.map((d) => {
+      return '<div class="dmg-bar-row"><div class="dmg-bar-top"><span>' + d.label + '</span><span>' + d.pct.toFixed(1) + '%</span></div><div class="dmg-bar-track"><div class="dmg-bar-fill" style="width:' + (maxPct ? (d.pct / maxPct * 100) : 0) + '%"></div></div></div>';
+    }).join('') + '</div>';
+  }
+  rootEl.innerHTML = html;
 }
 
 function openWeapon(id){
@@ -1847,6 +1894,8 @@ Promise.all([loadGameData(), loadProfile()]).then(() => {
   renderEchoSetsGrid();
   updateAccountAvatar();
   document.querySelectorAll('.build-dynamic[data-char-id]').forEach((el) => renderBuildTab(el, Number(el.dataset.charId)));
+  document.querySelectorAll('.gameplay-dynamic[data-char-id]').forEach((el) => renderGameplayTab(el, Number(el.dataset.charId)));
+  document.querySelectorAll('.calc-dynamic[data-char-id]').forEach((el) => renderCalcTab(el, Number(el.dataset.charId)));
   // only the tier-list is actually visible at load — everything else gets
   // staggered lazily by the tab click handler once it's actually rendered.
   document.querySelectorAll('#view-tierlist .tier-items').forEach(applyStagger);

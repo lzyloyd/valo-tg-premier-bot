@@ -30,7 +30,10 @@
       { "id": 21020044, "scores": { "tuneRupture": 75.3, "fusionBurst": 77.4 }, "note": "Лучший бесгачевый вариант — доступен с самого начала игры, апгрейдить на 5★ при первой возможности." }
     ],
     "echoSet": "Trailblazing Star",
-    "echoSetNote": "Собственный сет Aemeath: держит крит. шанс и бонус урона Fusion почти без перерывов на всей ротации — вопросов по выбору нет. Основной эхо (4-cost) для сета — Sigillum, даёт +20% урона Liberation.",
+    "echoSetNote": "Собственный сет Aemeath: держит крит. шанс и бонус урона Fusion почти без перерывов на всей ротации — вопросов по выбору нет.",
+    "echoMainItems": [
+      { "name": "Sigillum", "icon": "/wuwa-assets/echoes/6000191.webp", "note": "Отдельное эхо для Aemeath: +20% урона Liberation в главном слоте. Легко призывается в любой момент ротации." }
+    ],
     "echoStatPriority": [
       { "slot": "4-cost", "stat": "Крит. шанс / Крит. Урон" },
       { "slot": "3-cost", "stat": "Бонус урона Fusion" },
