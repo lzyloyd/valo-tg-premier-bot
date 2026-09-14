@@ -1,0 +1,514 @@
+[
+  {
+    "id": 1402,
+    "name": "Yangyang",
+    "file": "1402.webp",
+    "element": "Aero",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 1202,
+    "name": "Chixia",
+    "file": "1202.webp",
+    "element": "Fusion",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 1503,
+    "name": "Verina",
+    "file": "1503.webp",
+    "element": "Spectro",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1501,
+    "name": "Rover: Spectro",
+    "file": "1501.webp",
+    "element": "Spectro",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1102,
+    "name": "Sanhua",
+    "file": "1102.webp",
+    "element": "Glacio",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 1601,
+    "name": "Taoqi",
+    "file": "1601.webp",
+    "element": "Havoc",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 1502,
+    "name": "Rover: Spectro",
+    "file": "1502.webp",
+    "element": "Spectro",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1103,
+    "name": "Baizhi",
+    "file": "1103.webp",
+    "element": "Glacio",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 1203,
+    "name": "Encore",
+    "file": "1203.webp",
+    "element": "Fusion",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1602,
+    "name": "Danjin",
+    "file": "1602.webp",
+    "element": "Havoc",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 1403,
+    "name": "Aalto",
+    "file": "1403.webp",
+    "element": "Aero",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 1404,
+    "name": "Jiyan",
+    "file": "1404.webp",
+    "element": "Aero",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 1204,
+    "name": "Mortefi",
+    "file": "1204.webp",
+    "element": "Fusion",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 1603,
+    "name": "Camellya",
+    "file": "1603.webp",
+    "element": "Havoc",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1301,
+    "name": "Calcharo",
+    "file": "1301.webp",
+    "element": "Electro",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 1302,
+    "name": "Yinlin",
+    "file": "1302.webp",
+    "element": "Electro",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1104,
+    "name": "Lingyang",
+    "file": "1104.webp",
+    "element": "Glacio",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 1303,
+    "name": "Yuanwu",
+    "file": "1303.webp",
+    "element": "Electro",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 1604,
+    "name": "Rover: Havoc",
+    "file": "1604.webp",
+    "element": "Havoc",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1605,
+    "name": "Rover: Havoc",
+    "file": "1605.webp",
+    "element": "Havoc",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1405,
+    "name": "Jianxin",
+    "file": "1405.webp",
+    "element": "Aero",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 1304,
+    "name": "Jinhsi",
+    "file": "1304.webp",
+    "element": "Spectro",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 1305,
+    "name": "Xiangli Yao",
+    "file": "1305.webp",
+    "element": "Electro",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 1205,
+    "name": "Changli",
+    "file": "1205.webp",
+    "element": "Fusion",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1105,
+    "name": "Zhezhi",
+    "file": "1105.webp",
+    "element": "Glacio",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1504,
+    "name": "Lumi",
+    "file": "1504.webp",
+    "element": "Electro",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 1106,
+    "name": "Youhu",
+    "file": "1106.webp",
+    "element": "Glacio",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 1505,
+    "name": "Shorekeeper",
+    "file": "1505.webp",
+    "element": "Spectro",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1606,
+    "name": "Roccia",
+    "file": "1606.webp",
+    "element": "Havoc",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 1107,
+    "name": "Carlotta",
+    "file": "1107.webp",
+    "element": "Glacio",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 1206,
+    "name": "Brant",
+    "file": "1206.webp",
+    "element": "Fusion",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1506,
+    "name": "Phoebe",
+    "file": "1506.webp",
+    "element": "Spectro",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1406,
+    "name": "Rover: Aero",
+    "file": "1406.webp",
+    "element": "Aero",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1607,
+    "name": "Cantarella",
+    "file": "1607.webp",
+    "element": "Havoc",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1407,
+    "name": "Ciaccona",
+    "file": "1407.webp",
+    "element": "Aero",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 1507,
+    "name": "Zani",
+    "file": "1507.webp",
+    "element": "Spectro",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 1408,
+    "name": "Rover: Aero",
+    "file": "1408.webp",
+    "element": "Aero",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1207,
+    "name": "Lupa",
+    "file": "1207.webp",
+    "element": "Fusion",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 1608,
+    "name": "Phrolova",
+    "file": "1608.webp",
+    "element": "Havoc",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1409,
+    "name": "Cartethyia",
+    "file": "1409.webp",
+    "element": "Aero",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1306,
+    "name": "Augusta",
+    "file": "1306.webp",
+    "element": "Electro",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 1410,
+    "name": "Iuno",
+    "file": "1410.webp",
+    "element": "Aero",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 1307,
+    "name": "Buling",
+    "file": "1307.webp",
+    "element": "Electro",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 1208,
+    "name": "Galbrena",
+    "file": "1208.webp",
+    "element": "Fusion",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 1508,
+    "name": "Chisa",
+    "file": "1508.webp",
+    "element": "Havoc",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 1411,
+    "name": "Qiuyuan",
+    "file": "1411.webp",
+    "element": "Aero",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1509,
+    "name": "Lynae",
+    "file": "1509.webp",
+    "element": "Spectro",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 1209,
+    "name": "Mornye",
+    "file": "1209.webp",
+    "element": "Fusion",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 1510,
+    "name": "Luuk Herssen",
+    "file": "1510.webp",
+    "element": "Spectro",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 1210,
+    "name": "Aemeath",
+    "file": "1210.webp",
+    "element": "Fusion",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1412,
+    "name": "Sigrika",
+    "file": "1412.webp",
+    "element": "Aero",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 1211,
+    "name": "Denia",
+    "file": "1211.webp",
+    "element": "Fusion",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1308,
+    "name": "Rebecca",
+    "file": "1308.webp",
+    "element": "Electro",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 1109,
+    "name": "Lucilla",
+    "file": "1109.webp",
+    "element": "Glacio",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1511,
+    "name": "Lucy",
+    "file": "1511.webp",
+    "element": "Spectro",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 1108,
+    "name": "Hiyuki",
+    "file": "1108.webp",
+    "element": "Glacio",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1309,
+    "name": "Rover: Electro",
+    "file": "1309.webp",
+    "element": "Electro",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1310,
+    "name": "Rover: Electro",
+    "file": "1310.webp",
+    "element": "Electro",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1610,
+    "name": "Yangyang: Xuanling",
+    "file": "1610.webp",
+    "element": "Havoc",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1110,
+    "name": "Suisui",
+    "file": "1110.webp",
+    "element": "Glacio",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1413,
+    "name": "Qingxiao",
+    "file": "1413.webp",
+    "element": "Aero",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 1311,
+    "name": "Hsin",
+    "file": "1311.webp",
+    "element": "Electro",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 1212,
+    "name": "Jingran",
+    "file": "1212.webp",
+    "element": "Fusion",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 1312,
+    "name": "Suoming",
+    "file": "1312.webp",
+    "element": "Electro",
+    "weaponType": "Sword",
+    "rarity": 5
+  }
+]

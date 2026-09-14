@@ -1,0 +1,2193 @@
+[
+  {
+    "id": 6000038,
+    "name": "Hooscamp",
+    "file": "6000038.webp",
+    "element": "Aero",
+    "rarity": 0
+  },
+  {
+    "id": 6000039,
+    "name": "Tempest Mephis",
+    "file": "6000039.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000040,
+    "name": "Hoochief",
+    "file": "6000040.webp",
+    "element": "Aero",
+    "rarity": 1
+  },
+  {
+    "id": 6000041,
+    "name": "Diamondclaw",
+    "file": "6000041.webp",
+    "element": "Physical",
+    "rarity": 0
+  },
+  {
+    "id": 6000042,
+    "name": "Crownless",
+    "file": "6000042.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6000043,
+    "name": "Feilian Beringal",
+    "file": "6000043.webp",
+    "element": "Aero",
+    "rarity": 2
+  },
+  {
+    "id": 6000044,
+    "name": "Lampylumen Myriad",
+    "file": "6000044.webp",
+    "element": "Glacio",
+    "rarity": 2
+  },
+  {
+    "id": 6000045,
+    "name": "Mourning Aix",
+    "file": "6000045.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000046,
+    "name": "Carapace",
+    "file": "6000046.webp",
+    "element": "Aero",
+    "rarity": 1
+  },
+  {
+    "id": 6000047,
+    "name": "Chirpuff",
+    "file": "6000047.webp",
+    "element": "Aero",
+    "rarity": 0
+  },
+  {
+    "id": 6000048,
+    "name": "Mech Abomination",
+    "file": "6000048.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000049,
+    "name": "Autopuppet Scout",
+    "file": "6000049.webp",
+    "element": "Glacio",
+    "rarity": 1
+  },
+  {
+    "id": 6000050,
+    "name": "Traffic Illuminator",
+    "file": "6000050.webp",
+    "element": "Physical",
+    "rarity": 0
+  },
+  {
+    "id": 6000051,
+    "name": "Clang Bang",
+    "file": "6000051.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 6000052,
+    "name": "Impermanence Heron",
+    "file": "6000052.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6000053,
+    "name": "Dreamless",
+    "file": "6000053.webp",
+    "element": "Havoc",
+    "rarity": 3
+  },
+  {
+    "id": 6000054,
+    "name": "Lava Larva",
+    "file": "6000054.webp",
+    "element": "Fusion",
+    "rarity": 0
+  },
+  {
+    "id": 6000055,
+    "name": "Dwarf Cassowary",
+    "file": "6000055.webp",
+    "element": "Physical",
+    "rarity": 0
+  },
+  {
+    "id": 6000056,
+    "name": "Glacio Dreadmane",
+    "file": "6000056.webp",
+    "element": "Glacio",
+    "rarity": 1
+  },
+  {
+    "id": 6000057,
+    "name": "Lumiscale Construct",
+    "file": "6000057.webp",
+    "element": "Glacio",
+    "rarity": 1
+  },
+  {
+    "id": 6000058,
+    "name": "Lightcrusher",
+    "file": "6000058.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000059,
+    "name": "Jué",
+    "file": "6000059.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6000060,
+    "name": "Fallacy of No Return",
+    "file": "6000060.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000061,
+    "name": "Galescourge Stalker",
+    "file": "6000061.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000062,
+    "name": "Voltscourge Stalker",
+    "file": "6000062.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000063,
+    "name": "Frostscourge Stalker",
+    "file": "6000063.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000064,
+    "name": "Chop Chop: Headless",
+    "file": "6000064.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000065,
+    "name": "Chop Chop: Leftless",
+    "file": "6000065.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000066,
+    "name": "Chop Chop: Rightless",
+    "file": "6000066.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000067,
+    "name": "Fae Ignis",
+    "file": "6000067.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000068,
+    "name": "Nimbus Wraith",
+    "file": "6000068.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000069,
+    "name": "Hocus Pocus",
+    "file": "6000069.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000070,
+    "name": "Lottie Lost",
+    "file": "6000070.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000071,
+    "name": "Diggy Duggy",
+    "file": "6000071.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000072,
+    "name": "Chest Mimic",
+    "file": "6000072.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000073,
+    "name": "Questless Knight",
+    "file": "6000073.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6000074,
+    "name": "Diurnus Knight",
+    "file": "6000074.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6000075,
+    "name": "Nocturnus Knight",
+    "file": "6000075.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6000076,
+    "name": "Abyssal Patricius",
+    "file": "6000076.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6000077,
+    "name": "Abyssal Gladius",
+    "file": "6000077.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6000078,
+    "name": "Abyssal Mercator",
+    "file": "6000078.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6000079,
+    "name": "Chop Chop",
+    "file": "6000079.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6000080,
+    "name": "Vitreum Dancer",
+    "file": "6000080.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6000081,
+    "name": "Cuddle Wuddle",
+    "file": "6000081.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6000082,
+    "name": "Lorelei",
+    "file": "6000082.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000083,
+    "name": "Sentry Construct",
+    "file": "6000083.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000084,
+    "name": "Dragon of Dirge",
+    "file": "6000084.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000085,
+    "name": "Hecate",
+    "file": "6000085.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6000086,
+    "name": "Nightmare: Feilian Beringal",
+    "file": "6000086.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000087,
+    "name": "Nightmare: Impermanence Heron",
+    "file": "6000087.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000088,
+    "name": "Nightmare: Thundering Mephis",
+    "file": "6000088.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000089,
+    "name": "Nightmare: Tempest Mephis",
+    "file": "6000089.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000090,
+    "name": "Nightmare: Crownless",
+    "file": "6000090.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000091,
+    "name": "Nightmare: Inferno Rider",
+    "file": "6000091.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000092,
+    "name": "Nightmare: Mourning Aix",
+    "file": "6000092.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6000093,
+    "name": "Golden Junrock",
+    "file": "6000093.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000094,
+    "name": "Calcified Junrock",
+    "file": "6000094.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 6000095,
+    "name": "Aero Prism",
+    "file": "6000095.webp",
+    "element": "Aero",
+    "rarity": 0
+  },
+  {
+    "id": 6000096,
+    "name": "Rage Against the Statue",
+    "file": "6000096.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000097,
+    "name": "Hurriclaw",
+    "file": "6000097.webp",
+    "element": "Aero",
+    "rarity": 1
+  },
+  {
+    "id": 6000098,
+    "name": "La Guardia",
+    "file": "6000098.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000099,
+    "name": "Sagittario",
+    "file": "6000099.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000100,
+    "name": "Sacerdos",
+    "file": "6000100.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000101,
+    "name": "Aero Drake",
+    "file": "6000101.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000102,
+    "name": "Electro Drake",
+    "file": "6000102.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000103,
+    "name": "Glacio Drake",
+    "file": "6000103.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000104,
+    "name": "Capitaneus",
+    "file": "6000104.webp",
+    "element": "Aero",
+    "rarity": 1
+  },
+  {
+    "id": 6000105,
+    "name": "Nightmare: Lampylumen Myriad",
+    "file": "6000105.webp",
+    "element": "Glacio",
+    "rarity": 2
+  },
+  {
+    "id": 6000106,
+    "name": "Reminiscence: Fleurdelys",
+    "file": "6000106.webp",
+    "element": "Electro",
+    "rarity": 3
+  },
+  {
+    "id": 6000107,
+    "name": "Fusion Drake",
+    "file": "6000107.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000108,
+    "name": "Spectro Drake",
+    "file": "6000108.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000109,
+    "name": "Havoc Drake",
+    "file": "6000109.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000110,
+    "name": "Devotee's Flesh",
+    "file": "6000110.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000111,
+    "name": "Pilgrim's Shell",
+    "file": "6000111.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000112,
+    "name": "Kerasaur",
+    "file": "6000112.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000113,
+    "name": "Nightmare: Kelpie",
+    "file": "6000113.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000114,
+    "name": "Lioness of Glory",
+    "file": "6000114.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000115,
+    "name": "Nightmare: Hecate",
+    "file": "6000115.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6000116,
+    "name": "Reminiscence: Fenrico",
+    "file": "6000116.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000117,
+    "name": "Nightmare: Havoc Warrior",
+    "file": "6000117.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000118,
+    "name": "Nightmare: Glacio Predator",
+    "file": "6000118.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000119,
+    "name": "Nightmare: Tambourinist",
+    "file": "6000119.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000120,
+    "name": "Corrosaurus",
+    "file": "6000120.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000121,
+    "name": "The False Sovereign",
+    "file": "6000121.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000145,
+    "name": "Phantom: Mourning Aix",
+    "file": "6000145.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000160,
+    "name": "Lady of the Sea",
+    "file": "6000160.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000161,
+    "name": "Nightmare: Violet-Feathered Heron",
+    "file": "6000161.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000162,
+    "name": "Nightmare: Cyan-Feathered Heron",
+    "file": "6000162.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000163,
+    "name": "Nightmare: Electro Predator",
+    "file": "6000163.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000164,
+    "name": "Nightmare: Aero Predator",
+    "file": "6000164.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000165,
+    "name": "Nightmare: Gulpuff",
+    "file": "6000165.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000166,
+    "name": "Nightmare: Chirpuff",
+    "file": "6000166.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000167,
+    "name": "Reminiscence: Threnodian - Leviathan",
+    "file": "6000167.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6000168,
+    "name": "Nightmare: Viridblaze Saurian",
+    "file": "6000168.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000169,
+    "name": "Nightmare: Baby Viridblaze Saurian",
+    "file": "6000169.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000170,
+    "name": "Nightmare: Baby Roseshroom",
+    "file": "6000170.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000171,
+    "name": "Nightmare: Tick Tack",
+    "file": "6000171.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000172,
+    "name": "Nightmare: Dwarf Cassowary",
+    "file": "6000172.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000173,
+    "name": "Nightmare: Roseshroom",
+    "file": "6000173.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000174,
+    "name": "Tremor Warrior",
+    "file": "6000174.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000175,
+    "name": "Flora Drone",
+    "file": "6000175.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000176,
+    "name": "Mining Drone",
+    "file": "6000176.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000177,
+    "name": "Geospider S4",
+    "file": "6000177.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000178,
+    "name": "Zip Zap",
+    "file": "6000178.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000179,
+    "name": "Twin Nova: Nebulous Cannon",
+    "file": "6000179.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000180,
+    "name": "Twin Nova: Collapsar Blade",
+    "file": "6000180.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000181,
+    "name": "Flora Reindeer",
+    "file": "6000181.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000182,
+    "name": "Mining Reindeer",
+    "file": "6000182.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000183,
+    "name": "Ironhoof",
+    "file": "6000183.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000184,
+    "name": "Spacetrek Explorer",
+    "file": "6000184.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000185,
+    "name": "Sabercat Reaver",
+    "file": "6000185.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000186,
+    "name": "Sabercat Prowler",
+    "file": "6000186.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000187,
+    "name": "Frostbite Coleoid",
+    "file": "6000187.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000188,
+    "name": "Windlash Coleoid",
+    "file": "6000188.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000189,
+    "name": "Hyvatia",
+    "file": "6000189.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000190,
+    "name": "Reactor Husk",
+    "file": "6000190.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000191,
+    "name": "Sigillum",
+    "file": "6000191.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6000192,
+    "name": "Nameless Explorer",
+    "file": "6000192.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000193,
+    "name": "Kronablight",
+    "file": "6000193.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000194,
+    "name": "Reminiscence: Kronaclaw",
+    "file": "6000194.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000195,
+    "name": "Glommoth",
+    "file": "6000195.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000196,
+    "name": "Iceglint Dancer",
+    "file": "6000196.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000197,
+    "name": "Shadow Stepper",
+    "file": "6000197.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000198,
+    "name": "Voidwing Moth",
+    "file": "6000198.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000199,
+    "name": "Reminiscence: Threnodian - Voidborne Construct",
+    "file": "6000199.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6000200,
+    "name": "Reminiscence: Denia",
+    "file": "6000200.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6000201,
+    "name": "Reminiscence - Nightmare: Adam Smasher",
+    "file": "6000201.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000202,
+    "name": "Smiter",
+    "file": "6000202.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000203,
+    "name": "Porcelain Picket",
+    "file": "6000203.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000204,
+    "name": "Stone Picket",
+    "file": "6000204.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000205,
+    "name": "Aureate Picket",
+    "file": "6000205.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000206,
+    "name": "Kernel Puppet: Joy",
+    "file": "6000206.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000207,
+    "name": "Kernel Puppet: Anger",
+    "file": "6000207.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000208,
+    "name": "Kernel Puppet: Worry",
+    "file": "6000208.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000209,
+    "name": "Kernel Puppet: Reflection",
+    "file": "6000209.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000210,
+    "name": "Kernel Puppet: Grief",
+    "file": "6000210.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000211,
+    "name": "Kernel Puppet: Fright",
+    "file": "6000211.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000212,
+    "name": "Fog Lionarch: Body",
+    "file": "6000212.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000213,
+    "name": "Fog Lionarch: Head",
+    "file": "6000213.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000214,
+    "name": "Smolder",
+    "file": "6000214.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000215,
+    "name": "Fog Lionarch",
+    "file": "6000215.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000216,
+    "name": "Forbidden Bastion",
+    "file": "6000216.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000217,
+    "name": "Myriad Snare: Rustfire Chassis",
+    "file": "6000217.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6000218,
+    "name": "Thousand-Puppet Pavilion",
+    "file": "6000218.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6000219,
+    "name": "Jade Nether Serpent",
+    "file": "6000219.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000220,
+    "name": "Skywatch Lancer",
+    "file": "6000220.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000221,
+    "name": "Calamity Effigy",
+    "file": "6000221.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6010042,
+    "name": "Phantom: Crownless",
+    "file": "6010042.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6010051,
+    "name": "Phantom: Clang Bang",
+    "file": "6010051.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 6010052,
+    "name": "Phantom: Impermanence Heron",
+    "file": "6010052.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6010053,
+    "name": "Phantom: Dreamless",
+    "file": "6010053.webp",
+    "element": "Havoc",
+    "rarity": 3
+  },
+  {
+    "id": 6010057,
+    "name": "Phantom: Lumiscale Construct",
+    "file": "6010057.webp",
+    "element": "Glacio",
+    "rarity": 1
+  },
+  {
+    "id": 6010058,
+    "name": "Phantom: Lightcrusher",
+    "file": "6010058.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6010060,
+    "name": "Phantom: Fallacy of No Return",
+    "file": "6010060.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6010067,
+    "name": "Phantom: Fae Ignis",
+    "file": "6010067.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6010068,
+    "name": "Phantom: Nimbus Wraith",
+    "file": "6010068.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6010071,
+    "name": "Phantom: Diggy Duggy",
+    "file": "6010071.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6010072,
+    "name": "Phantom: Chest Mimic",
+    "file": "6010072.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6010073,
+    "name": "Phantom: Questless Knight",
+    "file": "6010073.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6010079,
+    "name": "Phantom: Chop Chop",
+    "file": "6010079.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6010080,
+    "name": "Phantom: Vitreum Dancer",
+    "file": "6010080.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6010081,
+    "name": "Phantom: Cuddle Wuddle",
+    "file": "6010081.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 6010082,
+    "name": "Phantom: Lorelei",
+    "file": "6010082.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6010083,
+    "name": "Phantom: Sentry Construct",
+    "file": "6010083.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6010090,
+    "name": "Phantom: Nightmare Crownless",
+    "file": "6010090.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6010091,
+    "name": "Phantom: Nightmare Inferno Rider",
+    "file": "6010091.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6010104,
+    "name": "Phantom: Capitaneus",
+    "file": "6010104.webp",
+    "element": "Aero",
+    "rarity": 1
+  },
+  {
+    "id": 6010112,
+    "name": "Phantom: Kerasaur",
+    "file": "6010112.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6010121,
+    "name": "Phantom: The False Sovereign",
+    "file": "6010121.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6010178,
+    "name": "Phantom: Zip Zap",
+    "file": "6010178.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6010179,
+    "name": "Phantom: Twin Nova - Nebulous Cannon",
+    "file": "6010179.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6010180,
+    "name": "Phantom: Twin Nova - Collapsar Blade",
+    "file": "6010180.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6010190,
+    "name": "Phantom: Reactor Husk",
+    "file": "6010190.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6010191,
+    "name": "Phantom: Sigillum",
+    "file": "6010191.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6010194,
+    "name": "Phantom: Kronaclaw",
+    "file": "6010194.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6010195,
+    "name": "Phantom: Glommoth",
+    "file": "6010195.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6010196,
+    "name": "Phantom: Iceglint Dancer",
+    "file": "6010196.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6010202,
+    "name": "Phantom: Smiter",
+    "file": "6010202.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6010216,
+    "name": "Phantom: Forbidden Bastion",
+    "file": "6010216.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6010217,
+    "name": "Phantom: Myriad Snare: Rustfire Chassis",
+    "file": "6010217.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6020001,
+    "name": "Phantom: Hoartoise",
+    "file": "6020001.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 6020002,
+    "name": "Glacio Prism",
+    "file": "6020002.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 6020003,
+    "name": "Autopuppet Scout",
+    "file": "6020003.webp",
+    "element": "Glacio",
+    "rarity": 1
+  },
+  {
+    "id": 6020004,
+    "name": "Tick Tack",
+    "file": "6020004.webp",
+    "element": "Havoc",
+    "rarity": 0
+  },
+  {
+    "id": 6020005,
+    "name": "Phantom: Rocksteady Guardian",
+    "file": "6020005.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6020006,
+    "name": "Whiff Whaff",
+    "file": "6020006.webp",
+    "element": "Aero",
+    "rarity": 0
+  },
+  {
+    "id": 6020007,
+    "name": "Flautist",
+    "file": "6020007.webp",
+    "element": "Havoc",
+    "rarity": 1
+  },
+  {
+    "id": 6020008,
+    "name": "Phantom: Feilian Beringal",
+    "file": "6020008.webp",
+    "element": "Aero",
+    "rarity": 2
+  },
+  {
+    "id": 6020009,
+    "name": "Phantom: Impermanence Heron",
+    "file": "6020009.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6020011,
+    "name": "Phantom: Rocksteady Guardian",
+    "file": "6020011.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6020012,
+    "name": "Gulpuff",
+    "file": "6020012.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 6020013,
+    "name": "Tempest Mephis",
+    "file": "6020013.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6020014,
+    "name": "Dreamless",
+    "file": "6020014.webp",
+    "element": "Havoc",
+    "rarity": 3
+  },
+  {
+    "id": 6020015,
+    "name": "Phantom: Feilian Beringal",
+    "file": "6020015.webp",
+    "element": "Aero",
+    "rarity": 2
+  },
+  {
+    "id": 6020016,
+    "name": "Phantom: Hoartoise",
+    "file": "6020016.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 6020017,
+    "name": "Flautist",
+    "file": "6020017.webp",
+    "element": "Havoc",
+    "rarity": 1
+  },
+  {
+    "id": 6020018,
+    "name": "Jué",
+    "file": "6020018.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6020019,
+    "name": "Zig Zag",
+    "file": "6020019.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6020021,
+    "name": "Phantom: Hoartoise",
+    "file": "6020021.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 6020022,
+    "name": "Glacio Prism",
+    "file": "6020022.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 6020023,
+    "name": "Autopuppet Scout",
+    "file": "6020023.webp",
+    "element": "Glacio",
+    "rarity": 1
+  },
+  {
+    "id": 6020024,
+    "name": "Tick Tack",
+    "file": "6020024.webp",
+    "element": "Havoc",
+    "rarity": 0
+  },
+  {
+    "id": 6020025,
+    "name": "Rocksteady Guardian",
+    "file": "6020025.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6020026,
+    "name": "Whiff Whaff",
+    "file": "6020026.webp",
+    "element": "Aero",
+    "rarity": 0
+  },
+  {
+    "id": 6020027,
+    "name": "Phantom: Dreamless",
+    "file": "6020027.webp",
+    "element": "Havoc",
+    "rarity": 3
+  },
+  {
+    "id": 6020028,
+    "name": "Phantom: Feilian Beringal",
+    "file": "6020028.webp",
+    "element": "Aero",
+    "rarity": 2
+  },
+  {
+    "id": 6020029,
+    "name": "Phantom: Impermanence Heron",
+    "file": "6020029.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6020041,
+    "name": "Kerasaur",
+    "file": "6020041.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6020054,
+    "name": "Phantom: Dreamless",
+    "file": "6020054.webp",
+    "element": "Havoc",
+    "rarity": 3
+  },
+  {
+    "id": 6020055,
+    "name": "Phantom: Dreamless",
+    "file": "6020055.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6020056,
+    "name": "Sentry Construct",
+    "file": "6020056.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6020057,
+    "name": "Phantom: Dreamless",
+    "file": "6020057.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6020058,
+    "name": "Phantom: Dreamless",
+    "file": "6020058.webp",
+    "element": "Havoc",
+    "rarity": 2
+  },
+  {
+    "id": 6020059,
+    "name": "Phantom: Thundering Mephis",
+    "file": "6020059.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6020060,
+    "name": "Phantom: Rocksteady Guardian",
+    "file": "6020060.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6020061,
+    "name": "Gulpuff",
+    "file": "6020061.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6020062,
+    "name": "Tempest Mephis",
+    "file": "6020062.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
+    "id": 6020063,
+    "name": "Dreamless",
+    "file": "6020063.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6020064,
+    "name": "Phantom: Feilian Beringal",
+    "file": "6020064.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 6020065,
+    "name": "Phantom: Hoartoise",
+    "file": "6020065.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6020066,
+    "name": "Flautist",
+    "file": "6020066.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6020067,
+    "name": "Jué",
+    "file": "6020067.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6020068,
+    "name": "Zig Zag",
+    "file": "6020068.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6030010,
+    "name": "Jinhsi",
+    "file": "6030010.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030020,
+    "name": "Changli",
+    "file": "6030020.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030030,
+    "name": "Calcharo",
+    "file": "6030030.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030040,
+    "name": "Shorekeeper",
+    "file": "6030040.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030050,
+    "name": "Camellya",
+    "file": "6030050.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030060,
+    "name": "Carlotta",
+    "file": "6030060.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030070,
+    "name": "Roccia",
+    "file": "6030070.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030080,
+    "name": "Brant",
+    "file": "6030080.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030090,
+    "name": "Cantarella",
+    "file": "6030090.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030100,
+    "name": "Zani",
+    "file": "6030100.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030110,
+    "name": "Cartethyia",
+    "file": "6030110.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 6030120,
+    "name": "Phoebe",
+    "file": "6030120.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200401,
+    "name": "Jinhsi",
+    "file": "60200401.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200402,
+    "name": "Jinhsi",
+    "file": "60200402.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200403,
+    "name": "Jinhsi",
+    "file": "60200403.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200404,
+    "name": "Jinhsi",
+    "file": "60200404.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200405,
+    "name": "Jinhsi",
+    "file": "60200405.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200406,
+    "name": "Jinhsi",
+    "file": "60200406.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200407,
+    "name": "Jinhsi",
+    "file": "60200407.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200408,
+    "name": "Jinhsi",
+    "file": "60200408.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200409,
+    "name": "Jinhsi",
+    "file": "60200409.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200501,
+    "name": "MonsterInfo_60200501_Name",
+    "file": "60200501.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200601,
+    "name": "MonsterInfo_60200601_Name",
+    "file": "60200601.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200602,
+    "name": "MonsterInfo_60200602_Name",
+    "file": "60200602.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200603,
+    "name": "MonsterInfo_60200603_Name",
+    "file": "60200603.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200604,
+    "name": "MonsterInfo_60200604_Name",
+    "file": "60200604.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200605,
+    "name": "MonsterInfo_60200605_Name",
+    "file": "60200605.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200606,
+    "name": "MonsterInfo_60200606_Name",
+    "file": "60200606.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200607,
+    "name": "MonsterInfo_60200607_Name",
+    "file": "60200607.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200608,
+    "name": "MonsterInfo_60200608_Name",
+    "file": "60200608.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200609,
+    "name": "MonsterInfo_60200609_Name",
+    "file": "60200609.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200610,
+    "name": "MonsterInfo_60200610_Name",
+    "file": "60200610.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200611,
+    "name": "MonsterInfo_60200611_Name",
+    "file": "60200611.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200612,
+    "name": "MonsterInfo_60200612_Name",
+    "file": "60200612.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200613,
+    "name": "MonsterInfo_60200613_Name",
+    "file": "60200613.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 60200701,
+    "name": "Reminiscence: Fenrico",
+    "file": "60200701.webp",
+    "element": "Spectro",
+    "rarity": 2
+  },
+  {
+    "id": 60200702,
+    "name": "Iceglint Dancer",
+    "file": "60200702.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 60200703,
+    "name": "Nimbus Wraith",
+    "file": "60200703.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 60200704,
+    "name": "Ironhoof",
+    "file": "60200704.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 60200705,
+    "name": "Sabercat Reaver",
+    "file": "60200705.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 60200706,
+    "name": "Sacerdos",
+    "file": "60200706.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 60200707,
+    "name": "Lampylumen Myriad",
+    "file": "60200707.webp",
+    "element": "Glacio",
+    "rarity": 2
+  },
+  {
+    "id": 60200708,
+    "name": "Twin Nova: Nebulous Cannon",
+    "file": "60200708.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 60200709,
+    "name": "Kerasaur",
+    "file": "60200709.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 390070051,
+    "name": "Vanguard Junrock",
+    "file": "390070051.webp",
+    "element": "Physical",
+    "rarity": 0
+  },
+  {
+    "id": 390070052,
+    "name": "Fission Junrock",
+    "file": "390070052.webp",
+    "element": "Physical",
+    "rarity": 0
+  },
+  {
+    "id": 390070053,
+    "name": "Electro Predator",
+    "file": "390070053.webp",
+    "element": "Electro",
+    "rarity": 0
+  },
+  {
+    "id": 390070064,
+    "name": "Fusion Warrior",
+    "file": "390070064.webp",
+    "element": "Fusion",
+    "rarity": 0
+  },
+  {
+    "id": 390070065,
+    "name": "Havoc Warrior",
+    "file": "390070065.webp",
+    "element": "Havoc",
+    "rarity": 0
+  },
+  {
+    "id": 390070066,
+    "name": "Snip Snap",
+    "file": "390070066.webp",
+    "element": "Fusion",
+    "rarity": 0
+  },
+  {
+    "id": 390070067,
+    "name": "Zig Zag",
+    "file": "390070067.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 390070068,
+    "name": "Whiff Whaff",
+    "file": "390070068.webp",
+    "element": "Aero",
+    "rarity": 0
+  },
+  {
+    "id": 390070069,
+    "name": "Tick Tack",
+    "file": "390070069.webp",
+    "element": "Havoc",
+    "rarity": 0
+  },
+  {
+    "id": 390070070,
+    "name": "Glacio Predator",
+    "file": "390070070.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 390070071,
+    "name": "Aero Predator",
+    "file": "390070071.webp",
+    "element": "Aero",
+    "rarity": 0
+  },
+  {
+    "id": 390070074,
+    "name": "Cruisewing",
+    "file": "390070074.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 390070075,
+    "name": "Sabyr Boar",
+    "file": "390070075.webp",
+    "element": "Physical",
+    "rarity": 0
+  },
+  {
+    "id": 390070076,
+    "name": "Gulpuff",
+    "file": "390070076.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 390070077,
+    "name": "Excarat",
+    "file": "390070077.webp",
+    "element": "Havoc",
+    "rarity": 0
+  },
+  {
+    "id": 390070078,
+    "name": "Baby Viridblaze Saurian",
+    "file": "390070078.webp",
+    "element": "Fusion",
+    "rarity": 0
+  },
+  {
+    "id": 390070079,
+    "name": "Baby Roseshroom",
+    "file": "390070079.webp",
+    "element": "Havoc",
+    "rarity": 0
+  },
+  {
+    "id": 390070100,
+    "name": "Fusion Dreadmane",
+    "file": "390070100.webp",
+    "element": "Fusion",
+    "rarity": 0
+  },
+  {
+    "id": 390070105,
+    "name": "Hoartoise",
+    "file": "390070105.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 390077004,
+    "name": "Violet-Feathered Heron",
+    "file": "390077004.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 390077005,
+    "name": "Cyan-Feathered Heron",
+    "file": "390077005.webp",
+    "element": "Aero",
+    "rarity": 1
+  },
+  {
+    "id": 390077012,
+    "name": "Fusion Prism",
+    "file": "390077012.webp",
+    "element": "Fusion",
+    "rarity": 0
+  },
+  {
+    "id": 390077013,
+    "name": "Glacio Prism",
+    "file": "390077013.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 390077016,
+    "name": "Spectro Prism",
+    "file": "390077016.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 390077017,
+    "name": "Havoc Prism",
+    "file": "390077017.webp",
+    "element": "Havoc",
+    "rarity": 0
+  },
+  {
+    "id": 390077021,
+    "name": "Stonewall Bracer",
+    "file": "390077021.webp",
+    "element": "Physical",
+    "rarity": 1
+  },
+  {
+    "id": 390077022,
+    "name": "Flautist",
+    "file": "390077022.webp",
+    "element": "Electro",
+    "rarity": 1
+  },
+  {
+    "id": 390077023,
+    "name": "Tambourinist",
+    "file": "390077023.webp",
+    "element": "Havoc",
+    "rarity": 1
+  },
+  {
+    "id": 390077024,
+    "name": "Rocksteady Guardian",
+    "file": "390077024.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 390077025,
+    "name": "Chasm Guardian",
+    "file": "390077025.webp",
+    "element": "Havoc",
+    "rarity": 1
+  },
+  {
+    "id": 390077028,
+    "name": "Viridblaze Saurian",
+    "file": "390077028.webp",
+    "element": "Fusion",
+    "rarity": 1
+  },
+  {
+    "id": 390077029,
+    "name": "Roseshroom",
+    "file": "390077029.webp",
+    "element": "Havoc",
+    "rarity": 1
+  },
+  {
+    "id": 390077033,
+    "name": "Havoc Dreadmane",
+    "file": "390077033.webp",
+    "element": "Havoc",
+    "rarity": 1
+  },
+  {
+    "id": 390077038,
+    "name": "Spearback",
+    "file": "390077038.webp",
+    "element": "Physical",
+    "rarity": 1
+  },
+  {
+    "id": 390080003,
+    "name": "Thundering Mephis",
+    "file": "390080003.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 390080005,
+    "name": "Bell-Borne Geochelone",
+    "file": "390080005.webp",
+    "element": "Glacio",
+    "rarity": 3
+  },
+  {
+    "id": 390080007,
+    "name": "Inferno Rider",
+    "file": "390080007.webp",
+    "element": "Fusion",
+    "rarity": 2
+  },
+  {
+    "id": 390180010,
+    "name": "Phantom: Feilian Beringal",
+    "file": "390180010.webp",
+    "element": "Aero",
+    "rarity": 2
+  },
+  {
+    "id": 391070076,
+    "name": "Phantom: Gulpuff",
+    "file": "391070076.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 391070105,
+    "name": "Phantom: Hoartoise",
+    "file": "391070105.webp",
+    "element": "Glacio",
+    "rarity": 0
+  },
+  {
+    "id": 391077024,
+    "name": "Phantom: Rocksteady Guardian",
+    "file": "391077024.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 391080003,
+    "name": "Phantom: Thundering Mephis",
+    "file": "391080003.webp",
+    "element": "Electro",
+    "rarity": 2
+  },
+  {
+    "id": 391080007,
+    "name": "Phantom: Inferno Rider",
+    "file": "391080007.webp",
+    "element": "Fusion",
+    "rarity": 2
+  },
+  {
+    "id": 391090203,
+    "name": "Kronablight",
+    "file": "391090203.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 391090204,
+    "name": "Reminiscence: Kronaclaw",
+    "file": "391090204.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 391090205,
+    "name": "Forbidden Bastion",
+    "file": "391090205.webp",
+    "element": "Spectro",
+    "rarity": 1
+  }
+]

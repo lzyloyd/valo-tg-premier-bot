@@ -1,0 +1,856 @@
+[
+  {
+    "id": 21010074,
+    "name": "Autumntrace",
+    "file": "21010074.webp",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 21020074,
+    "name": "Lumingloss",
+    "file": "21020074.webp",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 21030074,
+    "name": "Thunderbolt",
+    "file": "21030074.webp",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 21040074,
+    "name": "Stonard",
+    "file": "21040074.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 21050074,
+    "name": "Augment",
+    "file": "21050074.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21010024,
+    "name": "Discord",
+    "file": "21010024.webp",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 21020024,
+    "name": "Overture",
+    "file": "21020024.webp",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 21030024,
+    "name": "Cadenza",
+    "file": "21030024.webp",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 21040024,
+    "name": "Marcato",
+    "file": "21040024.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 21050024,
+    "name": "Variation",
+    "file": "21050024.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21010013,
+    "name": "Broadblade of Night",
+    "file": "21010013.webp",
+    "weaponType": "Broadblade",
+    "rarity": 3
+  },
+  {
+    "id": 21020013,
+    "name": "Sword of Night",
+    "file": "21020013.webp",
+    "weaponType": "Sword",
+    "rarity": 3
+  },
+  {
+    "id": 21030013,
+    "name": "Pistols of Night",
+    "file": "21030013.webp",
+    "weaponType": "Pistols",
+    "rarity": 3
+  },
+  {
+    "id": 21040013,
+    "name": "Gauntlets of Night",
+    "file": "21040013.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 3
+  },
+  {
+    "id": 21050013,
+    "name": "Rectifier of Night",
+    "file": "21050013.webp",
+    "weaponType": "Rectifier",
+    "rarity": 3
+  },
+  {
+    "id": 21010012,
+    "name": "Tyro Broadblade",
+    "file": "21010012.webp",
+    "weaponType": "Broadblade",
+    "rarity": 2
+  },
+  {
+    "id": 21020012,
+    "name": "Tyro Sword",
+    "file": "21020012.webp",
+    "weaponType": "Sword",
+    "rarity": 2
+  },
+  {
+    "id": 21030012,
+    "name": "Tyro Pistols",
+    "file": "21030012.webp",
+    "weaponType": "Pistols",
+    "rarity": 2
+  },
+  {
+    "id": 21040012,
+    "name": "Tyro Gauntlets",
+    "file": "21040012.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 2
+  },
+  {
+    "id": 21050012,
+    "name": "Tyro Rectifier",
+    "file": "21050012.webp",
+    "weaponType": "Rectifier",
+    "rarity": 2
+  },
+  {
+    "id": 21010011,
+    "name": "Training Broadblade",
+    "file": "21010011.webp",
+    "weaponType": "Broadblade",
+    "rarity": 1
+  },
+  {
+    "id": 21020011,
+    "name": "Training Sword",
+    "file": "21020011.webp",
+    "weaponType": "Sword",
+    "rarity": 1
+  },
+  {
+    "id": 21030011,
+    "name": "Training Pistols",
+    "file": "21030011.webp",
+    "weaponType": "Pistols",
+    "rarity": 1
+  },
+  {
+    "id": 21040011,
+    "name": "Training Gauntlets",
+    "file": "21040011.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 1
+  },
+  {
+    "id": 21050011,
+    "name": "Training Rectifier",
+    "file": "21050011.webp",
+    "weaponType": "Rectifier",
+    "rarity": 1
+  },
+  {
+    "id": 21010023,
+    "name": "Originite: Type I",
+    "file": "21010023.webp",
+    "weaponType": "Broadblade",
+    "rarity": 3
+  },
+  {
+    "id": 21020023,
+    "name": "Originite: Type II",
+    "file": "21020023.webp",
+    "weaponType": "Sword",
+    "rarity": 3
+  },
+  {
+    "id": 21030023,
+    "name": "Originite: Type III",
+    "file": "21030023.webp",
+    "weaponType": "Pistols",
+    "rarity": 3
+  },
+  {
+    "id": 21040023,
+    "name": "Originite: Type IV",
+    "file": "21040023.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 3
+  },
+  {
+    "id": 21050023,
+    "name": "Originite: Type V",
+    "file": "21050023.webp",
+    "weaponType": "Rectifier",
+    "rarity": 3
+  },
+  {
+    "id": 21010034,
+    "name": "Broadblade#41",
+    "file": "21010034.webp",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 21020034,
+    "name": "Sword#18",
+    "file": "21020034.webp",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 21030034,
+    "name": "Pistols#26",
+    "file": "21030034.webp",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 21040034,
+    "name": "Gauntlets#21D",
+    "file": "21040034.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 21050034,
+    "name": "Rectifier#25",
+    "file": "21050034.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21010044,
+    "name": "Dauntless Evernight",
+    "file": "21010044.webp",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 21020044,
+    "name": "Commando of Conviction",
+    "file": "21020044.webp",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 21030044,
+    "name": "Undying Flame",
+    "file": "21030044.webp",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 21040044,
+    "name": "Amity Accord",
+    "file": "21040044.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 21050044,
+    "name": "Jinzhou Keeper",
+    "file": "21050044.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21010043,
+    "name": "Broadblade of Voyager",
+    "file": "21010043.webp",
+    "weaponType": "Broadblade",
+    "rarity": 3
+  },
+  {
+    "id": 21020043,
+    "name": "Sword of Voyager",
+    "file": "21020043.webp",
+    "weaponType": "Sword",
+    "rarity": 3
+  },
+  {
+    "id": 21030043,
+    "name": "Pistols of Voyager",
+    "file": "21030043.webp",
+    "weaponType": "Pistols",
+    "rarity": 3
+  },
+  {
+    "id": 21040043,
+    "name": "Gauntlets of Voyager",
+    "file": "21040043.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 3
+  },
+  {
+    "id": 21050043,
+    "name": "Rectifier of Voyager",
+    "file": "21050043.webp",
+    "weaponType": "Rectifier",
+    "rarity": 3
+  },
+  {
+    "id": 21010053,
+    "name": "Guardian Broadblade",
+    "file": "21010053.webp",
+    "weaponType": "Broadblade",
+    "rarity": 3
+  },
+  {
+    "id": 21020053,
+    "name": "Guardian Sword",
+    "file": "21020053.webp",
+    "weaponType": "Sword",
+    "rarity": 3
+  },
+  {
+    "id": 21030053,
+    "name": "Guardian Pistols",
+    "file": "21030053.webp",
+    "weaponType": "Pistols",
+    "rarity": 3
+  },
+  {
+    "id": 21040053,
+    "name": "Guardian Gauntlets",
+    "file": "21040053.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 3
+  },
+  {
+    "id": 21050053,
+    "name": "Guardian Rectifier",
+    "file": "21050053.webp",
+    "weaponType": "Rectifier",
+    "rarity": 3
+  },
+  {
+    "id": 21010064,
+    "name": "Helios Cleaver",
+    "file": "21010064.webp",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 21020064,
+    "name": "Lunar Cutter",
+    "file": "21020064.webp",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 21030064,
+    "name": "Novaburst",
+    "file": "21030064.webp",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 21040064,
+    "name": "Hollow Mirage",
+    "file": "21040064.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 21050064,
+    "name": "Comet Flare",
+    "file": "21050064.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21010015,
+    "name": "Lustrous Razor",
+    "file": "21010015.webp",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 21020015,
+    "name": "Emerald of Genesis",
+    "file": "21020015.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21030015,
+    "name": "Static Mist",
+    "file": "21030015.webp",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 21040015,
+    "name": "Abyss Surges",
+    "file": "21040015.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 21050015,
+    "name": "Cosmic Ripples",
+    "file": "21050015.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21010016,
+    "name": "Verdant Summit",
+    "file": "21010016.webp",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 21050016,
+    "name": "Stringmaster",
+    "file": "21050016.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21010026,
+    "name": "Ages of Harvest",
+    "file": "21010026.webp",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 21020016,
+    "name": "Blazing Brilliance",
+    "file": "21020016.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21010063,
+    "name": "Beguiling Melody",
+    "file": "21010063.webp",
+    "weaponType": "Broadblade",
+    "rarity": 3
+  },
+  {
+    "id": 21050026,
+    "name": "Rime-Draped Sprouts",
+    "file": "21050026.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21040016,
+    "name": "Verity's Handle",
+    "file": "21040016.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 21050036,
+    "name": "Stellar Symphony",
+    "file": "21050036.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21010084,
+    "name": "Waning Redshift",
+    "file": "21010084.webp",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 21020084,
+    "name": "Endless Collapse",
+    "file": "21020084.webp",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 21030084,
+    "name": "Relativistic Jet",
+    "file": "21030084.webp",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 21040084,
+    "name": "Celestial Spiral",
+    "file": "21040084.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 21050084,
+    "name": "Fusion Accretion",
+    "file": "21050084.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21020017,
+    "name": "Somnoire Anchor",
+    "file": "21020017.webp",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 21020026,
+    "name": "Red Spring",
+    "file": "21020026.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21050017,
+    "name": "Call of the Abyss",
+    "file": "21050017.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21010094,
+    "name": "Meditations on Mercy",
+    "file": "21010094.webp",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 21020094,
+    "name": "Fables of Wisdom",
+    "file": "21020094.webp",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 21030094,
+    "name": "Romance in Farewell",
+    "file": "21030094.webp",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 21040094,
+    "name": "Legend of Drunken Hero",
+    "file": "21040094.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 21050094,
+    "name": "Waltz in Masquerade",
+    "file": "21050094.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21040026,
+    "name": "Tragicomedy",
+    "file": "21040026.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 21030016,
+    "name": "The Last Dance",
+    "file": "21030016.webp",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 21020036,
+    "name": "Unflickering Valor",
+    "file": "21020036.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21050046,
+    "name": "Luminous Hymn",
+    "file": "21050046.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21050027,
+    "name": "Ocean's Gift",
+    "file": "21050027.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21050056,
+    "name": "Whispers of Sirens",
+    "file": "21050056.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21020046,
+    "name": "Bloodpact's Pledge",
+    "file": "21020046.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21040036,
+    "name": "Blazing Justice",
+    "file": "21040036.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 21030026,
+    "name": "Woodland Aria",
+    "file": "21030026.webp",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 21020056,
+    "name": "Defier's Thorn",
+    "file": "21020056.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21010036,
+    "name": "Wildfire Mark",
+    "file": "21010036.webp",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 21050066,
+    "name": "Lethean Elegy",
+    "file": "21050066.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21040046,
+    "name": "Moongazer's Sigil",
+    "file": "21040046.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 21010046,
+    "name": "Thunderflare Dominion",
+    "file": "21010046.webp",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 21010104,
+    "name": "Aureate Zenith",
+    "file": "21010104.webp",
+    "weaponType": "Broadblade",
+    "rarity": 4
+  },
+  {
+    "id": 21020104,
+    "name": "Feather Edge",
+    "file": "21020104.webp",
+    "weaponType": "Sword",
+    "rarity": 4
+  },
+  {
+    "id": 21030104,
+    "name": "Solar Flame",
+    "file": "21030104.webp",
+    "weaponType": "Pistols",
+    "rarity": 4
+  },
+  {
+    "id": 21040104,
+    "name": "Aether Strike",
+    "file": "21040104.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 4
+  },
+  {
+    "id": 21050104,
+    "name": "Radiant Dawn",
+    "file": "21050104.webp",
+    "weaponType": "Rectifier",
+    "rarity": 4
+  },
+  {
+    "id": 21030036,
+    "name": "Lux & Umbra",
+    "file": "21030036.webp",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 21020066,
+    "name": "Emerald Sentence",
+    "file": "21020066.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21010056,
+    "name": "Kumokiri",
+    "file": "21010056.webp",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 21030046,
+    "name": "Spectrum Blaster",
+    "file": "21030046.webp",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 21010066,
+    "name": "Starfield Calibrator",
+    "file": "21010066.webp",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 21010045,
+    "name": "Radiance Cleaver",
+    "file": "21010045.webp",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 21020045,
+    "name": "Laser Shearer",
+    "file": "21020045.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21030045,
+    "name": "Phasic Homogenizer",
+    "file": "21030045.webp",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 21040045,
+    "name": "Pulsation Bracer",
+    "file": "21040045.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 21050045,
+    "name": "Boson Astrolabe",
+    "file": "21050045.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21020076,
+    "name": "Everbright Polestar",
+    "file": "21020076.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21040056,
+    "name": "Daybreaker's Spine",
+    "file": "21040056.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 21040066,
+    "name": "Solsworn Ciphers",
+    "file": "21040066.webp",
+    "weaponType": "Gauntlets",
+    "rarity": 5
+  },
+  {
+    "id": 21050076,
+    "name": "Forged Dwarf Star",
+    "file": "21050076.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21020086,
+    "name": "Frostburn",
+    "file": "21020086.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21030056,
+    "name": "Spectral Trigger",
+    "file": "21030056.webp",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 21030066,
+    "name": "Skull Thrasher",
+    "file": "21030066.webp",
+    "weaponType": "Pistols",
+    "rarity": 5
+  },
+  {
+    "id": 21050086,
+    "name": "Freeze Frame",
+    "file": "21050086.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21020096,
+    "name": "Azure Oath",
+    "file": "21020096.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21050096,
+    "name": "Firstlight's Herald",
+    "file": "21050096.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
+  },
+  {
+    "id": 21010076,
+    "name": "Thousandfold Deliverance",
+    "file": "21010076.webp",
+    "weaponType": "Broadblade",
+    "rarity": 5
+  },
+  {
+    "id": 21020106,
+    "name": "Glint of Clouds",
+    "file": "21020106.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  }
+]
