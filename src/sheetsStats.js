@@ -136,7 +136,7 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   return { sheetId: newSheetId, title: tabTitle, index: template.index + 1 };
 }
 
-async function resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode) {
+export async function resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode) {
   const table1Cols = mode === 'Premier' ? TABLE1_COLUMNS_PREMIER : TABLE1_COLUMNS_PRAKTIKA;
   const table2Cols = mode === 'Premier' ? TABLE2_COLUMNS_PREMIER : TABLE2_COLUMNS_PRAKTIKA;
   const data = [];
