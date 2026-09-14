@@ -199,20 +199,21 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
     ]);
   }
 
-  // The clone also still has whatever dark "Game N" cell formatting the
-  // master had accumulated for its own (much longer) game history —
-  // clearValues below only wipes the values, not the formatting, so those
-  // extra columns would otherwise sit there as blank dark rectangles. Reset
-  // the whole game-column region back to default formatting first; only the
-  // columns actually written from here on (via formatGameColumn) get styled.
+  // The clone also still has whatever dark "Game N" cell formatting AND
+  // matchId notes the master had accumulated for its own (much longer) game
+  // history — clearValues below only wipes the values, not formatting or
+  // notes, so those extra columns would otherwise sit there as blank dark
+  // rectangles carrying a stray matchId note from a completely different
+  // match. Reset the whole game-column region first; only the columns
+  // actually written from here on (via formatGameColumn) get styled/noted.
   const gameAreaStartCol0 = colToIndex(layout.firstGameColumn) - 1;
   const gameAreaLastRow0 = ANCHOR_FIRST_ROW - 1 + BLOCK_SIZE * ROSTER_SIZE;
   await batchUpdate(spreadsheetId, [
     {
       repeatCell: {
         range: { sheetId: newSheetId, startRowIndex: 0, endRowIndex: gameAreaLastRow0, startColumnIndex: gameAreaStartCol0, endColumnIndex: colToIndex('BZ') },
-        cell: { userEnteredFormat: {} },
-        fields: 'userEnteredFormat',
+        cell: { userEnteredFormat: {}, note: '' },
+        fields: 'userEnteredFormat,note',
       },
     },
   ]);
