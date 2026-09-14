@@ -222,16 +222,15 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .echo-icon{position:relative;width:56px;height:56px;flex-shrink:0;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--surface-3);}
 .echo-icon-art{width:100%;height:100%;object-fit:cover;display:block;}
 .echo-icon-solo{width:100%;height:100%;object-fit:contain;padding:10px;box-sizing:border-box;display:block;}
-.echo-icon-badge{position:absolute;right:3px;bottom:3px;width:20px;height:20px;border-radius:50%;overflow:hidden;border:1.5px solid var(--surface-2);background:var(--surface-3);box-shadow:0 1px 4px rgba(0,0,0,.5);}
-.echo-icon-badge img{width:100%;height:100%;object-fit:contain;display:block;}
 .echo-icon.noset{display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:20px;}
 .echo-item-info{flex:1;min-width:0;}
 .echo-item-name{font-weight:700;font-size:13.5px;margin-bottom:5px;}
 .echo-item-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:7px;}
 .echo-item-meta .hero-tag{font-size:9.5px;padding:3px 7px;}
 .echo-item-sets{display:flex;flex-wrap:wrap;gap:5px;}
-.echo-set-pill{font-size:10.5px;font-weight:700;font-family:'Exo 2',sans-serif;background:var(--accent-soft);color:var(--accent);padding:4px 9px;border-radius:14px;cursor:pointer;transition:filter .15s ease;}
+.echo-set-pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;font-family:'Exo 2',sans-serif;background:var(--accent-soft);color:var(--accent);padding:4px 9px;border-radius:14px;cursor:pointer;transition:filter .15s ease;}
 .echo-set-pill:hover{filter:brightness(1.15);}
+.echo-set-pill-icon{width:13px;height:13px;border-radius:50%;object-fit:contain;flex-shrink:0;display:block;}
 .echo-item-sets .noset-label{font-size:10.5px;color:var(--text-muted);font-style:italic;}
 .echo-load-more{width:100%;background:var(--surface-2);color:var(--accent);border:1px solid var(--border);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12.5px;padding:11px 14px;border-radius:10px;cursor:pointer;margin-top:4px;transition:background-color .15s ease,border-color .15s ease;}
 .echo-load-more:hover{background:var(--surface-3);border-color:var(--accent);}
@@ -242,7 +241,6 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .echo-users-row:hover{border-color:var(--accent);}
 .echo-users-row:last-child{margin-bottom:0;}
 .echo-users-row .echo-icon{width:36px;height:36px;}
-.echo-users-row .echo-icon-badge{width:16px;height:16px;}
 .echo-users-name{font-size:12.5px;font-weight:700;flex:1;min-width:0;}
 
 #view-echo .portrait.hero .portrait-img,#view-echo-item .portrait.hero .portrait-img{object-fit:contain;box-sizing:border-box;padding:16px;background:var(--surface-3);}
@@ -329,7 +327,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.10</div>
+    <div class="app-sub">WUTHERING WAVES · v1.11</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1334,7 +1332,6 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div>
           <h2 id="ec-name"></h2>
           <div class="hero-tags">
-            <div class="hero-tag"><span class="el-dot" id="ec-el-dot"></span><span id="ec-element"></span></div>
             <div class="hero-tag">Комплект эхо</div>
           </div>
         </div>
@@ -1366,7 +1363,6 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           <div class="hero-tags">
             <div class="hero-tag" id="ei-cost"></div>
             <div class="hero-tag" id="ei-class"></div>
-            <div class="hero-tag"><span class="el-dot" id="ei-el-dot"></span><span id="ei-element"></span></div>
           </div>
         </div>
       </div>
@@ -1560,16 +1556,13 @@ function openEcho(setName){
   if (!base) return;
   const facts = ECHO_FACTS[setName];
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  const el = base.element.toLowerCase();
   document.getElementById('ec-name').textContent = base.name;
   document.getElementById('ec-portrait-img').src = 'assets/sets/' + base.icon + '.webp';
-  document.getElementById('ec-el-dot').className = 'el-dot el-' + el;
-  document.getElementById('ec-element').textContent = base.element;
   const bonuses = facts ? facts.bonuses : [{n:'?',t:'Появится здесь позже.'}];
   document.getElementById('ec-bonuses').innerHTML = bonuses.map((b) => {
     return '<div class="echo-bonus-block"><div class="rating-row"><span class="rating-label">Бонус за ' + b.n + ' предмет' + (b.n === 1 ? '' : (b.n < 5 ? 'а' : 'ов')) + '</span></div><div class="review-text">' + b.t + '</div></div>';
   }).join('');
-  const carriers = ECHO_ITEMS.filter((it) => it.s.includes(setName));
+  const carriers = ECHO_ITEMS.filter((it) => it.s.includes(setName)).sort(echoCostCompare);
   document.getElementById('ec-item-list').innerHTML = carriers.length ? carriers.map((it) => {
     const nameAttr = it.n.replace(/'/g, "\\'");
     return '<div class="echo-users-row" onclick="openEchoItem(\'' + nameAttr + '\')"><div class="echo-icon">' + echoArtHtml(base) + '</div><div class="echo-users-name">' + it.n + '</div><span class="hero-tag">' + (it.co != null ? 'Cost ' + it.co : '—') + '</span></div>';
@@ -1600,12 +1593,10 @@ function openEchoItem(itemName){
   document.getElementById('ei-portrait').className = 'portrait hero' + (firstSet ? '' : ' noset-hero');
   document.getElementById('ei-portrait').innerHTML = (firstSet ? echoArtHtml(firstSet) : '') + '<span class="ring"></span>';
   document.getElementById('ei-name').textContent = item.n;
-  document.getElementById('ei-el-dot').className = 'el-dot' + (item.e ? ' el-' + item.e.toLowerCase() : '');
-  document.getElementById('ei-element').textContent = item.e || '—';
   document.getElementById('ei-cost').textContent = item.co != null ? 'Cost ' + item.co : '—';
   document.getElementById('ei-class').textContent = item.cl ? (CLASS_RU[item.cl] || item.cl) : '—';
   document.getElementById('ei-sets').innerHTML = item.s.length
-    ? item.s.map((name) => '<span class="echo-set-pill" onclick="openEcho(\'' + name.replace(/'/g, "\\'") + '\')">' + name + '</span>').join('')
+    ? item.s.map((name) => setPillHtml(name, false)).join('')
     : '<span class="noset-label">Это эхо не входит ни в один из известных комплектов.</span>';
   document.getElementById('view-echo-item').classList.add('active');
   window.scrollTo(0,0);
@@ -1674,9 +1665,18 @@ function echoArtHtml(setObj){
   if (!setObj) return '∅';
   const flagshipId = ECHO_SET_FLAGSHIP[setObj.name];
   if (flagshipId) {
-    return '<img class="echo-icon-art" src="assets/echo-art/' + flagshipId + '.webp" alt=""><span class="echo-icon-badge"><img src="assets/sets/' + setObj.icon + '.webp" alt=""></span>';
+    return '<img class="echo-icon-art" src="assets/echo-art/' + flagshipId + '.webp" alt="">';
   }
   return '<img class="echo-icon-solo" src="assets/sets/' + setObj.icon + '.webp" alt="">';
+}
+function setPillHtml(setName, stopProp){
+  const set = ECHOES.find((x) => x.name === setName);
+  const nameAttr = setName.replace(/'/g, "\\'");
+  const iconHtml = set ? '<img class="echo-set-pill-icon" src="assets/sets/' + set.icon + '.webp" alt="">' : '';
+  return '<span class="echo-set-pill" onclick="' + (stopProp ? 'event.stopPropagation();' : '') + 'openEcho(\'' + nameAttr + '\')">' + iconHtml + setName + '</span>';
+}
+function echoCostCompare(a, b){
+  return (a.co == null ? 99 : a.co) - (b.co == null ? 99 : b.co);
 }
 const ECHO_PAGE_SIZE = 40;
 let echoFilteredItems = [];
@@ -1684,7 +1684,7 @@ let echoRenderedCount = 0;
 function echoCardHtml(it){
   const firstSet = it.s.length ? ECHOES.find((x) => x.name === it.s[0]) : null;
   const setsHtml = it.s.length
-    ? it.s.map((name) => '<span class="echo-set-pill" onclick="event.stopPropagation();openEcho(\'' + name.replace(/'/g, "\\'") + '\')">' + name + '</span>').join('')
+    ? it.s.map((name) => setPillHtml(name, true)).join('')
     : '<span class="noset-label">Без сета</span>';
   const nameAttr = it.n.replace(/'/g, "\\'");
   return '<div class="echo-item-row" onclick="openEchoItem(\'' + nameAttr + '\')">' +
@@ -1708,7 +1708,7 @@ function renderEchoItemsGrid(){
     if (setVal !== 'all' && setVal !== 'none' && !it.s.includes(setVal)) return false;
     if (costVal !== 'all' && String(it.co) !== costVal) return false;
     return true;
-  });
+  }).sort(echoCostCompare);
   document.getElementById('echo-count').textContent = 'Найдено: ' + echoFilteredItems.length;
   echoRenderedCount = 0;
   document.getElementById('echoes-grid').innerHTML = '';
