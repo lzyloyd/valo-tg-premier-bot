@@ -17,7 +17,7 @@ const HEATMAP_RANGE = 'B1:P20';
 async function screenshotSheetRange(browser, spreadsheetId, gid, range) {
   const page = await browser.newPage();
   try {
-    await page.setViewport({ width: 900, height: 650 });
+    await page.setViewport({ width: 1500, height: 650 });
     // rm=minimal drops Sheets' own menu/toolbar chrome — this is the same
     // param Google's "publish to the web" embeds use.
     const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit?gid=${gid}&range=${range}&rm=minimal`;
