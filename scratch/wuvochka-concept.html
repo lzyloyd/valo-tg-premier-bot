@@ -329,7 +329,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.20</div>
+    <div class="app-sub">WUTHERING WAVES · v1.30</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1147,13 +1147,28 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <!-- BUILD -->
       <div class="subview" id="sub-build">
         <div class="card">
+          <h3>Расчёт под связку</h3>
+          <div class="skill-kind-tabs">
+            <div class="skill-kind active">Tune Rupture</div>
+            <div class="skill-kind">Fusion Burst</div>
+          </div>
+          <div class="review-text" style="margin-top:8px">Проценты ниже — для связки Tune Rupture; смена вкладки в этом прототипе не пересчитывает список (в реальном приложении — пересчитывает).</div>
+        </div>
+        <div class="card">
           <h3>Лучшее оружие</h3>
-          <div class="item-card clickable" onclick="openWeapon(21020016)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020016.webp" alt=""></div><div class="item-info"><div class="iname">Blazing Brilliance</div><div class="irole">Крит. урон + бонус Fusion</div></div><div class="rank-badge">S</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020015)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020015.webp" alt=""></div><div class="item-info"><div class="iname">Emerald of Genesis</div><div class="irole">Универсальный F2P-вариант</div></div><div class="rank-badge">A</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020076)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020076.webp" alt=""></div><div class="item-info"><div class="iname">Everbright Polestar · 100.0%</div><div class="irole">Сигнатура Aemeath — игнор Fusion-сопротивления на уроне Liberation, лучший выбор.</div></div><div class="rank-badge">S</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020015)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020015.webp" alt=""></div><div class="item-info"><div class="iname">Emerald of Genesis · 86.8%</div><div class="irole">Постоянно доступный второй по силе вариант с восст. энергии и АТК%.</div></div><div class="rank-badge">A</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020026)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020026.webp" alt=""></div><div class="item-info"><div class="iname">Red Spring · 84.7%</div><div class="irole">Крит-статстик 5★, чуть слабее Emerald of Genesis без нужды в восст. энергии.</div></div><div class="rank-badge">A</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020066)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020066.webp" alt=""></div><div class="item-info"><div class="iname">Emerald Sentence · 84.5%</div><div class="irole">АТК/крит. шанс статстик, чуть усиливает урон эхо команде.</div></div><div class="rank-badge">A</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020016)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020016.webp" alt=""></div><div class="item-info"><div class="iname">Blazing Brilliance · 84.2%</div><div class="irole">АТК/крит. урон статстик, свои бонусы урона навыка не задействует.</div></div><div class="rank-badge">A</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020104)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020104.webp" alt=""></div><div class="item-info"><div class="iname">Feather Edge · 79.3%</div><div class="irole">Лучший 4★ (баттлпасс): АТК и урон Liberation, но ниже базовая АТК, чем у 5★.</div></div><div class="rank-badge">B</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020017)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020017.webp" alt=""></div><div class="item-info"><div class="iname">Somnoire Anchor · 76.0%</div><div class="irole">Ивентовый 4★ с накопительными бонусами АТК и крит. шанса.</div></div><div class="rank-badge">B</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020084)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020084.webp" alt=""></div><div class="item-info"><div class="iname">Endless Collapse · 75.6%</div><div class="irole">Снимает потребность в восст. энергии, но почти ничего не даёт сверху.</div></div><div class="rank-badge">B</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020044)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020044.webp" alt=""></div><div class="item-info"><div class="iname">Commando of Conviction · 75.3%</div><div class="irole">Лучший бесгачевый вариант — доступен с самого старта игры.</div></div><div class="rank-badge">B</div></div>
         </div>
         <div class="card">
           <h3>Лучший набор эхо</h3>
-          <div class="item-card clickable" onclick="openEcho('Molten Rift')"><div class="item-icon"><img class="item-icon-img" src="assets/sets/set_2.webp" alt=""></div><div class="item-info"><div class="iname">Molten Rift · 2/5 предметов</div><div class="irole">Урон Fusion +10% / +30% после навыка резонанса</div></div></div>
+          <div class="item-card clickable" onclick="openEcho('Trailblazing Star')"><div class="item-icon"><img class="item-icon-img" src="assets/sets/set_26.webp" alt=""></div><div class="item-info"><div class="iname">Trailblazing Star</div><div class="irole">Собственный сет Aemeath: крит. шанс и бонус урона Fusion почти без перерывов. Основной эхо (4-cost) — Sigillum, +20% урона Liberation.</div></div></div>
         </div>
         <div class="card">
           <h3>Приоритет характеристик эхо</h3>
@@ -1168,19 +1183,23 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           <h3>Характеристики на 90 уровне</h3>
           <table class="stat-table">
             <tr><th>Параметр</th><th>Значение</th></tr>
-            <tr><td>АТК</td><td>2 480</td></tr>
-            <tr><td>Крит. шанс</td><td>62%</td></tr>
-            <tr><td>Крит. урон</td><td>218%</td></tr>
-            <tr><td>Бонус Fusion</td><td>+56%</td></tr>
+            <tr><td>HP</td><td>15 000+</td></tr>
+            <tr><td>DEF</td><td>1 100+</td></tr>
+            <tr><td>АТК</td><td>2 000–2 400+</td></tr>
+            <tr><td>Крит. шанс</td><td>65%+ (до сет-бонусов)</td></tr>
+            <tr><td>Крит. урон</td><td>210–260%+</td></tr>
+            <tr><td>Восст. энергии</td><td>115–125%+</td></tr>
+            <tr><td>Бонус Fusion</td><td>40–70%+</td></tr>
           </table>
         </div>
         <div class="card">
           <h3>Порядок прокачки навыков</h3>
           <div class="pill-list">
             <div class="pill">1. Liberation</div>
-            <div class="pill">2. Навык резонанса</div>
-            <div class="pill">3. Базовая атака</div>
-            <div class="pill">4. Интро</div>
+            <div class="pill">2. Forte Circuit</div>
+            <div class="pill">3. Навык резонанса</div>
+            <div class="pill">4. Базовая атака</div>
+            <div class="pill">5. Интро</div>
           </div>
         </div>
       </div>

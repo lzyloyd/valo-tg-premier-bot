@@ -331,7 +331,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.20</div>
+    <div class="app-sub">WUTHERING WAVES · v1.30</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1144,43 +1144,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 
       <!-- BUILD -->
       <div class="subview" id="sub-build">
-        <div class="card">
-          <h3>Лучшее оружие</h3>
-          <div class="item-card clickable" onclick="openWeapon(21020016)"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/21020016.webp" alt=""></div><div class="item-info"><div class="iname">Blazing Brilliance</div><div class="irole">Крит. урон + бонус Fusion</div></div><div class="rank-badge">S</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020015)"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/21020015.webp" alt=""></div><div class="item-info"><div class="iname">Emerald of Genesis</div><div class="irole">Универсальный F2P-вариант</div></div><div class="rank-badge">A</div></div>
-        </div>
-        <div class="card">
-          <h3>Лучший набор эхо</h3>
-          <div class="item-card clickable" onclick="openEcho('Molten Rift')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/echo-sets/set_2.webp" alt=""></div><div class="item-info"><div class="iname">Molten Rift · 2/5 предметов</div><div class="irole">Урон Fusion +10% / +30% после навыка резонанса</div></div></div>
-        </div>
-        <div class="card">
-          <h3>Приоритет характеристик эхо</h3>
-          <table class="stat-table">
-            <tr><th>Слот (стоимость)</th><th>Стата</th></tr>
-            <tr><td>4-cost</td><td>Крит. шанс / Крит. Урон</td></tr>
-            <tr><td>3-cost</td><td>Бонус урона Fusion</td></tr>
-            <tr><td>1-cost</td><td>АТК%</td></tr>
-          </table>
-        </div>
-        <div class="card">
-          <h3>Характеристики на 90 уровне</h3>
-          <table class="stat-table">
-            <tr><th>Параметр</th><th>Значение</th></tr>
-            <tr><td>АТК</td><td>2 480</td></tr>
-            <tr><td>Крит. шанс</td><td>62%</td></tr>
-            <tr><td>Крит. урон</td><td>218%</td></tr>
-            <tr><td>Бонус Fusion</td><td>+56%</td></tr>
-          </table>
-        </div>
-        <div class="card">
-          <h3>Порядок прокачки навыков</h3>
-          <div class="pill-list">
-            <div class="pill">1. Liberation</div>
-            <div class="pill">2. Навык резонанса</div>
-            <div class="pill">3. Базовая атака</div>
-            <div class="pill">4. Интро</div>
-          </div>
-        </div>
+        <div class="build-dynamic" data-char-id="1210"></div>
       </div>
 
       <!-- GAMEPLAY -->
@@ -1294,7 +1258,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div class="card"><h3>Обзор</h3><div class="review-text">Оценки, плюсы и минусы появятся здесь, когда мы разберём гайды по этому персонажу.</div></div>
       </div>
       <div class="subview-g" id="subg-build">
-        <div class="card"><h3>Билд</h3><div class="review-text">Рекомендации по оружию, эхо и характеристикам появятся здесь позже.</div></div>
+        <div class="build-dynamic"></div>
       </div>
       <div class="subview-g" id="subg-gameplay">
         <div class="card"><h3>Геймплей</h3><div class="review-text">Ротация и синергии с другими персонажами появятся здесь позже.</div></div>
@@ -1404,16 +1368,19 @@ let CHARACTERS = [];
 let WEAPONS = [];
 let ECHOES = [];
 let ECHO_ITEMS = [];
+let BUILDS = {};
 async function loadGameData(){
-  const [characters, weapons, echoData] = await Promise.all([
+  const [characters, weapons, echoData, builds] = await Promise.all([
     fetch('/wuwa-assets/characters/index.json').then((r) => r.json()),
     fetch('/wuwa-assets/weapons/index.json').then((r) => r.json()),
     fetch('/wuvochka/echo-data.json').then((r) => r.json()),
+    fetch('/wuvochka/builds.json').then((r) => r.json()),
   ]);
   CHARACTERS = characters;
   WEAPONS = weapons;
   ECHOES = echoData.sets;
   ECHO_ITEMS = echoData.items;
+  BUILDS = builds;
 }
 </script>
 
@@ -1542,6 +1509,9 @@ function openChar(id){
     document.getElementById('g-fact-element').textContent = character.element;
     document.getElementById('g-fact-weapon').textContent = WEAPON_TYPE_RU[character.weaponType] || character.weaponType;
     document.getElementById('g-fact-rarity').textContent = character.rarity + '★';
+    const buildEl = document.querySelector('#subg-build .build-dynamic');
+    buildEl.dataset.charId = character.id;
+    renderBuildTab(buildEl, character.id);
     document.querySelectorAll('.subtab-g').forEach(x => x.classList.remove('active'));
     document.querySelectorAll('.subview-g').forEach(x => x.classList.remove('active'));
     document.querySelector('.subtab-g[data-subg="kit"]').classList.add('active');
@@ -1571,6 +1541,51 @@ function popViewHistory(fallbackId){
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   const prev = viewHistory.length ? viewHistory.pop() : (fallbackId || 'view-characters');
   document.getElementById(prev).classList.add('active');
+}
+
+let buildActiveVariant = {};
+function tierFromScore(score){
+  if (score == null) return '—';
+  if (score >= 99) return 'S';
+  if (score >= 80) return 'A';
+  if (score >= 60) return 'B';
+  return 'C';
+}
+function buildVariantId(data, charId){
+  if (!data.variants || !data.variants.length) return 'default';
+  return buildActiveVariant[charId] || data.variants[0].id;
+}
+function renderBuildTab(rootEl, charId){
+  const data = BUILDS[charId];
+  if (!data) {
+    rootEl.innerHTML = '<div class="card"><h3>Билд</h3><div class="review-text">Рекомендации по оружию, эхо и характеристикам появятся здесь позже.</div></div>';
+    return;
+  }
+  const variantId = buildVariantId(data, charId);
+  let html = '';
+  if (data.variants && data.variants.length > 1) {
+    html += '<div class="card"><h3>Расчёт под связку</h3><div class="skill-kind-tabs">' + data.variants.map((v) => {
+      return '<div class="skill-kind' + (v.id === variantId ? ' active' : '') + '" onclick="setBuildVariant(' + charId + ',\'' + v.id + '\')">' + v.name + '</div>';
+    }).join('') + '</div></div>';
+  }
+  html += '<div class="card"><h3>Лучшее оружие</h3>' + data.weapons.map((w) => {
+    const base = WEAPONS.find((x) => x.id === w.id);
+    if (!base) return '';
+    const score = w.scores ? w.scores[variantId] : null;
+    const scoreLabel = score != null ? score.toFixed(1) + '%' : '—';
+    return '<div class="item-card clickable" onclick="openWeapon(' + w.id + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + w.id + '.webp" alt=""></div><div class="item-info"><div class="iname">' + base.name + ' · ' + scoreLabel + '</div><div class="irole">' + w.note + '</div></div><div class="rank-badge">' + tierFromScore(score) + '</div></div>';
+  }).join('') + '</div>';
+  const setBase = ECHOES.find((x) => x.name === data.echoSet);
+  const echoSetAttr = data.echoSet.replace(/'/g, "\\'");
+  html += '<div class="card"><h3>Лучший набор эхо</h3><div class="item-card clickable" onclick="openEcho(\'' + echoSetAttr + '\')"><div class="item-icon"><img class="item-icon-img" src="' + (setBase ? setBase.badge : '') + '" alt=""></div><div class="item-info"><div class="iname">' + data.echoSet + '</div><div class="irole">' + data.echoSetNote + '</div></div></div></div>';
+  html += '<div class="card"><h3>Приоритет характеристик эхо</h3><table class="stat-table"><tr><th>Слот (стоимость)</th><th>Стата</th></tr>' + data.echoStatPriority.map((p) => '<tr><td>' + p.slot + '</td><td>' + p.stat + '</td></tr>').join('') + '</table></div>';
+  html += '<div class="card"><h3>Характеристики на 90 уровне</h3><table class="stat-table"><tr><th>Параметр</th><th>Значение</th></tr>' + data.stats.map((s) => '<tr><td>' + s.label + '</td><td>' + s.value + '</td></tr>').join('') + '</table></div>';
+  html += '<div class="card"><h3>Порядок прокачки навыков</h3><div class="pill-list">' + data.skillPriority.map((s, i) => '<div class="pill">' + (i + 1) + '. ' + s + '</div>').join('') + '</div></div>';
+  rootEl.innerHTML = html;
+}
+function setBuildVariant(charId, variantId){
+  buildActiveVariant[charId] = variantId;
+  document.querySelectorAll('.build-dynamic[data-char-id="' + charId + '"]').forEach((el) => renderBuildTab(el, charId));
 }
 
 function openWeapon(id){
@@ -1799,6 +1814,7 @@ Promise.all([loadGameData(), loadProfile()]).then(() => {
   renderEchoItemsGrid();
   renderEchoSetsGrid();
   updateAccountAvatar();
+  document.querySelectorAll('.build-dynamic[data-char-id]').forEach((el) => renderBuildTab(el, Number(el.dataset.charId)));
   // only the tier-list is actually visible at load — everything else gets
   // staggered lazily by the tab click handler once it's actually rendered.
   document.querySelectorAll('#view-tierlist .tier-items').forEach(applyStagger);
