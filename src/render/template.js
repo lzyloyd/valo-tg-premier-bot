@@ -125,8 +125,13 @@ function signedColor(value) {
 // tracker.gg's own TRS grade badge — the API only ever gives the raw score,
 // so the value->grade cutoffs here are reverse-engineered by comparing a
 // sample of scores against the badge actually rendered on tracker.gg's page.
+// Verified against two real matches' rendered badges (19 data points spanning
+// 100-1000): the real tier set is 1k/s/a/b/c/d, not 1k/a/b/c/d — a previous
+// pass missed the "s" tier entirely and folded it into "a", which is why
+// high scores (e.g. 833-937) rendered green instead of the correct blue.
 function trsRatingIconUrl(trs) {
-  const tier = trs >= 1000 ? '1k' : trs >= 700 ? 'a' : trs >= 500 ? 'b' : trs >= 300 ? 'c' : 'd';
+  const tier =
+    trs >= 1000 ? '1k' : trs >= 800 ? 's' : trs >= 600 ? 'a' : trs >= 450 ? 'b' : trs >= 300 ? 'c' : 'd';
   return `https://trackercdn.com/cdn/tracker.gg/img/tracker-score/trn-rating-${tier}.svg`;
 }
 
