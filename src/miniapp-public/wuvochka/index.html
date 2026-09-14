@@ -156,16 +156,19 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-role-label{font-size:10.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;}
 
 /* team tier list */
-.team-card{background:var(--surface-2);border-radius:14px;overflow:hidden;flex:1;min-width:0;}
-.team-card-header{padding:9px 12px;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12.5px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);text-align:center;cursor:pointer;}
+.tier-teams{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
+.team-card{background:var(--surface-2);border-radius:14px;overflow:hidden;}
+.team-card-header{padding:10px 12px;font-family:'Exo 2',sans-serif;font-weight:800;font-size:14px;letter-spacing:.03em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);text-align:center;text-transform:uppercase;}
 .team-card-body{display:flex;align-items:stretch;}
-.team-hero{width:34%;min-width:92px;flex-shrink:0;cursor:pointer;background:var(--surface-3);}
+.team-hero{width:34%;min-width:92px;flex-shrink:0;cursor:pointer;}
 .team-hero img{width:100%;height:100%;object-fit:cover;display:block;}
 .team-columns{flex:1;display:flex;min-width:0;}
-.team-column{flex:1;padding:10px 5px;display:flex;flex-direction:column;align-items:center;gap:8px;border-left:1px solid var(--border);min-width:0;}
+.team-column{flex:1;padding:10px 5px;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);min-width:0;}
+.team-column-picks{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.team-column-picks.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;justify-items:center;}
 .team-column-pick{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;max-width:100%;}
-.team-column-pick img{width:34px;height:34px;border-radius:9px;object-fit:cover;}
-.team-column-pick span{font-size:9px;color:var(--text-muted);text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.team-column-pick img{width:46px;height:46px;border-radius:10px;object-fit:cover;}
+.team-column-pick span{font-size:9.5px;color:var(--text-muted);text-align:center;line-height:1.2;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .teams-legend{font-size:11px;color:var(--text-muted);line-height:1.5;padding:2px 2px 16px;}
 .teams-legend b{color:var(--accent);font-weight:700;}
 
@@ -377,7 +380,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.90</div>
+    <div class="app-sub">WUTHERING WAVES · v1.91</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1120,9 +1123,8 @@ function renderTeamsView(){
   const rootEl = document.querySelector('#view-teams .teams-dynamic');
   if (!rootEl) return;
   rootEl.innerHTML = TEAMS.tiers.map((tierGroup) => {
-    return tierGroup.teams.map((t) => {
-      return '<div class="tier-row"><div class="tier-badge ' + tierGroup.class + '">' + tierGroup.tier + '</div>' + teamCardHtml(t.title, t.slots) + '</div>';
-    }).join('');
+    const cardsHtml = tierGroup.teams.map((t) => teamCardHtml(t.title, t.slots)).join('');
+    return '<div class="tier-row"><div class="tier-badge ' + tierGroup.class + '">' + tierGroup.tier + '</div><div class="tier-teams">' + cardsHtml + '</div></div>';
   }).join('');
 }
 </script>
@@ -1313,6 +1315,17 @@ function teammatesRowsHtml(teammates){
       + '</div>';
   }).join('');
 }
+function slotPicksHtml(slot){
+  const gridClass = slot.length > 2 ? ' grid' : '';
+  const centerLast = slot.length > 2 && slot.length % 2 === 1;
+  const items = slot.map((id, idx) => {
+    const c = CHARACTERS.find((x) => x.id === id);
+    if (!c) return '';
+    const lastStyle = centerLast && idx === slot.length - 1 ? ' style="grid-column:1/3;justify-self:center;"' : '';
+    return '<div class="team-column-pick"' + lastStyle + ' onclick="openChar(' + id + ')"><img src="/wuwa-assets/characters/' + id + '.webp" alt=""><span>' + c.name + '</span></div>';
+  }).join('');
+  return '<div class="team-column-picks' + gridClass + '">' + items + '</div>';
+}
 function teamCardHtml(title, slots){
   const mainId = slots[0] && slots[0][0];
   const mainChar = CHARACTERS.find((x) => x.id === mainId);
@@ -1320,13 +1333,8 @@ function teamCardHtml(title, slots){
   const heroHtml = mainChar
     ? '<div class="team-hero" onclick="openChar(' + mainId + ')"><img src="/wuwa-assets/characters/' + mainId + '.webp" alt=""></div>'
     : '<div class="team-hero"></div>';
-  const columnsHtml = slots.slice(1).map((slot) => {
-    return '<div class="team-column">' + slot.map((id) => {
-      const c = CHARACTERS.find((x) => x.id === id);
-      return c ? '<div class="team-column-pick" onclick="openChar(' + id + ')"><img src="/wuwa-assets/characters/' + id + '.webp" alt=""><span>' + c.name + '</span></div>' : '';
-    }).join('') + '</div>';
-  }).join('');
-  return '<div class="team-card"><div class="team-card-header ' + elClass + '" onclick="openChar(' + mainId + ')">' + title + '</div><div class="team-card-body">' + heroHtml + '<div class="team-columns">' + columnsHtml + '</div></div></div>';
+  const columnsHtml = slots.map((slot) => '<div class="team-column">' + slotPicksHtml(slot) + '</div>').join('');
+  return '<div class="team-card"><div class="team-card-header ' + elClass + '">' + title + '</div><div class="team-card-body">' + heroHtml + '<div class="team-columns">' + columnsHtml + '</div></div></div>';
 }
 function tierFromScore(score){
   if (score == null) return '—';
