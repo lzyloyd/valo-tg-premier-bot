@@ -18,11 +18,13 @@
     "test-notifications": "node scripts/test-notifications.mjs",
     "debug-playlist": "node scripts/debug-playlist.mjs",
     "debug-roster": "node scripts/debug-roster.mjs",
-    "debug-poller-once": "node scripts/debug-poller-once.mjs"
+    "debug-poller-once": "node scripts/debug-poller-once.mjs",
+    "debug-sheet": "node scripts/debug-sheet.mjs"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "google-auth-library": "^9.14.1",
     "puppeteer": "^23.5.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"

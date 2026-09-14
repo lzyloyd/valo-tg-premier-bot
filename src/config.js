@@ -46,4 +46,9 @@ export const config = {
   // the summary. Usernames can change; ids don't.
   adminUserId: process.env.ADMIN_USER_ID ? Number(process.env.ADMIN_USER_ID) : null,
   scheduleDataPath: path.join(dataDir, 'schedule.json'),
+
+  // "добавь в таблицу статистики" — writes per-match player stats into the
+  // team's Google Sheet (one tab per map+mode, see sheetsStats.js).
+  googleServiceAccountKeyPath: path.join(dataDir, 'google-service-account.json'),
+  statsSpreadsheetId: process.env.STATS_SPREADSHEET_ID || null,
 };
