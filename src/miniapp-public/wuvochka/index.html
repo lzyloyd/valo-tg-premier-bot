@@ -152,7 +152,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-role-heading.dps{color:var(--bad);}
 .tier-role-heading.hybrid{color:var(--el-electro);}
 .tier-role-heading.support{color:var(--tier-0);}
-#view-tierlist .tier-items{display:grid;grid-template-columns:repeat(auto-fill, minmax(96px, 1fr));gap:10px;}
+#view-tierlist .tier-items{display:grid;grid-template-columns:repeat(auto-fill, 96px);gap:10px;}
 #view-tierlist .tier-items .portrait.sm{width:100%;}
 
 /* team tier list */
@@ -166,8 +166,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .team-column{container-type:inline-size;flex:1;padding:10px 5px;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);min-width:0;}
 .team-column-picks{display:flex;flex-direction:column;align-items:center;gap:10px;}
 .team-column-picks.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;justify-items:center;}
-.team-column-picks:not(.grid) .team-column-pick img{width:clamp(44px, 52cqw, 84px);height:clamp(44px, 52cqw, 84px);}
-.team-column-picks.grid .team-column-pick img{width:clamp(38px, 40cqw, 64px);height:clamp(38px, 40cqw, 64px);}
+.team-column-picks:not(.grid) .team-column-pick img{width:56px;height:56px;}
+.team-column-picks.grid .team-column-pick img{width:44px;height:44px;}
 .team-column-pick{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;max-width:100%;}
 .team-column-pick img{border-radius:10px;object-fit:cover;}
 .team-column-pick span{font-size:9.5px;color:var(--text-muted);text-align:center;line-height:1.2;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -379,7 +379,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.23</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.3</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -1090,9 +1090,12 @@ function openChar(id){
 
   if (id === SHOWCASE_CHAR_ID) {
     lastCharViewId = 'view-detail';
+    document.querySelectorAll('.subtab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.subview').forEach(x => x.classList.remove('active'));
+    document.querySelector('.subtab[data-sub="review"]').classList.add('active');
+    document.getElementById('sub-review').classList.add('active');
     document.getElementById('view-detail').classList.add('active');
-    const activeSubtab = document.querySelector('#view-detail .subtab.active') || document.querySelector('#view-detail .subtab');
-    if (activeSubtab) moveSubtabIndicator(activeSubtab);
+    moveSubtabIndicator(document.querySelector('.subtab[data-sub="review"]'));
   } else {
     lastCharViewId = 'view-detail-generic';
     const el = character.element.toLowerCase();
