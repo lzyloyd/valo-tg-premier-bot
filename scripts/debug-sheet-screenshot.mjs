@@ -23,6 +23,8 @@ try {
   console.log('navigating to', url);
   await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
   await new Promise((r) => setTimeout(r, 1500));
+  await page.keyboard.press('Escape');
+  await new Promise((r) => setTimeout(r, 200));
   const png = await page.screenshot({ type: 'png' });
   fs.writeFileSync('/tmp/sheet-screenshot.png', png);
   console.log('saved to /tmp/sheet-screenshot.png');

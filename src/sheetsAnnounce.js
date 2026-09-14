@@ -23,6 +23,8 @@ async function screenshotSheetRange(browser, spreadsheetId, gid, range) {
     const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit?gid=${gid}&range=${range}&rm=minimal`;
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
     await new Promise((resolve) => setTimeout(resolve, 1500)); // grid/heatmap colors finish painting after load fires
+    await page.keyboard.press('Escape'); // the range= param also selects it (blue highlight) — deselect before capturing
+    await new Promise((resolve) => setTimeout(resolve, 200));
     return await page.screenshot({ type: 'png' });
   } finally {
     await page.close();
