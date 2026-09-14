@@ -14,13 +14,30 @@ function getJwtClient() {
   return jwtClient;
 }
 
-async function authedFetch(url, options = {}) {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// The free tier's Sheets API quota (60 read requests/min/user) is easy to
+// blow through when a batch command ("...следующие премьер матчи:" with a
+// handful of links) fires off several reads per match in a tight loop.
+// Retrying with backoff on 429 lets a big batch just take longer instead of
+// failing partway through.
+const MAX_RATE_LIMIT_ATTEMPTS = 6;
+
+async function authedFetch(url, options = {}, attempt = 1) {
   const { token } = await getJwtClient().getAccessToken();
   const res = await fetch(url, {
     ...options,
     headers: { ...(options.headers ?? {}), Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   });
   const json = await res.json().catch(() => ({}));
+  if (res.status === 429 && attempt < MAX_RATE_LIMIT_ATTEMPTS) {
+    const waitMs = Math.min(2 ** attempt * 1000, 30_000); // 2s, 4s, 8s, 16s, 30s
+    console.warn(`[sheetsClient] 429 rate limited, retrying in ${waitMs}ms (attempt ${attempt}/${MAX_RATE_LIMIT_ATTEMPTS})`);
+    await sleep(waitMs);
+    return authedFetch(url, options, attempt + 1);
+  }
   if (!res.ok) throw new Error(`Sheets API ${res.status} on ${url}: ${JSON.stringify(json)}`);
   return json;
 }
