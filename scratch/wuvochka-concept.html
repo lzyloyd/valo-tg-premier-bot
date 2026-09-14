@@ -329,7 +329,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.12</div>
+    <div class="app-sub">WUTHERING WAVES · v1.20</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1062,21 +1062,37 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div class="card">
           <h3>Навыки</h3>
           <div class="skill-kind-tabs">
-            <div class="skill-kind active">Активные</div>
-            <div class="skill-kind">Пассивные</div>
-            <div class="skill-kind">Концерто</div>
+            <div class="skill-kind active" data-kind="active">Активные</div>
+            <div class="skill-kind" data-kind="passive">Пассивные</div>
+            <div class="skill-kind" data-kind="concerto">Концерто</div>
           </div>
-          <div class="skill-item">
+          <div class="skill-item" data-kind="active">
             <div class="sname">Базовая атака — Infinity Calibration</div>
             <div class="sdesc">До 4 ударов подряд, урон Fusion. Заряженная тяжёлая атака переходит в усиленную версию при удержании.</div>
           </div>
-          <div class="skill-item">
+          <div class="skill-item" data-kind="active">
             <div class="sname">Навык резонанса — Form Switch</div>
             <div class="sdesc">Переключение между Aemeath и её механическим доспехом; характеристики наследуются между формами.</div>
           </div>
-          <div class="skill-item">
+          <div class="skill-item" data-kind="active">
             <div class="sname">Ультимативный навык — Heavenfall Edict</div>
             <div class="sdesc">Урон Fusion + переход в усиленное состояние, открывающее финальную атаку при заполнении шкалы резонанса.</div>
+          </div>
+          <div class="skill-item" data-kind="passive" style="display:none">
+            <div class="sname">Врождённый навык — Overclocked Frame</div>
+            <div class="sdesc">При смене формы Aemeath получает +15% бонус Fusion на 10 секунд; при повторной смене эффект обновляется, не суммируясь.</div>
+          </div>
+          <div class="skill-item" data-kind="passive" style="display:none">
+            <div class="sname">Врождённый навык — Kinetic Memory</div>
+            <div class="sdesc">Часть урона, нанесённого в одной форме, повышает АТК другой формы на 8 секунд после переключения между ними.</div>
+          </div>
+          <div class="skill-item" data-kind="concerto" style="display:none">
+            <div class="sname">Интро-навык — Vanguard Ignition</div>
+            <div class="sdesc">Активируется при выходе Aemeath на поле: наносит урон Fusion по области и накладывает резонансный бафф на 5 секунд.</div>
+          </div>
+          <div class="skill-item" data-kind="concerto" style="display:none">
+            <div class="sname">Аутро-навык — Edict Discharge</div>
+            <div class="sdesc">Расходует всю накопленную энергию концерто при смене персонажа: чем больше энергии накоплено, тем мощнее взрыв урона Fusion.</div>
           </div>
         </div>
         <div class="card">
@@ -1143,7 +1159,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           <h3>Приоритет характеристик эхо</h3>
           <table class="stat-table">
             <tr><th>Слот (стоимость)</th><th>Стата</th></tr>
-            <tr><td>4-cost</td><td>Крит. Ставка / Крит. Урон</td></tr>
+            <tr><td>4-cost</td><td>Крит. шанс / Крит. Урон</td></tr>
             <tr><td>3-cost</td><td>Бонус урона Fusion</td></tr>
             <tr><td>1-cost</td><td>АТК%</td></tr>
           </table>
@@ -1153,7 +1169,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           <table class="stat-table">
             <tr><th>Параметр</th><th>Значение</th></tr>
             <tr><td>АТК</td><td>2 480</td></tr>
-            <tr><td>Крит. ставка</td><td>62%</td></tr>
+            <tr><td>Крит. шанс</td><td>62%</td></tr>
             <tr><td>Крит. урон</td><td>218%</td></tr>
             <tr><td>Бонус Fusion</td><td>+56%</td></tr>
           </table>
@@ -1448,6 +1464,9 @@ document.querySelectorAll('.subtab-g').forEach(t => t.addEventListener('click', 
 document.querySelectorAll('.skill-kind').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.skill-kind').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
+  document.querySelectorAll('.skill-item').forEach(item => {
+    item.style.display = item.dataset.kind === t.dataset.kind ? '' : 'none';
+  });
 }));
 
 // filters: each .filters block declares which attribute on which portraits it controls
