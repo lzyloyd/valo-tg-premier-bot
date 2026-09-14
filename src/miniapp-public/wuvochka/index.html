@@ -152,15 +152,15 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 @media (max-width:380px){#view-tierlist .tier-items{grid-template-columns:repeat(3,1fr);}}
 
 /* team tier list */
-.team-card{display:flex;align-items:center;gap:14px;padding:15px;background:var(--surface-2);border-radius:14px;flex:1;min-width:0;}
-.mini-stack{display:flex;}
-.mini{position:relative;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12px;margin-left:-12px;border:2px solid var(--surface-2);color:#fff;}
-.mini:first-child{margin-left:0;box-shadow:0 0 0 2px var(--accent);z-index:1;}
+.team-card{display:flex;flex-direction:column;gap:11px;padding:15px;background:var(--surface-2);border-radius:14px;flex:1;min-width:0;}
+.mini-stack{display:flex;flex-wrap:wrap;gap:7px;}
+.mini{position:relative;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12px;border:2px solid var(--surface-3);color:#fff;}
+.mini:first-child{box-shadow:0 0 0 2px var(--accent);z-index:1;}
 .teams-legend{font-size:11px;color:var(--text-muted);line-height:1.5;padding:2px 2px 16px;}
 .teams-legend b{color:var(--accent);font-weight:700;}
 .team-meta{flex:1;min-width:0;}
 .team-meta .name{font-family:'Exo 2',sans-serif;font-weight:700;font-size:15px;}
-.team-meta .desc{font-size:11.5px;color:var(--text-muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.team-meta .desc{font-size:11.5px;color:var(--text-muted);margin-top:3px;line-height:1.5;white-space:normal;}
 
 /* character grid */
 .char-grid{display:grid;grid-template-columns:repeat(var(--char-grid-cols),1fr);gap:11px;}
@@ -368,7 +368,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.41</div>
+    <div class="app-sub">WUTHERING WAVES · v1.50</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1542,6 +1542,11 @@ function popViewHistory(fallbackId){
 }
 
 let buildActiveVariant = {};
+let gameplayActiveRotation = {};
+function setGameplayRotation(charId, idx){
+  gameplayActiveRotation[charId] = idx;
+  document.querySelectorAll('.gameplay-dynamic[data-char-id="' + charId + '"]').forEach((el) => renderGameplayTab(el, charId));
+}
 function tierFromScore(score){
   if (score == null) return '—';
   if (score >= 99) return 'S';
@@ -1626,11 +1631,15 @@ function renderGameplayTab(rootEl, charId){
   }
   let html = '';
   if (data.rotations && data.rotations.length) {
-    html += data.rotations.map((r) => {
-      return '<div class="card"><h3>' + r.title + '</h3>'
-        + (r.note ? '<div class="review-text" style="margin-bottom:10px">' + r.note + '</div>' : '')
-        + '<ol class="rotation-steps">' + r.steps.map((s) => '<li><span>' + s + '</span></li>').join('') + '</ol></div>';
-    }).join('');
+    const activeIdx = gameplayActiveRotation[charId] || 0;
+    const r = data.rotations[activeIdx] || data.rotations[0];
+    html += '<div class="card"><h3>Ротация</h3>'
+      + (data.rotationsNote ? '<div class="review-text" style="margin-bottom:10px">' + data.rotationsNote + '</div>' : '')
+      + '<div class="filters">' + data.rotations.map((rot, i) => {
+        return '<div class="chip' + (i === activeIdx ? ' active' : '') + '" onclick="setGameplayRotation(' + charId + ',' + i + ')">' + rot.title + '</div>';
+      }).join('') + '</div>'
+      + (r.note ? '<div class="review-text" style="margin:11px 0">' + r.note + '</div>' : '')
+      + '<ol class="rotation-steps">' + r.steps.map((s) => '<li><span>' + s + '</span></li>').join('') + '</ol></div>';
   }
   if (data.synergies && data.synergies.length) {
     html += '<div class="card"><h3>Синергии</h3>' + data.synergies.map((s) => {
