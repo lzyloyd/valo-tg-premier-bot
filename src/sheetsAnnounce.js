@@ -26,7 +26,7 @@ async function screenshotSheetRange(browser, spreadsheetId, gid, range) {
     // The range= param also selects it (blue highlight + a sum/count bar) —
     // clicking a single already-visible cell clears that without disturbing
     // scroll position the way Escape does (Escape recentered on A1 instead).
-    await page.mouse.click(105, 30);
+    await page.mouse.click(105, 124);
     await new Promise((resolve) => setTimeout(resolve, 200));
     return await page.screenshot({ type: 'png' });
   } finally {
