@@ -160,7 +160,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .team-card{background:var(--surface-2);border-radius:14px;overflow:hidden;}
 .team-card-header{padding:10px 12px;font-family:'Exo 2',sans-serif;font-weight:800;font-size:14px;letter-spacing:.03em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);text-align:center;text-transform:uppercase;}
 .team-card-body{display:flex;align-items:stretch;}
-.team-hero{width:34%;min-width:92px;flex-shrink:0;cursor:pointer;}
+.team-hero{width:38%;min-width:100px;flex-shrink:0;cursor:pointer;-webkit-mask-image:linear-gradient(to right, #000 70%, transparent 100%);mask-image:linear-gradient(to right, #000 70%, transparent 100%);}
 .team-hero img{width:100%;height:100%;object-fit:cover;display:block;}
 .team-columns{flex:1;display:flex;min-width:0;}
 .team-column{flex:1;padding:10px 5px;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);min-width:0;}
@@ -380,7 +380,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.91</div>
+    <div class="app-sub">WUTHERING WAVES · v1.92</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1333,7 +1333,7 @@ function teamCardHtml(title, slots){
   const heroHtml = mainChar
     ? '<div class="team-hero" onclick="openChar(' + mainId + ')"><img src="/wuwa-assets/characters/' + mainId + '.webp" alt=""></div>'
     : '<div class="team-hero"></div>';
-  const columnsHtml = slots.map((slot) => '<div class="team-column">' + slotPicksHtml(slot) + '</div>').join('');
+  const columnsHtml = slots.slice(1).map((slot) => '<div class="team-column">' + slotPicksHtml(slot) + '</div>').join('');
   return '<div class="team-card"><div class="team-card-header ' + elClass + '">' + title + '</div><div class="team-card-body">' + heroHtml + '<div class="team-columns">' + columnsHtml + '</div></div></div>';
 }
 function tierFromScore(score){
