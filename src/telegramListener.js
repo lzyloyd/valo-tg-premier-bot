@@ -290,6 +290,11 @@ export async function runTelegramListener() {
     for (const update of updates) {
       offset = update.update_id + 1;
       const text = update.message?.text;
+      if (update.message) {
+        console.log(
+          `[listener] DEBUG msg — chat_id=${update.message.chat.id} thread_id=${update.message.message_thread_id} text=${JSON.stringify((text || '').slice(0, 40))}`,
+        );
+      }
       if (!text) continue;
       const triggerMatch = TRIGGER.exec(text);
       if (!triggerMatch) continue;
