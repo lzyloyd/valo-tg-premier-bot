@@ -150,12 +150,24 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 #view-tierlist .tier-items{display:grid;grid-template-columns:repeat(var(--tier-grid-cols),1fr);gap:10px;}
 #view-tierlist .tier-items .portrait.sm{width:100%;}
 @media (max-width:380px){#view-tierlist .tier-items{grid-template-columns:repeat(3,1fr);}}
+.tier-role-group{margin-top:16px;}
+.tier-role-group:first-of-type{margin-top:0;}
+.tier-role-group.hidden-by-filter{display:none;}
+.tier-role-label{font-size:10.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;}
 
 /* team tier list */
 .team-card{display:flex;flex-direction:column;gap:11px;padding:15px;background:var(--surface-2);border-radius:14px;flex:1;min-width:0;}
 .mini-stack{display:flex;flex-wrap:wrap;gap:7px;}
 .mini{position:relative;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12px;border:2px solid var(--surface-3);color:#fff;}
 .mini:first-child{box-shadow:0 0 0 2px var(--accent);z-index:1;}
+.team-slots{display:flex;gap:8px;}
+.team-slot{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;}
+.team-slot-label{font-size:9.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;}
+.team-slot-main{width:56px;height:56px;border-radius:14px;overflow:hidden;border:2px solid var(--accent);cursor:pointer;flex-shrink:0;}
+.team-slot-main img{width:100%;height:100%;object-fit:cover;}
+.team-slot-alts{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
+.team-slot-alt{width:28px;height:28px;border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:pointer;flex-shrink:0;}
+.team-slot-alt img{width:100%;height:100%;object-fit:cover;}
 .teams-legend{font-size:11px;color:var(--text-muted);line-height:1.5;padding:2px 2px 16px;}
 .teams-legend b{color:var(--accent);font-weight:700;}
 .team-meta{flex:1;min-width:0;}
@@ -368,7 +380,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.60</div>
+    <div class="app-sub">WUTHERING WAVES · v1.70</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -395,111 +407,197 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <div class="filters" data-filter-target="#view-tierlist" data-filter-attr="role">
         <div class="chip active" data-val="all">Все</div>
         <div class="chip" data-val="dps">DPS</div>
-        <div class="chip" data-val="hybrid">Гибрид</div>
+        <div class="chip" data-val="hybrid">Hybrid</div>
         <div class="chip" data-val="support">Support</div>
       </div>
 
       <div class="tier-row">
         <div class="tier-badge t0">T0</div>
-        <div class="tier-items">
-          <div class="portrait sm fusion" data-role="dps" onclick="openChar(1210)"><img class="portrait-img" src="/wuwa-assets/characters/1210.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Aemeath</span></div>
-          <div class="portrait sm glacio" data-role="dps" onclick="openChar(1108)"><img class="portrait-img" src="/wuwa-assets/characters/1108.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Hiyuki</span></div>
-          <div class="portrait sm fusion" data-role="dps" onclick="openChar(1212)"><img class="portrait-img" src="/wuwa-assets/characters/1212.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Jingran</span></div>
-          <div class="portrait sm aero" data-role="dps" onclick="openChar(1413)"><img class="portrait-img" src="/wuwa-assets/characters/1413.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Qingxiao</span></div>
-          <div class="portrait sm havoc" data-role="dps" onclick="openChar(1610)"><img class="portrait-img" src="/wuwa-assets/characters/1610.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Yangyang: Xuanling</span></div>
-          <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1211)"><img class="portrait-img" src="/wuwa-assets/characters/1211.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Denia</span></div>
-          <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1410)"><img class="portrait-img" src="/wuwa-assets/characters/1410.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Iuno</span></div>
-          <div class="portrait sm glacio" data-role="hybrid" onclick="openChar(1109)"><img class="portrait-img" src="/wuwa-assets/characters/1109.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Lucilla</span></div>
-          <div class="portrait sm spectro" data-role="hybrid" onclick="openChar(1509)"><img class="portrait-img" src="/wuwa-assets/characters/1509.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Lynae</span></div>
-          <div class="portrait sm havoc" data-role="support" onclick="openChar(1508)"><img class="portrait-img" src="/wuwa-assets/characters/1508.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Chisa</span></div>
-          <div class="portrait sm fusion" data-role="support" onclick="openChar(1209)"><img class="portrait-img" src="/wuwa-assets/characters/1209.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Mornye</span></div>
-          <div class="portrait sm glacio" data-role="support" onclick="openChar(1110)"><img class="portrait-img" src="/wuwa-assets/characters/1110.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Suisui</span></div>
-          <div class="portrait sm spectro" data-role="support" onclick="openChar(1505)"><img class="portrait-img" src="/wuwa-assets/characters/1505.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Shorekeeper</span></div>
+        <div class="tier-role-group" data-role="dps">
+          <div class="tier-role-label">DPS</div>
+          <div class="tier-items">
+            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1210)"><img class="portrait-img" src="/wuwa-assets/characters/1210.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Aemeath</span></div>
+            <div class="portrait sm glacio" data-role="dps" onclick="openChar(1108)"><img class="portrait-img" src="/wuwa-assets/characters/1108.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Hiyuki</span></div>
+            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1212)"><img class="portrait-img" src="/wuwa-assets/characters/1212.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Jingran</span></div>
+            <div class="portrait sm aero" data-role="dps" onclick="openChar(1413)"><img class="portrait-img" src="/wuwa-assets/characters/1413.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Qingxiao</span></div>
+            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1610)"><img class="portrait-img" src="/wuwa-assets/characters/1610.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Yangyang: Xuanling</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="hybrid">
+          <div class="tier-role-label">Hybrid</div>
+          <div class="tier-items">
+            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1211)"><img class="portrait-img" src="/wuwa-assets/characters/1211.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Denia</span></div>
+            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1410)"><img class="portrait-img" src="/wuwa-assets/characters/1410.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Iuno</span></div>
+            <div class="portrait sm glacio" data-role="hybrid" onclick="openChar(1109)"><img class="portrait-img" src="/wuwa-assets/characters/1109.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Lucilla</span></div>
+            <div class="portrait sm spectro" data-role="hybrid" onclick="openChar(1509)"><img class="portrait-img" src="/wuwa-assets/characters/1509.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Lynae</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="support">
+          <div class="tier-role-label">Support</div>
+          <div class="tier-items">
+            <div class="portrait sm havoc" data-role="support" onclick="openChar(1508)"><img class="portrait-img" src="/wuwa-assets/characters/1508.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Chisa</span></div>
+            <div class="portrait sm fusion" data-role="support" onclick="openChar(1209)"><img class="portrait-img" src="/wuwa-assets/characters/1209.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Mornye</span></div>
+            <div class="portrait sm glacio" data-role="support" onclick="openChar(1110)"><img class="portrait-img" src="/wuwa-assets/characters/1110.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Suisui</span></div>
+            <div class="portrait sm spectro" data-role="support" onclick="openChar(1505)"><img class="portrait-img" src="/wuwa-assets/characters/1505.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Shorekeeper</span></div>
+          </div>
         </div>
       </div>
 
       <div class="tier-row">
         <div class="tier-badge t05">T0.5</div>
-        <div class="tier-items">
-          <div class="portrait sm spectro" data-role="dps" onclick="openChar(1510)"><img class="portrait-img" src="/wuwa-assets/characters/1510.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Luuk Herssen</span></div>
-          <div class="portrait sm aero" data-role="dps" onclick="openChar(1412)"><img class="portrait-img" src="/wuwa-assets/characters/1412.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Sigrika</span></div>
-          <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1207)"><img class="portrait-img" src="/wuwa-assets/characters/1207.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Lupa</span></div>
-          <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1411)"><img class="portrait-img" src="/wuwa-assets/characters/1411.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Qiuyuan</span></div>
-          <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1308)"><img class="portrait-img" src="/wuwa-assets/characters/1308.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rebecca</span></div>
-          <div class="portrait sm spectro" data-role="support" onclick="openChar(1503)"><img class="portrait-img" src="/wuwa-assets/characters/1503.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Verina</span></div>
+        <div class="tier-role-group" data-role="dps">
+          <div class="tier-role-label">DPS</div>
+          <div class="tier-items">
+            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1510)"><img class="portrait-img" src="/wuwa-assets/characters/1510.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Luuk Herssen</span></div>
+            <div class="portrait sm aero" data-role="dps" onclick="openChar(1412)"><img class="portrait-img" src="/wuwa-assets/characters/1412.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Sigrika</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="hybrid">
+          <div class="tier-role-label">Hybrid</div>
+          <div class="tier-items">
+            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1207)"><img class="portrait-img" src="/wuwa-assets/characters/1207.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Lupa</span></div>
+            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1411)"><img class="portrait-img" src="/wuwa-assets/characters/1411.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Qiuyuan</span></div>
+            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1308)"><img class="portrait-img" src="/wuwa-assets/characters/1308.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rebecca</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="support">
+          <div class="tier-role-label">Support</div>
+          <div class="tier-items">
+            <div class="portrait sm spectro" data-role="support" onclick="openChar(1503)"><img class="portrait-img" src="/wuwa-assets/characters/1503.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Verina</span></div>
+          </div>
         </div>
       </div>
 
       <div class="tier-row">
         <div class="tier-badge t1">T1</div>
-        <div class="tier-items">
-          <div class="portrait sm electro" data-role="dps" onclick="openChar(1306)"><img class="portrait-img" src="/wuwa-assets/characters/1306.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Augusta</span></div>
-          <div class="portrait sm aero" data-role="dps" onclick="openChar(1409)"><img class="portrait-img" src="/wuwa-assets/characters/1409.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Cartethyia</span></div>
-          <div class="portrait sm fusion" data-role="dps" onclick="openChar(1208)"><img class="portrait-img" src="/wuwa-assets/characters/1208.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Galbrena</span></div>
-          <div class="portrait sm spectro" data-role="dps" onclick="openChar(1511)"><img class="portrait-img" src="/wuwa-assets/characters/1511.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Lucy</span></div>
-          <div class="portrait sm havoc" data-role="dps" onclick="openChar(1608)"><img class="portrait-img" src="/wuwa-assets/characters/1608.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Phrolova</span></div>
-          <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1407)"><img class="portrait-img" src="/wuwa-assets/characters/1407.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Ciaccona</span></div>
-          <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1204)"><img class="portrait-img" src="/wuwa-assets/characters/1204.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Mortefi</span></div>
+        <div class="tier-role-group" data-role="dps">
+          <div class="tier-role-label">DPS</div>
+          <div class="tier-items">
+            <div class="portrait sm electro" data-role="dps" onclick="openChar(1306)"><img class="portrait-img" src="/wuwa-assets/characters/1306.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Augusta</span></div>
+            <div class="portrait sm aero" data-role="dps" onclick="openChar(1409)"><img class="portrait-img" src="/wuwa-assets/characters/1409.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Cartethyia</span></div>
+            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1208)"><img class="portrait-img" src="/wuwa-assets/characters/1208.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Galbrena</span></div>
+            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1511)"><img class="portrait-img" src="/wuwa-assets/characters/1511.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Lucy</span></div>
+            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1608)"><img class="portrait-img" src="/wuwa-assets/characters/1608.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Phrolova</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="hybrid">
+          <div class="tier-role-label">Hybrid</div>
+          <div class="tier-items">
+            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1407)"><img class="portrait-img" src="/wuwa-assets/characters/1407.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Ciaccona</span></div>
+            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1204)"><img class="portrait-img" src="/wuwa-assets/characters/1204.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Mortefi</span></div>
+          </div>
         </div>
       </div>
 
       <div class="tier-row">
         <div class="tier-badge t15">T1.5</div>
-        <div class="tier-items">
-          <div class="portrait sm glacio" data-role="dps" onclick="openChar(1107)"><img class="portrait-img" src="/wuwa-assets/characters/1107.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Carlotta</span></div>
-          <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1206)"><img class="portrait-img" src="/wuwa-assets/characters/1206.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Brant</span></div>
-          <div class="portrait sm aero" data-role="support" onclick="openChar(1406)"><img class="portrait-img" src="/wuwa-assets/characters/1406.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Rover: Aero</span></div>
-          <div class="portrait sm aero" data-role="support" onclick="openChar(1408)"><img class="portrait-img" src="/wuwa-assets/characters/1408.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Rover: Aero</span></div>
+        <div class="tier-role-group" data-role="dps">
+          <div class="tier-role-label">DPS</div>
+          <div class="tier-items">
+            <div class="portrait sm glacio" data-role="dps" onclick="openChar(1107)"><img class="portrait-img" src="/wuwa-assets/characters/1107.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Carlotta</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="hybrid">
+          <div class="tier-role-label">Hybrid</div>
+          <div class="tier-items">
+            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1206)"><img class="portrait-img" src="/wuwa-assets/characters/1206.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Brant</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="support">
+          <div class="tier-role-label">Support</div>
+          <div class="tier-items">
+            <div class="portrait sm aero" data-role="support" onclick="openChar(1406)"><img class="portrait-img" src="/wuwa-assets/characters/1406.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Rover: Aero</span></div>
+            <div class="portrait sm aero" data-role="support" onclick="openChar(1408)"><img class="portrait-img" src="/wuwa-assets/characters/1408.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Rover: Aero</span></div>
+          </div>
         </div>
       </div>
 
       <div class="tier-row">
         <div class="tier-badge t2">T2</div>
-        <div class="tier-items">
-          <div class="portrait sm aero" data-role="dps" onclick="openChar(1404)"><img class="portrait-img" src="/wuwa-assets/characters/1404.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Jiyan</span></div>
-          <div class="portrait sm spectro" data-role="dps" onclick="openChar(1506)"><img class="portrait-img" src="/wuwa-assets/characters/1506.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Phoebe</span></div>
-          <div class="portrait sm spectro" data-role="dps" onclick="openChar(1507)"><img class="portrait-img" src="/wuwa-assets/characters/1507.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Zani</span></div>
-          <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1607)"><img class="portrait-img" src="/wuwa-assets/characters/1607.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Cantarella</span></div>
-          <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1205)"><img class="portrait-img" src="/wuwa-assets/characters/1205.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Changli</span></div>
-          <div class="portrait sm glacio" data-role="hybrid" onclick="openChar(1102)"><img class="portrait-img" src="/wuwa-assets/characters/1102.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Sanhua</span></div>
-          <div class="portrait sm electro" data-role="support" onclick="openChar(1307)"><img class="portrait-img" src="/wuwa-assets/characters/1307.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Buling</span></div>
-          <div class="portrait sm spectro" data-role="support" onclick="openChar(1501)"><img class="portrait-img" src="/wuwa-assets/characters/1501.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Rover: Spectro</span></div>
-          <div class="portrait sm spectro" data-role="support" onclick="openChar(1502)"><img class="portrait-img" src="/wuwa-assets/characters/1502.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Rover: Spectro</span></div>
+        <div class="tier-role-group" data-role="dps">
+          <div class="tier-role-label">DPS</div>
+          <div class="tier-items">
+            <div class="portrait sm aero" data-role="dps" onclick="openChar(1404)"><img class="portrait-img" src="/wuwa-assets/characters/1404.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Jiyan</span></div>
+            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1506)"><img class="portrait-img" src="/wuwa-assets/characters/1506.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Phoebe</span></div>
+            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1507)"><img class="portrait-img" src="/wuwa-assets/characters/1507.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Zani</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="hybrid">
+          <div class="tier-role-label">Hybrid</div>
+          <div class="tier-items">
+            <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1607)"><img class="portrait-img" src="/wuwa-assets/characters/1607.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Cantarella</span></div>
+            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1205)"><img class="portrait-img" src="/wuwa-assets/characters/1205.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Changli</span></div>
+            <div class="portrait sm glacio" data-role="hybrid" onclick="openChar(1102)"><img class="portrait-img" src="/wuwa-assets/characters/1102.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Sanhua</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="support">
+          <div class="tier-role-label">Support</div>
+          <div class="tier-items">
+            <div class="portrait sm electro" data-role="support" onclick="openChar(1307)"><img class="portrait-img" src="/wuwa-assets/characters/1307.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Buling</span></div>
+            <div class="portrait sm spectro" data-role="support" onclick="openChar(1501)"><img class="portrait-img" src="/wuwa-assets/characters/1501.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Rover: Spectro</span></div>
+            <div class="portrait sm spectro" data-role="support" onclick="openChar(1502)"><img class="portrait-img" src="/wuwa-assets/characters/1502.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Rover: Spectro</span></div>
+          </div>
         </div>
       </div>
 
       <div class="tier-row">
         <div class="tier-badge t3">T3</div>
-        <div class="tier-items">
-          <div class="portrait sm havoc" data-role="dps" onclick="openChar(1603)"><img class="portrait-img" src="/wuwa-assets/characters/1603.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Camellya</span></div>
-          <div class="portrait sm fusion" data-role="dps" onclick="openChar(1203)"><img class="portrait-img" src="/wuwa-assets/characters/1203.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Encore</span></div>
-          <div class="portrait sm spectro" data-role="dps" onclick="openChar(1304)"><img class="portrait-img" src="/wuwa-assets/characters/1304.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Jinhsi</span></div>
-          <div class="portrait sm glacio" data-role="dps" onclick="openChar(1104)"><img class="portrait-img" src="/wuwa-assets/characters/1104.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Lingyang</span></div>
-          <div class="portrait sm electro" data-role="dps" onclick="openChar(1305)"><img class="portrait-img" src="/wuwa-assets/characters/1305.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Xiangli Yao</span></div>
-          <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1602)"><img class="portrait-img" src="/wuwa-assets/characters/1602.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Danjin</span></div>
-          <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1606)"><img class="portrait-img" src="/wuwa-assets/characters/1606.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Roccia</span></div>
-          <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1302)"><img class="portrait-img" src="/wuwa-assets/characters/1302.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Yinlin</span></div>
-          <div class="portrait sm glacio" data-role="hybrid" onclick="openChar(1105)"><img class="portrait-img" src="/wuwa-assets/characters/1105.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Zhezhi</span></div>
-          <div class="portrait sm glacio" data-role="support" onclick="openChar(1103)"><img class="portrait-img" src="/wuwa-assets/characters/1103.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Baizhi</span></div>
+        <div class="tier-role-group" data-role="dps">
+          <div class="tier-role-label">DPS</div>
+          <div class="tier-items">
+            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1603)"><img class="portrait-img" src="/wuwa-assets/characters/1603.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Camellya</span></div>
+            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1203)"><img class="portrait-img" src="/wuwa-assets/characters/1203.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Encore</span></div>
+            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1304)"><img class="portrait-img" src="/wuwa-assets/characters/1304.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Jinhsi</span></div>
+            <div class="portrait sm glacio" data-role="dps" onclick="openChar(1104)"><img class="portrait-img" src="/wuwa-assets/characters/1104.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Lingyang</span></div>
+            <div class="portrait sm electro" data-role="dps" onclick="openChar(1305)"><img class="portrait-img" src="/wuwa-assets/characters/1305.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Xiangli Yao</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="hybrid">
+          <div class="tier-role-label">Hybrid</div>
+          <div class="tier-items">
+            <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1602)"><img class="portrait-img" src="/wuwa-assets/characters/1602.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Danjin</span></div>
+            <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1606)"><img class="portrait-img" src="/wuwa-assets/characters/1606.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Roccia</span></div>
+            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1302)"><img class="portrait-img" src="/wuwa-assets/characters/1302.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Yinlin</span></div>
+            <div class="portrait sm glacio" data-role="hybrid" onclick="openChar(1105)"><img class="portrait-img" src="/wuwa-assets/characters/1105.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Zhezhi</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="support">
+          <div class="tier-role-label">Support</div>
+          <div class="tier-items">
+            <div class="portrait sm glacio" data-role="support" onclick="openChar(1103)"><img class="portrait-img" src="/wuwa-assets/characters/1103.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Baizhi</span></div>
+          </div>
         </div>
       </div>
 
       <div class="tier-row">
         <div class="tier-badge t4">T4</div>
-        <div class="tier-items">
-          <div class="portrait sm electro" data-role="dps" onclick="openChar(1301)"><img class="portrait-img" src="/wuwa-assets/characters/1301.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Calcharo</span></div>
-          <div class="portrait sm fusion" data-role="dps" onclick="openChar(1202)"><img class="portrait-img" src="/wuwa-assets/characters/1202.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Chixia</span></div>
-          <div class="portrait sm havoc" data-role="dps" onclick="openChar(1604)"><img class="portrait-img" src="/wuwa-assets/characters/1604.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Rover: Havoc</span></div>
-          <div class="portrait sm havoc" data-role="dps" onclick="openChar(1605)"><img class="portrait-img" src="/wuwa-assets/characters/1605.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Rover: Havoc</span></div>
-          <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1403)"><img class="portrait-img" src="/wuwa-assets/characters/1403.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Aalto</span></div>
-          <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1405)"><img class="portrait-img" src="/wuwa-assets/characters/1405.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Jianxin</span></div>
-          <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1504)"><img class="portrait-img" src="/wuwa-assets/characters/1504.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Lumi</span></div>
-          <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1309)"><img class="portrait-img" src="/wuwa-assets/characters/1309.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rover: Electro</span></div>
-          <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1310)"><img class="portrait-img" src="/wuwa-assets/characters/1310.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rover: Electro</span></div>
-          <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1601)"><img class="portrait-img" src="/wuwa-assets/characters/1601.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Taoqi</span></div>
-          <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1402)"><img class="portrait-img" src="/wuwa-assets/characters/1402.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Yangyang</span></div>
-          <div class="portrait sm glacio" data-role="support" onclick="openChar(1106)"><img class="portrait-img" src="/wuwa-assets/characters/1106.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Youhu</span></div>
-          <div class="portrait sm electro" data-role="support" onclick="openChar(1303)"><img class="portrait-img" src="/wuwa-assets/characters/1303.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Yuanwu</span></div>
+        <div class="tier-role-group" data-role="dps">
+          <div class="tier-role-label">DPS</div>
+          <div class="tier-items">
+            <div class="portrait sm electro" data-role="dps" onclick="openChar(1301)"><img class="portrait-img" src="/wuwa-assets/characters/1301.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Calcharo</span></div>
+            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1202)"><img class="portrait-img" src="/wuwa-assets/characters/1202.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Chixia</span></div>
+            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1604)"><img class="portrait-img" src="/wuwa-assets/characters/1604.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Rover: Havoc</span></div>
+            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1605)"><img class="portrait-img" src="/wuwa-assets/characters/1605.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Rover: Havoc</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="hybrid">
+          <div class="tier-role-label">Hybrid</div>
+          <div class="tier-items">
+            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1403)"><img class="portrait-img" src="/wuwa-assets/characters/1403.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Aalto</span></div>
+            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1405)"><img class="portrait-img" src="/wuwa-assets/characters/1405.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Jianxin</span></div>
+            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1504)"><img class="portrait-img" src="/wuwa-assets/characters/1504.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Lumi</span></div>
+            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1309)"><img class="portrait-img" src="/wuwa-assets/characters/1309.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rover: Electro</span></div>
+            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1310)"><img class="portrait-img" src="/wuwa-assets/characters/1310.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rover: Electro</span></div>
+            <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1601)"><img class="portrait-img" src="/wuwa-assets/characters/1601.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Taoqi</span></div>
+            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1402)"><img class="portrait-img" src="/wuwa-assets/characters/1402.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Yangyang</span></div>
+          </div>
+        </div>
+        <div class="tier-role-group" data-role="support">
+          <div class="tier-role-label">Support</div>
+          <div class="tier-items">
+            <div class="portrait sm glacio" data-role="support" onclick="openChar(1106)"><img class="portrait-img" src="/wuwa-assets/characters/1106.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Youhu</span></div>
+            <div class="portrait sm electro" data-role="support" onclick="openChar(1303)"><img class="portrait-img" src="/wuwa-assets/characters/1303.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Yuanwu</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1616,13 +1714,6 @@ function setBuildVariant(charId, variantId){
   document.querySelectorAll('.calc-dynamic[data-char-id="' + charId + '"]').forEach((el) => renderCalcTab(el, charId));
 }
 
-function charMiniHtml(charId){
-  const c = CHARACTERS.find((x) => x.id === charId);
-  if (!c) return '';
-  const el = c.element.toLowerCase();
-  return '<div class="mini" style="background:var(--el-' + el + ')" title="' + c.name + '"><img class="mini-img" src="/wuwa-assets/characters/' + c.id + '.webp" alt=""></div>';
-}
-
 function renderGameplayTab(rootEl, charId){
   const data = GAMEPLAY[charId];
   if (!data) {
@@ -1651,7 +1742,17 @@ function renderGameplayTab(rootEl, charId){
   }
   if (data.teams && data.teams.length) {
     html += '<div class="card"><h3>Примеры команд</h3>' + data.teams.map((t) => {
-      return '<div class="team-card" style="margin-bottom:10px"><div class="mini-stack">' + t.charIds.map((id) => charMiniHtml(id)).join('') + '</div><div class="team-meta"><div class="name">' + t.title + '</div><div class="desc">' + t.text + '</div></div></div>';
+      const slotsHtml = '<div class="team-slots">' + t.slots.map((s, i) => {
+        const main = CHARACTERS.find((x) => x.id === s.main);
+        const altsHtml = s.alts && s.alts.length ? '<div class="team-slot-alts">' + s.alts.map((aid) => {
+          const a = CHARACTERS.find((x) => x.id === aid);
+          return a ? '<div class="team-slot-alt" onclick="openChar(' + aid + ')" title="' + a.name + '"><img src="/wuwa-assets/characters/' + aid + '.webp" alt=""></div>' : '';
+        }).join('') + '</div>' : '';
+        return '<div class="team-slot"><div class="team-slot-label">Слот ' + (i + 1) + '</div>'
+          + (main ? '<div class="team-slot-main" onclick="openChar(' + s.main + ')" title="' + main.name + '"><img src="/wuwa-assets/characters/' + s.main + '.webp" alt=""></div>' : '')
+          + altsHtml + '</div>';
+      }).join('') + '</div>';
+      return '<div class="team-card" style="margin-bottom:10px">' + slotsHtml + '<div class="team-meta"><div class="name">' + t.title + '</div><div class="desc">' + t.text + '</div></div></div>';
     }).join('') + '</div>';
   }
   rootEl.innerHTML = html;
