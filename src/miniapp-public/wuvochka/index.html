@@ -372,7 +372,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.0</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.01</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -603,8 +603,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
             <div class="hero-tag"><img class="el-dot el-fusion" src="/wuwa-assets/elements/fusion.webp" alt=""> Fusion</div>
             <div class="hero-tag">Меч</div>
             <div class="hero-tag">5★</div>
-            <div class="hero-tag tier" id="showcase-tier-toa"></div>
-            <div class="hero-tag tier" id="showcase-tier-ww"></div>
+            <span id="showcase-tier-tags" style="display:contents"></span>
           </div>
         </div>
       </div>
@@ -742,8 +741,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
             <div class="hero-tag"><img class="el-dot" id="g-el-dot" src="" alt=""><span id="g-element"></span></div>
             <div class="hero-tag" id="g-weapon"></div>
             <div class="hero-tag" id="g-rarity"></div>
-            <div class="hero-tag tier" id="g-tier-toa" style="display:none"></div>
-            <div class="hero-tag tier" id="g-tier-ww" style="display:none"></div>
+            <span id="g-tier-tags" style="display:contents"></span>
           </div>
         </div>
       </div>
@@ -943,15 +941,27 @@ function setTierlistMode(mode){
 }
 function findTierInfo(charId, mode){
   const data = TIERLIST[mode];
-  if (!data) return null;
+  if (!data) return [];
+  const results = [];
   for (const tierGroup of data.tiers) {
     for (const role of ['dps', 'hybrid', 'support']) {
       if ((tierGroup.roles[role] || []).includes(charId)) {
-        return { tier: tierGroup.tier, role: ROLE_LABEL_RU[role] };
+        results.push({ tier: tierGroup.tier, role: ROLE_LABEL_RU[role] });
       }
     }
   }
-  return null;
+  return results;
+}
+function tierTagsHtml(charId){
+  const modeLabels = { toa: 'ToA', ww: 'WW' };
+  let html = '';
+  for (const mode of ['toa', 'ww']) {
+    const infos = findTierInfo(charId, mode);
+    for (const info of infos) {
+      html += '<div class="hero-tag tier">' + modeLabels[mode] + ': ' + info.tier + ' · ' + info.role + '</div>';
+    }
+  }
+  return html;
 }
 function renderTeamsView(){
   const rootEl = document.querySelector('#view-teams .teams-dynamic');
@@ -1089,14 +1099,7 @@ function openChar(id){
     document.getElementById('g-fact-element').textContent = character.element;
     document.getElementById('g-fact-weapon').textContent = WEAPON_TYPE_RU[character.weaponType] || character.weaponType;
     document.getElementById('g-fact-rarity').textContent = character.rarity + '★';
-    const toaInfo = findTierInfo(character.id, 'toa');
-    const toaTagEl = document.getElementById('g-tier-toa');
-    toaTagEl.style.display = toaInfo ? '' : 'none';
-    if (toaInfo) toaTagEl.textContent = 'ToA: ' + toaInfo.tier + ' · ' + toaInfo.role;
-    const wwInfo = findTierInfo(character.id, 'ww');
-    const wwTagEl = document.getElementById('g-tier-ww');
-    wwTagEl.style.display = wwInfo ? '' : 'none';
-    if (wwInfo) wwTagEl.textContent = 'WW: ' + wwInfo.tier + ' · ' + wwInfo.role;
+    document.getElementById('g-tier-tags').innerHTML = tierTagsHtml(character.id);
     const buildEl = document.querySelector('#subg-build .build-dynamic');
     buildEl.dataset.charId = character.id;
     renderBuildTab(buildEl, character.id);
@@ -1545,10 +1548,7 @@ Promise.all([loadGameData(), loadProfile()]).then(() => {
   document.querySelectorAll('.calc-dynamic[data-char-id]').forEach((el) => renderCalcTab(el, Number(el.dataset.charId)));
   renderTeamsView();
   renderTierListView();
-  const showcaseToa = findTierInfo(SHOWCASE_CHAR_ID, 'toa');
-  if (showcaseToa) document.getElementById('showcase-tier-toa').textContent = 'ToA: ' + showcaseToa.tier + ' · ' + showcaseToa.role;
-  const showcaseWw = findTierInfo(SHOWCASE_CHAR_ID, 'ww');
-  if (showcaseWw) document.getElementById('showcase-tier-ww').textContent = 'WW: ' + showcaseWw.tier + ' · ' + showcaseWw.role;
+  document.getElementById('showcase-tier-tags').innerHTML = tierTagsHtml(SHOWCASE_CHAR_ID);
   // only the tier-list is actually visible at load — everything else gets
   // staggered lazily by the tab click handler once it's actually rendered.
   document.querySelectorAll('#view-tierlist .tier-items').forEach(applyStagger);
