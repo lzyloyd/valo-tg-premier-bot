@@ -89,6 +89,15 @@ export async function getCellNotes(spreadsheetId, range) {
   return rowData.map((row) => (row.values ?? []).map((v) => v.note ?? null));
 }
 
+/** Developer metadata is invisible in the Sheets UI (unlike a cell note) — used to stash bot-internal bookkeeping. Returns every {developerMetadata: {metadataId, metadataValue, location: {sheetId}, ...}} entry matching this key across the whole spreadsheet. */
+export async function searchDeveloperMetadata(spreadsheetId, metadataKey) {
+  const json = await authedFetch(`${BASE}/${spreadsheetId}/developerMetadata:search`, {
+    method: 'POST',
+    body: JSON.stringify({ dataFilters: [{ developerMetadataLookup: { metadataKey } }] }),
+  });
+  return json.matchedDeveloperMetadata ?? [];
+}
+
 export async function batchUpdate(spreadsheetId, requests) {
   return authedFetch(`${BASE}/${spreadsheetId}:batchUpdate`, {
     method: 'POST',

@@ -4,6 +4,7 @@ import {
   getSpreadsheetMeta,
   getValues,
   getCellNotes,
+  searchDeveloperMetadata,
   batchUpdateValues,
   clearValues,
   batchUpdate,
@@ -441,7 +442,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
   // pinned first regardless, so this call (tabTitle === OVERALL_PREMIER_TAB)
   // skips it.
   if (tabTitle !== OVERALL_PREMIER_TAB) {
-    await updateTabLastMatchDate(spreadsheetId, sheet.sheetId, tabTitle, matchDate);
+    await updateTabLastMatchDate(spreadsheetId, sheet.sheetId, matchDate);
     await reorderStatsTabsByDate(spreadsheetId);
   }
 
@@ -454,37 +455,53 @@ export async function getTabSheetId(spreadsheetId, tabTitle) {
   return sheets.find((s) => s.title === tabTitle)?.sheetId ?? null;
 }
 
-// Stashes a tab's latest known match date (ISO string) as a note on an
-// otherwise-unused cell — lets tabs be reordered by real match chronology
-// across BOTH modes together. "Append new tabs at the end" alone only
-// grouped tabs by whichever mode happened to get its first match logged
-// first, not by actual date.
-const TAB_DATE_CELL = 'A1';
+// Stashes a tab's latest known match date (ISO string) as developer
+// metadata — invisible in the UI, unlike a cell note (which showed up as an
+// open comment box when someone clicked that cell) — keyed by sheetId so
+// tabs can be reordered by real match chronology across BOTH modes
+// together. "Append new tabs at the end" alone only grouped tabs by
+// whichever mode happened to get its first match logged first, not by date.
+const LAST_MATCH_DATE_KEY = 'lastMatchDate';
 
-async function updateTabLastMatchDate(spreadsheetId, sheetId, tabTitle, matchDateIso) {
+async function updateTabLastMatchDate(spreadsheetId, sheetId, matchDateIso) {
   if (!matchDateIso) return;
-  const existing = (await getCellNotes(spreadsheetId, `'${tabTitle}'!${TAB_DATE_CELL}`))[0]?.[0];
-  if (existing && existing >= matchDateIso) return; // this tab's stored date is already at least as new
-  await batchUpdate(spreadsheetId, [
-    {
-      repeatCell: {
-        range: { sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 1 },
-        cell: { note: matchDateIso },
-        fields: 'note',
+  const matches = await searchDeveloperMetadata(spreadsheetId, LAST_MATCH_DATE_KEY);
+  const existing = matches.find((m) => m.developerMetadata.location?.sheetId === sheetId)?.developerMetadata;
+  if (existing) {
+    if (existing.metadataValue >= matchDateIso) return; // this tab's stored date is already at least as new
+    await batchUpdate(spreadsheetId, [
+      {
+        updateDeveloperMetadata: {
+          dataFilters: [{ developerMetadataLookup: { metadataId: existing.metadataId } }],
+          developerMetadata: { metadataValue: matchDateIso },
+          fields: 'metadataValue',
+        },
       },
-    },
-  ]);
+    ]);
+  } else {
+    await batchUpdate(spreadsheetId, [
+      {
+        createDeveloperMetadata: {
+          developerMetadata: {
+            metadataKey: LAST_MATCH_DATE_KEY,
+            metadataValue: matchDateIso,
+            location: { sheetId },
+            visibility: 'DOCUMENT',
+          },
+        },
+      },
+    ]);
+  }
 }
 
-/** Re-sorts every "<Map> - <Mode>" tab by its stored last-match-date note, keeping the overall summary tab pinned first. */
+/** Re-sorts every "<Map> - <Mode>" tab by its stored last-match-date metadata, keeping the overall summary tab pinned first. */
 export async function reorderStatsTabsByDate(spreadsheetId) {
   const sheets = await getSpreadsheetMeta(spreadsheetId);
   const mapTabs = sheets.filter((s) => s.title !== OVERALL_PREMIER_TAB);
-  const dated = [];
-  for (const s of mapTabs) {
-    const note = (await getCellNotes(spreadsheetId, `'${s.title}'!${TAB_DATE_CELL}`))[0]?.[0];
-    dated.push({ sheetId: s.sheetId, lastMatchDate: note ?? '' });
-  }
+  const matches = await searchDeveloperMetadata(spreadsheetId, LAST_MATCH_DATE_KEY);
+  const dateBySheetId = new Map(matches.map((m) => [m.developerMetadata.location?.sheetId, m.developerMetadata.metadataValue]));
+
+  const dated = mapTabs.map((s) => ({ sheetId: s.sheetId, lastMatchDate: dateBySheetId.get(s.sheetId) ?? '' }));
   dated.sort((a, b) => (a.lastMatchDate < b.lastMatchDate ? -1 : a.lastMatchDate > b.lastMatchDate ? 1 : 0));
   const requests = dated.map(({ sheetId }, i) => ({
     updateSheetProperties: { properties: { sheetId, index: i + 1 }, fields: 'index' },
