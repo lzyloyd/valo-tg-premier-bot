@@ -10,7 +10,9 @@
   --accent:#42e8d4; --accent-soft:rgba(66,232,212,.14);
 
   --el-fusion:#ff7a4d; --el-glacio:#5fc7ff; --el-electro:#b478ff;
-  --el-aero:#3ddba8; --el-spectro:#ffcf3d; --el-havoc:#ff3d78;
+  --el-aero:#3ddba8; --el-spectro:#ffcf3d; --el-havoc:#ff3d78; --el-physical:#c7cedb;
+
+  --r5:#f2c14e; --r4:#c084fc; --r3:#60a5fa; --r2:#34d399; --r1:#94a3b8;
 
   --tier-0:#ffb020; --tier-05:#42e8d4; --tier-1:#5fc7ff; --tier-15:#7f9ecb;
   --tier-2:#7488a8; --tier-3:#5a6b85; --tier-4:#40495c;
@@ -56,6 +58,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .el-fusion{background:var(--el-fusion);} .el-glacio{background:var(--el-glacio);}
 .el-electro{background:var(--el-electro);} .el-aero{background:var(--el-aero);}
 .el-spectro{background:var(--el-spectro);} .el-havoc{background:var(--el-havoc);}
+.el-physical{background:var(--el-physical);}
 
 /* filters — wrap, never scroll */
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
@@ -71,6 +74,12 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .portrait.aero{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-aero) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.spectro{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-spectro) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.havoc{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-havoc) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
+.portrait.physical{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-physical) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
+.portrait.r5{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r5) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
+.portrait.r4{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r4) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
+.portrait.r3{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r3) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
+.portrait.r2{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r2) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
+.portrait.r1{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r1) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait .ring{position:absolute;inset:7px;border:1.5px solid rgba(255,255,255,.16);border-radius:10px;pointer-events:none;}
 .portrait .glyph{font-family:'Exo 2',sans-serif;font-weight:800;color:rgba(255,255,255,.92);text-shadow:0 3px 14px rgba(0,0,0,.4);}
 .portrait .p-el{position:absolute;top:7px;right:7px;box-shadow:0 0 0 2px rgba(8,11,18,.7);}
@@ -212,7 +221,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v0.4</div>
+    <div class="app-sub">WUTHERING WAVES · v0.5</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -221,6 +230,8 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
     <button class="tab active" data-view="tierlist">Тир-лист</button>
     <button class="tab" data-view="teams">Команды</button>
     <button class="tab" data-view="characters">Персонажи</button>
+    <button class="tab" data-view="weapons">Оружие</button>
+    <button class="tab" data-view="echoes">Эхо</button>
     <button class="tab" data-view="profile">Профиль</button>
     <button class="tab" data-view="matrix">Матрица</button>
   </div>
@@ -799,6 +810,38 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
     </div>
   </div>
 
+  <!-- WEAPONS -->
+  <div class="view" id="view-weapons">
+    <div class="screen">
+      <div class="filters" data-filter-target="#view-weapons" data-filter-attr="type">
+        <div class="chip active" data-val="all">Все</div>
+        <div class="chip" data-val="Sword">Меч</div>
+        <div class="chip" data-val="Broadblade">Клинок</div>
+        <div class="chip" data-val="Pistols">Пистолеты</div>
+        <div class="chip" data-val="Gauntlets">Перчатки</div>
+        <div class="chip" data-val="Rectifier">Ректификатор</div>
+      </div>
+      <div class="char-grid" id="weapons-grid"></div>
+    </div>
+  </div>
+
+  <!-- ECHOES -->
+  <div class="view" id="view-echoes">
+    <div class="screen">
+      <div class="filters" data-filter-target="#view-echoes" data-filter-attr="el">
+        <div class="chip active" data-val="all">Все</div>
+        <div class="chip" data-val="fusion"><span class="el-dot el-fusion"></span>Fusion</div>
+        <div class="chip" data-val="glacio"><span class="el-dot el-glacio"></span>Glacio</div>
+        <div class="chip" data-val="electro"><span class="el-dot el-electro"></span>Electro</div>
+        <div class="chip" data-val="aero"><span class="el-dot el-aero"></span>Aero</div>
+        <div class="chip" data-val="spectro"><span class="el-dot el-spectro"></span>Spectro</div>
+        <div class="chip" data-val="havoc"><span class="el-dot el-havoc"></span>Havoc</div>
+        <div class="chip" data-val="physical"><span class="el-dot el-physical"></span>Physical</div>
+      </div>
+      <div class="char-grid" id="echoes-grid"></div>
+    </div>
+  </div>
+
   <!-- PROFILE -->
   <div class="view" id="view-profile">
     <div class="screen">
@@ -956,7 +999,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         </div>
         <div class="card">
           <h3>Лучший набор эхо</h3>
-          <div class="item-card clickable" onclick="openEcho(6000054)"><div class="item-icon"><img class="item-icon-img" src="assets/echoes/6000054.webp" alt=""></div><div class="item-info"><div class="iname">Molten Rift · 2/5 предметов</div><div class="irole">Урон Fusion +10% / +30% после навыка резонанса</div></div></div>
+          <div class="item-card clickable" onclick="openEcho('Molten Rift')"><div class="item-icon"><img class="item-icon-img" src="assets/echoes/6000054.webp" alt=""></div><div class="item-info"><div class="iname">Molten Rift · 2/5 предметов</div><div class="irole">Урон Fusion +10% / +30% после навыка резонанса</div></div></div>
         </div>
         <div class="card">
           <h3>Приоритет характеристик эхо</h3>
@@ -1153,7 +1196,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           <h2 id="ec-name"></h2>
           <div class="hero-tags">
             <div class="hero-tag"><span class="el-dot" id="ec-el-dot"></span><span id="ec-element"></span></div>
-            <div class="hero-tag" id="ec-set"></div>
+            <div class="hero-tag">Комплект эхо</div>
           </div>
         </div>
       </div>
@@ -1179,7 +1222,9 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 const CHARACTERS = [{"id":1402,"name":"Yangyang","element":"Aero","weaponType":"Sword","rarity":4},{"id":1202,"name":"Chixia","element":"Fusion","weaponType":"Pistols","rarity":4},{"id":1503,"name":"Verina","element":"Spectro","weaponType":"Rectifier","rarity":5},{"id":1501,"name":"Rover: Spectro","element":"Spectro","weaponType":"Sword","rarity":5},{"id":1102,"name":"Sanhua","element":"Glacio","weaponType":"Sword","rarity":4},{"id":1601,"name":"Taoqi","element":"Havoc","weaponType":"Broadblade","rarity":4},{"id":1502,"name":"Rover: Spectro","element":"Spectro","weaponType":"Sword","rarity":5},{"id":1103,"name":"Baizhi","element":"Glacio","weaponType":"Rectifier","rarity":4},{"id":1203,"name":"Encore","element":"Fusion","weaponType":"Rectifier","rarity":5},{"id":1602,"name":"Danjin","element":"Havoc","weaponType":"Sword","rarity":4},{"id":1403,"name":"Aalto","element":"Aero","weaponType":"Pistols","rarity":4},{"id":1404,"name":"Jiyan","element":"Aero","weaponType":"Broadblade","rarity":5},{"id":1204,"name":"Mortefi","element":"Fusion","weaponType":"Pistols","rarity":4},{"id":1603,"name":"Camellya","element":"Havoc","weaponType":"Sword","rarity":5},{"id":1301,"name":"Calcharo","element":"Electro","weaponType":"Broadblade","rarity":5},{"id":1302,"name":"Yinlin","element":"Electro","weaponType":"Rectifier","rarity":5},{"id":1104,"name":"Lingyang","element":"Glacio","weaponType":"Gauntlets","rarity":5},{"id":1303,"name":"Yuanwu","element":"Electro","weaponType":"Gauntlets","rarity":4},{"id":1604,"name":"Rover: Havoc","element":"Havoc","weaponType":"Sword","rarity":5},{"id":1605,"name":"Rover: Havoc","element":"Havoc","weaponType":"Sword","rarity":5},{"id":1405,"name":"Jianxin","element":"Aero","weaponType":"Gauntlets","rarity":5},{"id":1304,"name":"Jinhsi","element":"Spectro","weaponType":"Broadblade","rarity":5},{"id":1305,"name":"Xiangli Yao","element":"Electro","weaponType":"Gauntlets","rarity":5},{"id":1205,"name":"Changli","element":"Fusion","weaponType":"Sword","rarity":5},{"id":1105,"name":"Zhezhi","element":"Glacio","weaponType":"Rectifier","rarity":5},{"id":1504,"name":"Lumi","element":"Electro","weaponType":"Broadblade","rarity":4},{"id":1106,"name":"Youhu","element":"Glacio","weaponType":"Gauntlets","rarity":4},{"id":1505,"name":"Shorekeeper","element":"Spectro","weaponType":"Rectifier","rarity":5},{"id":1606,"name":"Roccia","element":"Havoc","weaponType":"Gauntlets","rarity":5},{"id":1107,"name":"Carlotta","element":"Glacio","weaponType":"Pistols","rarity":5},{"id":1206,"name":"Brant","element":"Fusion","weaponType":"Sword","rarity":5},{"id":1506,"name":"Phoebe","element":"Spectro","weaponType":"Rectifier","rarity":5},{"id":1406,"name":"Rover: Aero","element":"Aero","weaponType":"Sword","rarity":5},{"id":1607,"name":"Cantarella","element":"Havoc","weaponType":"Rectifier","rarity":5},{"id":1407,"name":"Ciaccona","element":"Aero","weaponType":"Pistols","rarity":5},{"id":1507,"name":"Zani","element":"Spectro","weaponType":"Gauntlets","rarity":5},{"id":1408,"name":"Rover: Aero","element":"Aero","weaponType":"Sword","rarity":5},{"id":1207,"name":"Lupa","element":"Fusion","weaponType":"Broadblade","rarity":5},{"id":1608,"name":"Phrolova","element":"Havoc","weaponType":"Rectifier","rarity":5},{"id":1409,"name":"Cartethyia","element":"Aero","weaponType":"Sword","rarity":5},{"id":1306,"name":"Augusta","element":"Electro","weaponType":"Broadblade","rarity":5},{"id":1410,"name":"Iuno","element":"Aero","weaponType":"Gauntlets","rarity":5},{"id":1307,"name":"Buling","element":"Electro","weaponType":"Rectifier","rarity":4},{"id":1208,"name":"Galbrena","element":"Fusion","weaponType":"Pistols","rarity":5},{"id":1508,"name":"Chisa","element":"Havoc","weaponType":"Broadblade","rarity":5},{"id":1411,"name":"Qiuyuan","element":"Aero","weaponType":"Sword","rarity":5},{"id":1509,"name":"Lynae","element":"Spectro","weaponType":"Pistols","rarity":5},{"id":1209,"name":"Mornye","element":"Fusion","weaponType":"Broadblade","rarity":5},{"id":1510,"name":"Luuk Herssen","element":"Spectro","weaponType":"Gauntlets","rarity":5},{"id":1210,"name":"Aemeath","element":"Fusion","weaponType":"Sword","rarity":5},{"id":1412,"name":"Sigrika","element":"Aero","weaponType":"Gauntlets","rarity":5},{"id":1211,"name":"Denia","element":"Fusion","weaponType":"Rectifier","rarity":5},{"id":1308,"name":"Rebecca","element":"Electro","weaponType":"Pistols","rarity":5},{"id":1109,"name":"Lucilla","element":"Glacio","weaponType":"Rectifier","rarity":5},{"id":1511,"name":"Lucy","element":"Spectro","weaponType":"Pistols","rarity":5},{"id":1108,"name":"Hiyuki","element":"Glacio","weaponType":"Sword","rarity":5},{"id":1309,"name":"Rover: Electro","element":"Electro","weaponType":"Sword","rarity":5},{"id":1310,"name":"Rover: Electro","element":"Electro","weaponType":"Sword","rarity":5},{"id":1610,"name":"Yangyang: Xuanling","element":"Havoc","weaponType":"Sword","rarity":5},{"id":1110,"name":"Suisui","element":"Glacio","weaponType":"Rectifier","rarity":5},{"id":1413,"name":"Qingxiao","element":"Aero","weaponType":"Sword","rarity":5},{"id":1311,"name":"Hsin","element":"Electro","weaponType":"Rectifier","rarity":5},{"id":1212,"name":"Jingran","element":"Fusion","weaponType":"Broadblade","rarity":5},{"id":1312,"name":"Suoming","element":"Electro","weaponType":"Sword","rarity":5}];
 const WEAPON_FACTS = {"21020015":{"name":"Emerald of Genesis","weaponType":"Sword","rarity":5,"passiveName":"Stormy Resolution","passiveDesc":"Восстановление энергии увеличивается на 12.8%/16%/19.2%/22.4%/25.6%. При использовании навыка резонанса АТК увеличивается на 6%/7.5%/9%/10.5%/12%, эффект стакается до 2 раз и длится 10 секунд.","flavor":"Внимайте: ледяной клинок таит в себе стремительное течение, сплетающееся в водоворот мыслей. Обратите эту грозную силу против врагов."},"21020016":{"name":"Blazing Brilliance","weaponType":"Sword","rarity":5,"passiveName":"Crimson Phoenix","passiveDesc":"АТК увеличивается на 12%/15%/18%/21%/24%. При нанесении урона персонаж получает 1 заряд эффекта «Пылающее перо» (не чаще раза в 0.5с), а при использовании навыка резонанса — сразу 5 зарядов. Каждый заряд даёт 4%/5%/6%/7%/8% доп. урона навыка резонанса, максимум 14 зарядов. По достижении максимума все заряды снимаются через 12 секунд.","flavor":"Выковано из самой сути и перьев легендарной птицы — этот клинок пылает светом, что заливает мир своим сиянием. С каждой вспышкой огня он обращает всё на своём пути в пепел."}};
 const WEAPON_TYPE_RU = {"Sword":"Меч","Broadblade":"Клинок","Pistols":"Пистолеты","Gauntlets":"Перчатки","Rectifier":"Ректификатор"};
-const ECHO_FACTS = {"6000054":{"name":"Lava Larva","element":"Fusion","setName":"Molten Rift","twoPiece":"Урон Fusion +10%.","fivePiece":"Урон Fusion +30% на 15 секунд после применения навыка резонанса.","skillName":"Навык эхо","skillDesc":"Призывает Лавовую личинку, которая непрерывно атакует врагов — каждый удар наносит 38.40% урона Fusion. Личинка исчезает, если сменить персонажа или отойти слишком далеко.","cooldown":8}};
+const ECHO_FACTS = {"Lingering Tunes":{twoPiece:"АТК +10%.",fivePiece:"Пока персонаж на поле, АТК растёт на 5% каждые 1.5с (до 4 стаков). Урон Аутро-навыка +60%."},"Sierra Gale":{twoPiece:"Урон Aero +10%.",fivePiece:"Урон Aero +30% на 15с после применения Интро-навыка."},"Void Thunder":{twoPiece:"Урон Electro +10%.",fivePiece:"Урон Electro +15% после тяжёлой атаки или навыка резонанса, до 2 стаков по 15с."},"Rejuvenating Glow":{twoPiece:"Бонус лечения +10%.",fivePiece:"Лечение союзника увеличивает АТК всей команды на 15% на 30с."},"Havoc Eclipse":{twoPiece:"Урон Havoc +10%.",fivePiece:"Урон Havoc +7.5% после базовой или тяжёлой атаки, до 4 стаков по 15с.",skillName:"Навык эхо (КД 20с)",skillDesc:"Превращается в Dreamless и наносит 6 ударов подряд: первые 5 — по 54.08% урона Havoc, последний — 270.40%. Урон навыка увеличен на 50% первые 5с после Резонансного Высвобождения Rover: Havoc."},"Freezing Frost":{twoPiece:"Урон Glacio +10%.",fivePiece:"Урон Glacio +10% после базовой или тяжёлой атаки, до 3 стаков по 15с."},"Celestial Light":{twoPiece:"Урон Spectro +10%.",fivePiece:"Урон Spectro +30% на 15с после применения Интро-навыка."},"Molten Rift":{twoPiece:"Урон Fusion +10%.",fivePiece:"Урон Fusion +30% на 15 секунд после применения навыка резонанса.",skillName:"Навык эхо (КД 8с)",skillDesc:"Призывает Лавовую личинку, которая непрерывно атакует врагов — каждый удар наносит 38.40% урона Fusion. Личинка исчезает, если сменить персонажа или отойти слишком далеко."}};
+const WEAPONS = [{"id":21010074,"name":"Autumntrace","weaponType":"Broadblade","rarity":4},{"id":21020074,"name":"Lumingloss","weaponType":"Sword","rarity":4},{"id":21030074,"name":"Thunderbolt","weaponType":"Pistols","rarity":4},{"id":21040074,"name":"Stonard","weaponType":"Gauntlets","rarity":4},{"id":21050074,"name":"Augment","weaponType":"Rectifier","rarity":4},{"id":21010024,"name":"Discord","weaponType":"Broadblade","rarity":4},{"id":21020024,"name":"Overture","weaponType":"Sword","rarity":4},{"id":21030024,"name":"Cadenza","weaponType":"Pistols","rarity":4},{"id":21040024,"name":"Marcato","weaponType":"Gauntlets","rarity":4},{"id":21050024,"name":"Variation","weaponType":"Rectifier","rarity":4},{"id":21010013,"name":"Broadblade of Night","weaponType":"Broadblade","rarity":3},{"id":21020013,"name":"Sword of Night","weaponType":"Sword","rarity":3},{"id":21030013,"name":"Pistols of Night","weaponType":"Pistols","rarity":3},{"id":21040013,"name":"Gauntlets of Night","weaponType":"Gauntlets","rarity":3},{"id":21050013,"name":"Rectifier of Night","weaponType":"Rectifier","rarity":3},{"id":21010012,"name":"Tyro Broadblade","weaponType":"Broadblade","rarity":2},{"id":21020012,"name":"Tyro Sword","weaponType":"Sword","rarity":2},{"id":21030012,"name":"Tyro Pistols","weaponType":"Pistols","rarity":2},{"id":21040012,"name":"Tyro Gauntlets","weaponType":"Gauntlets","rarity":2},{"id":21050012,"name":"Tyro Rectifier","weaponType":"Rectifier","rarity":2},{"id":21010011,"name":"Training Broadblade","weaponType":"Broadblade","rarity":1},{"id":21020011,"name":"Training Sword","weaponType":"Sword","rarity":1},{"id":21030011,"name":"Training Pistols","weaponType":"Pistols","rarity":1},{"id":21040011,"name":"Training Gauntlets","weaponType":"Gauntlets","rarity":1},{"id":21050011,"name":"Training Rectifier","weaponType":"Rectifier","rarity":1},{"id":21010023,"name":"Originite: Type I","weaponType":"Broadblade","rarity":3},{"id":21020023,"name":"Originite: Type II","weaponType":"Sword","rarity":3},{"id":21030023,"name":"Originite: Type III","weaponType":"Pistols","rarity":3},{"id":21040023,"name":"Originite: Type IV","weaponType":"Gauntlets","rarity":3},{"id":21050023,"name":"Originite: Type V","weaponType":"Rectifier","rarity":3},{"id":21010034,"name":"Broadblade#41","weaponType":"Broadblade","rarity":4},{"id":21020034,"name":"Sword#18","weaponType":"Sword","rarity":4},{"id":21030034,"name":"Pistols#26","weaponType":"Pistols","rarity":4},{"id":21040034,"name":"Gauntlets#21D","weaponType":"Gauntlets","rarity":4},{"id":21050034,"name":"Rectifier#25","weaponType":"Rectifier","rarity":4},{"id":21010044,"name":"Dauntless Evernight","weaponType":"Broadblade","rarity":4},{"id":21020044,"name":"Commando of Conviction","weaponType":"Sword","rarity":4},{"id":21030044,"name":"Undying Flame","weaponType":"Pistols","rarity":4},{"id":21040044,"name":"Amity Accord","weaponType":"Gauntlets","rarity":4},{"id":21050044,"name":"Jinzhou Keeper","weaponType":"Rectifier","rarity":4},{"id":21010043,"name":"Broadblade of Voyager","weaponType":"Broadblade","rarity":3},{"id":21020043,"name":"Sword of Voyager","weaponType":"Sword","rarity":3},{"id":21030043,"name":"Pistols of Voyager","weaponType":"Pistols","rarity":3},{"id":21040043,"name":"Gauntlets of Voyager","weaponType":"Gauntlets","rarity":3},{"id":21050043,"name":"Rectifier of Voyager","weaponType":"Rectifier","rarity":3},{"id":21010053,"name":"Guardian Broadblade","weaponType":"Broadblade","rarity":3},{"id":21020053,"name":"Guardian Sword","weaponType":"Sword","rarity":3},{"id":21030053,"name":"Guardian Pistols","weaponType":"Pistols","rarity":3},{"id":21040053,"name":"Guardian Gauntlets","weaponType":"Gauntlets","rarity":3},{"id":21050053,"name":"Guardian Rectifier","weaponType":"Rectifier","rarity":3},{"id":21010064,"name":"Helios Cleaver","weaponType":"Broadblade","rarity":4},{"id":21020064,"name":"Lunar Cutter","weaponType":"Sword","rarity":4},{"id":21030064,"name":"Novaburst","weaponType":"Pistols","rarity":4},{"id":21040064,"name":"Hollow Mirage","weaponType":"Gauntlets","rarity":4},{"id":21050064,"name":"Comet Flare","weaponType":"Rectifier","rarity":4},{"id":21010015,"name":"Lustrous Razor","weaponType":"Broadblade","rarity":5},{"id":21020015,"name":"Emerald of Genesis","weaponType":"Sword","rarity":5},{"id":21030015,"name":"Static Mist","weaponType":"Pistols","rarity":5},{"id":21040015,"name":"Abyss Surges","weaponType":"Gauntlets","rarity":5},{"id":21050015,"name":"Cosmic Ripples","weaponType":"Rectifier","rarity":5},{"id":21010016,"name":"Verdant Summit","weaponType":"Broadblade","rarity":5},{"id":21050016,"name":"Stringmaster","weaponType":"Rectifier","rarity":5},{"id":21010026,"name":"Ages of Harvest","weaponType":"Broadblade","rarity":5},{"id":21020016,"name":"Blazing Brilliance","weaponType":"Sword","rarity":5},{"id":21010063,"name":"Beguiling Melody","weaponType":"Broadblade","rarity":3},{"id":21050026,"name":"Rime-Draped Sprouts","weaponType":"Rectifier","rarity":5},{"id":21040016,"name":"Verity's Handle","weaponType":"Gauntlets","rarity":5},{"id":21050036,"name":"Stellar Symphony","weaponType":"Rectifier","rarity":5},{"id":21010084,"name":"Waning Redshift","weaponType":"Broadblade","rarity":4},{"id":21020084,"name":"Endless Collapse","weaponType":"Sword","rarity":4},{"id":21030084,"name":"Relativistic Jet","weaponType":"Pistols","rarity":4},{"id":21040084,"name":"Celestial Spiral","weaponType":"Gauntlets","rarity":4},{"id":21050084,"name":"Fusion Accretion","weaponType":"Rectifier","rarity":4},{"id":21020017,"name":"Somnoire Anchor","weaponType":"Sword","rarity":4},{"id":21020026,"name":"Red Spring","weaponType":"Sword","rarity":5},{"id":21050017,"name":"Call of the Abyss","weaponType":"Rectifier","rarity":4},{"id":21010094,"name":"Meditations on Mercy","weaponType":"Broadblade","rarity":4},{"id":21020094,"name":"Fables of Wisdom","weaponType":"Sword","rarity":4},{"id":21030094,"name":"Romance in Farewell","weaponType":"Pistols","rarity":4},{"id":21040094,"name":"Legend of Drunken Hero","weaponType":"Gauntlets","rarity":4},{"id":21050094,"name":"Waltz in Masquerade","weaponType":"Rectifier","rarity":4},{"id":21040026,"name":"Tragicomedy","weaponType":"Gauntlets","rarity":5},{"id":21030016,"name":"The Last Dance","weaponType":"Pistols","rarity":5},{"id":21020036,"name":"Unflickering Valor","weaponType":"Sword","rarity":5},{"id":21050046,"name":"Luminous Hymn","weaponType":"Rectifier","rarity":5},{"id":21050027,"name":"Ocean's Gift","weaponType":"Rectifier","rarity":4},{"id":21050056,"name":"Whispers of Sirens","weaponType":"Rectifier","rarity":5},{"id":21020046,"name":"Bloodpact's Pledge","weaponType":"Sword","rarity":5},{"id":21040036,"name":"Blazing Justice","weaponType":"Gauntlets","rarity":5},{"id":21030026,"name":"Woodland Aria","weaponType":"Pistols","rarity":5},{"id":21020056,"name":"Defier's Thorn","weaponType":"Sword","rarity":5},{"id":21010036,"name":"Wildfire Mark","weaponType":"Broadblade","rarity":5},{"id":21050066,"name":"Lethean Elegy","weaponType":"Rectifier","rarity":5},{"id":21040046,"name":"Moongazer's Sigil","weaponType":"Gauntlets","rarity":5},{"id":21010046,"name":"Thunderflare Dominion","weaponType":"Broadblade","rarity":5},{"id":21010104,"name":"Aureate Zenith","weaponType":"Broadblade","rarity":4},{"id":21020104,"name":"Feather Edge","weaponType":"Sword","rarity":4},{"id":21030104,"name":"Solar Flame","weaponType":"Pistols","rarity":4},{"id":21040104,"name":"Aether Strike","weaponType":"Gauntlets","rarity":4},{"id":21050104,"name":"Radiant Dawn","weaponType":"Rectifier","rarity":4},{"id":21030036,"name":"Lux & Umbra","weaponType":"Pistols","rarity":5},{"id":21020066,"name":"Emerald Sentence","weaponType":"Sword","rarity":5},{"id":21010056,"name":"Kumokiri","weaponType":"Broadblade","rarity":5},{"id":21030046,"name":"Spectrum Blaster","weaponType":"Pistols","rarity":5},{"id":21010066,"name":"Starfield Calibrator","weaponType":"Broadblade","rarity":5},{"id":21010045,"name":"Radiance Cleaver","weaponType":"Broadblade","rarity":5},{"id":21020045,"name":"Laser Shearer","weaponType":"Sword","rarity":5},{"id":21030045,"name":"Phasic Homogenizer","weaponType":"Pistols","rarity":5},{"id":21040045,"name":"Pulsation Bracer","weaponType":"Gauntlets","rarity":5},{"id":21050045,"name":"Boson Astrolabe","weaponType":"Rectifier","rarity":5},{"id":21020076,"name":"Everbright Polestar","weaponType":"Sword","rarity":5},{"id":21040056,"name":"Daybreaker's Spine","weaponType":"Gauntlets","rarity":5},{"id":21040066,"name":"Solsworn Ciphers","weaponType":"Gauntlets","rarity":5},{"id":21050076,"name":"Forged Dwarf Star","weaponType":"Rectifier","rarity":5},{"id":21020086,"name":"Frostburn","weaponType":"Sword","rarity":5},{"id":21030056,"name":"Spectral Trigger","weaponType":"Pistols","rarity":5},{"id":21030066,"name":"Skull Thrasher","weaponType":"Pistols","rarity":5},{"id":21050086,"name":"Freeze Frame","weaponType":"Rectifier","rarity":5},{"id":21020096,"name":"Azure Oath","weaponType":"Sword","rarity":5},{"id":21050096,"name":"Firstlight's Herald","weaponType":"Rectifier","rarity":5},{"id":21010076,"name":"Thousandfold Deliverance","weaponType":"Broadblade","rarity":5},{"id":21020106,"name":"Glint of Clouds","weaponType":"Sword","rarity":5}];
+const ECHOES = [{"name":"Lingering Tunes","icon":6000038,"element":"Aero"},{"name":"Sierra Gale","icon":6000038,"element":"Aero"},{"name":"Void Thunder","icon":6000039,"element":"Electro"},{"name":"Rejuvenating Glow","icon":6000040,"element":"Aero"},{"name":"Moonlit Clouds","icon":6000041,"element":"Physical"},{"name":"Havoc Eclipse","icon":6000053,"element":"Havoc"},{"name":"Freezing Frost","icon":6000044,"element":"Glacio"},{"name":"Celestial Light","icon":6000045,"element":"Spectro"},{"name":"Molten Rift","icon":6000054,"element":"Fusion"},{"name":"Frosty Resolve","icon":6000061,"element":"Spectro"},{"name":"Empyrean Anthem","icon":6000061,"element":"Spectro"},{"name":"Midnight Veil","icon":6000062,"element":"Spectro"},{"name":"Eternal Radiance","icon":6000063,"element":"Spectro"},{"name":"Tidebreaking Courage","icon":6000064,"element":"Spectro"},{"name":"Dream of the Lost","icon":6000067,"element":"Spectro"},{"name":"Flamewing's Shadow","icon":6000068,"element":"Spectro"},{"name":"Thread of Severed Fate","icon":6000077,"element":"Electro"},{"name":"Law of Harmony","icon":6000093,"element":"Spectro"},{"name":"Crown of Valor","icon":6000094,"element":"Glacio"},{"name":"Gusts of Welkin","icon":6000096,"element":"Spectro"},{"name":"Flaming Clawprint","icon":6000098,"element":"Spectro"},{"name":"Windward Pilgrimage","icon":6000100,"element":"Spectro"},{"name":"Halo of Starry Radiance","icon":6000174,"element":"Spectro"},{"name":"Chromatic Foam","icon":6000174,"element":"Spectro"},{"name":"Wishes of Quiet Snowfall","icon":6000174,"element":"Spectro"},{"name":"Pact of Neonlight Leap","icon":6000175,"element":"Spectro"},{"name":"Rite of Gilded Revelation","icon":6000175,"element":"Spectro"},{"name":"Sound of True Name","icon":6000175,"element":"Spectro"},{"name":"Reel of Spliced Memories","icon":6000175,"element":"Spectro"},{"name":"Trailblazing Star","icon":6000177,"element":"Spectro"},{"name":"Shadow of Shattered Dreams","icon":6000201,"element":"Spectro"},{"name":"Song of Feathered Trace","icon":6000202,"element":"Spectro"},{"name":"Lamp of Nether Road","icon":6000203,"element":"Spectro"},{"name":"Flash of Electric Reflection","icon":6000203,"element":"Spectro"},{"name":"Heart of Evil's Purge","icon":6000205,"element":"Spectro"},{"name":"Heart of Sworn Vigil","icon":6000206,"element":"Spectro"},{"name":"Flower of Tinged Yearning","icon":6000207,"element":"Spectro"}];
 </script>
 
 <script>
@@ -1282,16 +1327,19 @@ function closeChar(){
 }
 
 function openWeapon(id){
+  const activeView = document.querySelector('.view.active');
+  if (activeView) lastCharViewId = activeView.id;
+  const base = WEAPONS.find((x) => x.id === id);
+  if (!base) return;
   const w = WEAPON_FACTS[id];
-  if (!w) return;
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  document.getElementById('w-name').textContent = w.name;
+  document.getElementById('w-name').textContent = base.name;
   document.getElementById('w-portrait-img').src = 'assets/weapons/' + id + '.webp';
-  document.getElementById('w-type').textContent = WEAPON_TYPE_RU[w.weaponType] || w.weaponType;
-  document.getElementById('w-rarity').textContent = w.rarity + '★';
-  document.getElementById('w-passive-name').textContent = w.passiveName;
-  document.getElementById('w-passive-desc').textContent = w.passiveDesc;
-  document.getElementById('w-flavor').textContent = w.flavor;
+  document.getElementById('w-type').textContent = WEAPON_TYPE_RU[base.weaponType] || base.weaponType;
+  document.getElementById('w-rarity').textContent = base.rarity + '★';
+  document.getElementById('w-passive-name').textContent = w ? w.passiveName : 'Пассивка';
+  document.getElementById('w-passive-desc').textContent = w ? w.passiveDesc : 'Описание пассивки появится здесь позже.';
+  document.getElementById('w-flavor').textContent = w ? w.flavor : 'Описание оружия появится здесь позже.';
   document.getElementById('view-weapon').classList.add('active');
   window.scrollTo(0,0);
 }
@@ -1300,20 +1348,22 @@ function closeWeapon(){
   document.getElementById(lastCharViewId).classList.add('active');
 }
 
-function openEcho(id){
-  const e = ECHO_FACTS[id];
-  if (!e) return;
+function openEcho(setName){
+  const activeView = document.querySelector('.view.active');
+  if (activeView) lastCharViewId = activeView.id;
+  const base = ECHOES.find((x) => x.name === setName);
+  if (!base) return;
+  const e = ECHO_FACTS[setName];
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  const el = e.element.toLowerCase();
-  document.getElementById('ec-name').textContent = e.name;
-  document.getElementById('ec-portrait-img').src = 'assets/echoes/' + id + '.webp';
+  const el = base.element.toLowerCase();
+  document.getElementById('ec-name').textContent = base.name;
+  document.getElementById('ec-portrait-img').src = 'assets/echoes/' + base.icon + '.webp';
   document.getElementById('ec-el-dot').className = 'el-dot el-' + el;
-  document.getElementById('ec-element').textContent = e.element;
-  document.getElementById('ec-set').textContent = e.setName;
-  document.getElementById('ec-2pc').textContent = e.twoPiece;
-  document.getElementById('ec-5pc').textContent = e.fivePiece;
-  document.getElementById('ec-skill-name').textContent = e.skillName + ' (КД ' + e.cooldown + 'с)';
-  document.getElementById('ec-skill-desc').textContent = e.skillDesc;
+  document.getElementById('ec-element').textContent = base.element;
+  document.getElementById('ec-2pc').textContent = e ? e.twoPiece : 'Появится здесь позже.';
+  document.getElementById('ec-5pc').textContent = e ? e.fivePiece : 'Появится здесь позже.';
+  document.getElementById('ec-skill-name').textContent = (e && e.skillName) ? e.skillName : 'Навык эхо';
+  document.getElementById('ec-skill-desc').textContent = (e && e.skillDesc) ? e.skillDesc : 'Описание навыка появится здесь позже.';
   document.getElementById('view-echo').classList.add('active');
   window.scrollTo(0,0);
 }
@@ -1321,6 +1371,23 @@ function closeEcho(){
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   document.getElementById(lastCharViewId).classList.add('active');
 }
+
+function renderWeaponsGrid(){
+  const grid = document.getElementById('weapons-grid');
+  grid.innerHTML = WEAPONS.map((w) => {
+    return '<div class="portrait lg r' + w.rarity + '" data-type="' + w.weaponType + '" onclick="openWeapon(' + w.id + ')"><img class="portrait-img" src="assets/weapons/' + w.id + '.webp" alt=""><span class="ring"></span><span class="p-name">' + w.name + '</span></div>';
+  }).join('');
+}
+function renderEchoesGrid(){
+  const grid = document.getElementById('echoes-grid');
+  grid.innerHTML = ECHOES.map((e) => {
+    const el = e.element.toLowerCase();
+    const nameAttr = e.name.replace(/'/g, "\\'");
+    return '<div class="portrait lg ' + el + '" data-el="' + el + '" onclick="openEcho(\'' + nameAttr + '\')"><img class="portrait-img" src="assets/echoes/' + e.icon + '.webp" alt=""><span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="p-name">' + e.name + '</span></div>';
+  }).join('');
+}
+renderWeaponsGrid();
+renderEchoesGrid();
 
 // ---- Profile: "my characters" + favorites. This prototype runs as a
 // Claude Artifact, which has no per-account identity of its own to key a
