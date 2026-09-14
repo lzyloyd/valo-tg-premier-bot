@@ -78,12 +78,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .avatar-picker-preview.flash,.account-avatar.flash{animation:avatarFlash .55s ease;}
 @media (prefers-reduced-motion:reduce){.char-grid>*,.tier-items>.portrait{animation:none!important;}}
 
-/* element dots (small badges on portraits + filter chips) */
-.el-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block;}
-.el-fusion{background:var(--el-fusion);} .el-glacio{background:var(--el-glacio);}
-.el-electro{background:var(--el-electro);} .el-aero{background:var(--el-aero);}
-.el-spectro{background:var(--el-spectro);} .el-havoc{background:var(--el-havoc);}
-.el-physical{background:var(--el-physical);}
+/* element icons (small badges on portraits + filter chips) */
+.el-dot{width:15px;height:15px;flex-shrink:0;display:inline-block;object-fit:contain;}
 
 /* filters — wrap, never scroll */
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
@@ -142,15 +138,14 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-items{display:flex;flex-wrap:wrap;gap:8px;flex:1;align-content:flex-start;}
 
 /* character tier-list: badge is a full-height vertical block beside the
-   tier's content (same treatment as the team tier list), now that each
-   tier is tall enough (3 role rows) for that to look proportionate again */
+   tier's content (same treatment as the team tier list); DPS/Hybrid/
+   Support are always-visible side-by-side columns, not filterable rows */
 #view-tierlist .tier-row{align-items:stretch;padding:16px;margin-bottom:16px;}
-#view-tierlist .tier-content{flex:1;min-width:0;}
-#view-tierlist .tier-items{display:grid;grid-template-columns:repeat(auto-fill, minmax(96px, 1fr));gap:10px;}
+#view-tierlist .tier-content{flex:1;min-width:0;display:flex;}
+#view-tierlist .tier-role-col{flex:1;min-width:0;padding:0 8px;border-left:1px solid var(--border);}
+#view-tierlist .tier-role-col:first-child{padding-left:0;border-left:none;}
+#view-tierlist .tier-items{display:flex;flex-direction:column;gap:10px;}
 #view-tierlist .tier-items .portrait.sm{width:100%;}
-.tier-role-group{margin-top:16px;}
-.tier-role-group:first-of-type{margin-top:0;}
-.tier-role-group.hidden-by-filter{display:none;}
 .tier-role-label{font-size:10.5px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;}
 
 /* team tier list */
@@ -377,7 +372,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v1.95</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.0</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -405,216 +400,8 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
   <!-- TIER LIST -->
   <div class="view active" id="view-tierlist">
     <div class="screen">
-      <div class="filters" data-filter-target="#view-tierlist" data-filter-attr="role">
-        <div class="chip active" data-val="all">Все</div>
-        <div class="chip" data-val="dps">DPS</div>
-        <div class="chip" data-val="hybrid">Hybrid</div>
-        <div class="chip" data-val="support">Support</div>
-      </div>
-
-      <div class="tier-row">
-        <div class="tier-badge t0">T0</div>
-        <div class="tier-content">
-        <div class="tier-role-group" data-role="dps">
-          <div class="tier-role-label">DPS</div>
-          <div class="tier-items">
-            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1210)"><img class="portrait-img" src="/wuwa-assets/characters/1210.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Aemeath</span></div>
-            <div class="portrait sm glacio" data-role="dps" onclick="openChar(1108)"><img class="portrait-img" src="/wuwa-assets/characters/1108.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Hiyuki</span></div>
-            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1212)"><img class="portrait-img" src="/wuwa-assets/characters/1212.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Jingran</span></div>
-            <div class="portrait sm aero" data-role="dps" onclick="openChar(1413)"><img class="portrait-img" src="/wuwa-assets/characters/1413.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Qingxiao</span></div>
-            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1610)"><img class="portrait-img" src="/wuwa-assets/characters/1610.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Yangyang: Xuanling</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="hybrid">
-          <div class="tier-role-label">Hybrid</div>
-          <div class="tier-items">
-            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1211)"><img class="portrait-img" src="/wuwa-assets/characters/1211.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Denia</span></div>
-            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1410)"><img class="portrait-img" src="/wuwa-assets/characters/1410.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Iuno</span></div>
-            <div class="portrait sm glacio" data-role="hybrid" onclick="openChar(1109)"><img class="portrait-img" src="/wuwa-assets/characters/1109.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Lucilla</span></div>
-            <div class="portrait sm spectro" data-role="hybrid" onclick="openChar(1509)"><img class="portrait-img" src="/wuwa-assets/characters/1509.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Lynae</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="support">
-          <div class="tier-role-label">Support</div>
-          <div class="tier-items">
-            <div class="portrait sm havoc" data-role="support" onclick="openChar(1508)"><img class="portrait-img" src="/wuwa-assets/characters/1508.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Chisa</span></div>
-            <div class="portrait sm fusion" data-role="support" onclick="openChar(1209)"><img class="portrait-img" src="/wuwa-assets/characters/1209.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Mornye</span></div>
-            <div class="portrait sm glacio" data-role="support" onclick="openChar(1110)"><img class="portrait-img" src="/wuwa-assets/characters/1110.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Suisui</span></div>
-            <div class="portrait sm spectro" data-role="support" onclick="openChar(1505)"><img class="portrait-img" src="/wuwa-assets/characters/1505.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Shorekeeper</span></div>
-          </div>
-        </div>
-        </div>
-      </div>
-
-      <div class="tier-row">
-        <div class="tier-badge t05">T0.5</div>
-        <div class="tier-content">
-        <div class="tier-role-group" data-role="dps">
-          <div class="tier-role-label">DPS</div>
-          <div class="tier-items">
-            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1510)"><img class="portrait-img" src="/wuwa-assets/characters/1510.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Luuk Herssen</span></div>
-            <div class="portrait sm aero" data-role="dps" onclick="openChar(1412)"><img class="portrait-img" src="/wuwa-assets/characters/1412.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Sigrika</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="hybrid">
-          <div class="tier-role-label">Hybrid</div>
-          <div class="tier-items">
-            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1207)"><img class="portrait-img" src="/wuwa-assets/characters/1207.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Lupa</span></div>
-            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1411)"><img class="portrait-img" src="/wuwa-assets/characters/1411.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Qiuyuan</span></div>
-            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1308)"><img class="portrait-img" src="/wuwa-assets/characters/1308.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rebecca</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="support">
-          <div class="tier-role-label">Support</div>
-          <div class="tier-items">
-            <div class="portrait sm spectro" data-role="support" onclick="openChar(1503)"><img class="portrait-img" src="/wuwa-assets/characters/1503.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Verina</span></div>
-          </div>
-        </div>
-      </div>
-        </div>
-
-      <div class="tier-row">
-        <div class="tier-badge t1">T1</div>
-        <div class="tier-content">
-        <div class="tier-role-group" data-role="dps">
-          <div class="tier-role-label">DPS</div>
-          <div class="tier-items">
-            <div class="portrait sm electro" data-role="dps" onclick="openChar(1306)"><img class="portrait-img" src="/wuwa-assets/characters/1306.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Augusta</span></div>
-            <div class="portrait sm aero" data-role="dps" onclick="openChar(1409)"><img class="portrait-img" src="/wuwa-assets/characters/1409.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Cartethyia</span></div>
-            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1208)"><img class="portrait-img" src="/wuwa-assets/characters/1208.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Galbrena</span></div>
-            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1511)"><img class="portrait-img" src="/wuwa-assets/characters/1511.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Lucy</span></div>
-            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1608)"><img class="portrait-img" src="/wuwa-assets/characters/1608.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Phrolova</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="hybrid">
-          <div class="tier-role-label">Hybrid</div>
-          <div class="tier-items">
-            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1407)"><img class="portrait-img" src="/wuwa-assets/characters/1407.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Ciaccona</span></div>
-            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1204)"><img class="portrait-img" src="/wuwa-assets/characters/1204.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Mortefi</span></div>
-          </div>
-        </div>
-      </div>
-        </div>
-
-      <div class="tier-row">
-        <div class="tier-badge t15">T1.5</div>
-        <div class="tier-content">
-        <div class="tier-role-group" data-role="dps">
-          <div class="tier-role-label">DPS</div>
-          <div class="tier-items">
-            <div class="portrait sm glacio" data-role="dps" onclick="openChar(1107)"><img class="portrait-img" src="/wuwa-assets/characters/1107.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Carlotta</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="hybrid">
-          <div class="tier-role-label">Hybrid</div>
-          <div class="tier-items">
-            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1206)"><img class="portrait-img" src="/wuwa-assets/characters/1206.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Brant</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="support">
-          <div class="tier-role-label">Support</div>
-          <div class="tier-items">
-            <div class="portrait sm aero" data-role="support" onclick="openChar(1406)"><img class="portrait-img" src="/wuwa-assets/characters/1406.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Rover: Aero</span></div>
-            <div class="portrait sm aero" data-role="support" onclick="openChar(1408)"><img class="portrait-img" src="/wuwa-assets/characters/1408.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Rover: Aero</span></div>
-          </div>
-        </div>
-      </div>
-        </div>
-
-      <div class="tier-row">
-        <div class="tier-badge t2">T2</div>
-        <div class="tier-content">
-        <div class="tier-role-group" data-role="dps">
-          <div class="tier-role-label">DPS</div>
-          <div class="tier-items">
-            <div class="portrait sm aero" data-role="dps" onclick="openChar(1404)"><img class="portrait-img" src="/wuwa-assets/characters/1404.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Jiyan</span></div>
-            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1506)"><img class="portrait-img" src="/wuwa-assets/characters/1506.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Phoebe</span></div>
-            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1507)"><img class="portrait-img" src="/wuwa-assets/characters/1507.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Zani</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="hybrid">
-          <div class="tier-role-label">Hybrid</div>
-          <div class="tier-items">
-            <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1607)"><img class="portrait-img" src="/wuwa-assets/characters/1607.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Cantarella</span></div>
-            <div class="portrait sm fusion" data-role="hybrid" onclick="openChar(1205)"><img class="portrait-img" src="/wuwa-assets/characters/1205.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Changli</span></div>
-            <div class="portrait sm glacio" data-role="hybrid" onclick="openChar(1102)"><img class="portrait-img" src="/wuwa-assets/characters/1102.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Sanhua</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="support">
-          <div class="tier-role-label">Support</div>
-          <div class="tier-items">
-            <div class="portrait sm electro" data-role="support" onclick="openChar(1307)"><img class="portrait-img" src="/wuwa-assets/characters/1307.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Buling</span></div>
-            <div class="portrait sm spectro" data-role="support" onclick="openChar(1501)"><img class="portrait-img" src="/wuwa-assets/characters/1501.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Rover: Spectro</span></div>
-            <div class="portrait sm spectro" data-role="support" onclick="openChar(1502)"><img class="portrait-img" src="/wuwa-assets/characters/1502.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Rover: Spectro</span></div>
-          </div>
-        </div>
-      </div>
-        </div>
-
-      <div class="tier-row">
-        <div class="tier-badge t3">T3</div>
-        <div class="tier-content">
-        <div class="tier-role-group" data-role="dps">
-          <div class="tier-role-label">DPS</div>
-          <div class="tier-items">
-            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1603)"><img class="portrait-img" src="/wuwa-assets/characters/1603.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Camellya</span></div>
-            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1203)"><img class="portrait-img" src="/wuwa-assets/characters/1203.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Encore</span></div>
-            <div class="portrait sm spectro" data-role="dps" onclick="openChar(1304)"><img class="portrait-img" src="/wuwa-assets/characters/1304.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Jinhsi</span></div>
-            <div class="portrait sm glacio" data-role="dps" onclick="openChar(1104)"><img class="portrait-img" src="/wuwa-assets/characters/1104.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Lingyang</span></div>
-            <div class="portrait sm electro" data-role="dps" onclick="openChar(1305)"><img class="portrait-img" src="/wuwa-assets/characters/1305.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Xiangli Yao</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="hybrid">
-          <div class="tier-role-label">Hybrid</div>
-          <div class="tier-items">
-            <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1602)"><img class="portrait-img" src="/wuwa-assets/characters/1602.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Danjin</span></div>
-            <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1606)"><img class="portrait-img" src="/wuwa-assets/characters/1606.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Roccia</span></div>
-            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1302)"><img class="portrait-img" src="/wuwa-assets/characters/1302.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Yinlin</span></div>
-            <div class="portrait sm glacio" data-role="hybrid" onclick="openChar(1105)"><img class="portrait-img" src="/wuwa-assets/characters/1105.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Zhezhi</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="support">
-          <div class="tier-role-label">Support</div>
-          <div class="tier-items">
-            <div class="portrait sm glacio" data-role="support" onclick="openChar(1103)"><img class="portrait-img" src="/wuwa-assets/characters/1103.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Baizhi</span></div>
-          </div>
-        </div>
-      </div>
-        </div>
-
-      <div class="tier-row">
-        <div class="tier-badge t4">T4</div>
-        <div class="tier-content">
-        <div class="tier-role-group" data-role="dps">
-          <div class="tier-role-label">DPS</div>
-          <div class="tier-items">
-            <div class="portrait sm electro" data-role="dps" onclick="openChar(1301)"><img class="portrait-img" src="/wuwa-assets/characters/1301.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Calcharo</span></div>
-            <div class="portrait sm fusion" data-role="dps" onclick="openChar(1202)"><img class="portrait-img" src="/wuwa-assets/characters/1202.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Chixia</span></div>
-            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1604)"><img class="portrait-img" src="/wuwa-assets/characters/1604.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Rover: Havoc</span></div>
-            <div class="portrait sm havoc" data-role="dps" onclick="openChar(1605)"><img class="portrait-img" src="/wuwa-assets/characters/1605.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Rover: Havoc</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="hybrid">
-          <div class="tier-role-label">Hybrid</div>
-          <div class="tier-items">
-            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1403)"><img class="portrait-img" src="/wuwa-assets/characters/1403.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Aalto</span></div>
-            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1405)"><img class="portrait-img" src="/wuwa-assets/characters/1405.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Jianxin</span></div>
-            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1504)"><img class="portrait-img" src="/wuwa-assets/characters/1504.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Lumi</span></div>
-            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1309)"><img class="portrait-img" src="/wuwa-assets/characters/1309.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rover: Electro</span></div>
-            <div class="portrait sm electro" data-role="hybrid" onclick="openChar(1310)"><img class="portrait-img" src="/wuwa-assets/characters/1310.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rover: Electro</span></div>
-            <div class="portrait sm havoc" data-role="hybrid" onclick="openChar(1601)"><img class="portrait-img" src="/wuwa-assets/characters/1601.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Taoqi</span></div>
-            <div class="portrait sm aero" data-role="hybrid" onclick="openChar(1402)"><img class="portrait-img" src="/wuwa-assets/characters/1402.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Yangyang</span></div>
-          </div>
-        </div>
-        <div class="tier-role-group" data-role="support">
-          <div class="tier-role-label">Support</div>
-          <div class="tier-items">
-            <div class="portrait sm glacio" data-role="support" onclick="openChar(1106)"><img class="portrait-img" src="/wuwa-assets/characters/1106.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Youhu</span></div>
-            <div class="portrait sm electro" data-role="support" onclick="openChar(1303)"><img class="portrait-img" src="/wuwa-assets/characters/1303.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Yuanwu</span></div>
-          </div>
-        </div>
-        </div>
-      </div>
+      <div class="filters" id="tierlist-mode-switch"></div>
+      <div class="tierlist-dynamic"></div>
     </div>
   </div>
 
@@ -631,78 +418,78 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
     <div class="screen">
       <div class="filters" data-filter-target="#view-characters" data-filter-attr="el">
         <div class="chip active" data-val="all">Все</div>
-        <div class="chip" data-val="fusion"><span class="el-dot el-fusion"></span>Fusion</div>
-        <div class="chip" data-val="glacio"><span class="el-dot el-glacio"></span>Glacio</div>
-        <div class="chip" data-val="electro"><span class="el-dot el-electro"></span>Electro</div>
-        <div class="chip" data-val="aero"><span class="el-dot el-aero"></span>Aero</div>
-        <div class="chip" data-val="spectro"><span class="el-dot el-spectro"></span>Spectro</div>
-        <div class="chip" data-val="havoc"><span class="el-dot el-havoc"></span>Havoc</div>
+        <div class="chip" data-val="fusion"><img class="el-dot el-fusion" src="/wuwa-assets/elements/fusion.webp" alt="">Fusion</div>
+        <div class="chip" data-val="glacio"><img class="el-dot el-glacio" src="/wuwa-assets/elements/glacio.webp" alt="">Glacio</div>
+        <div class="chip" data-val="electro"><img class="el-dot el-electro" src="/wuwa-assets/elements/electro.webp" alt="">Electro</div>
+        <div class="chip" data-val="aero"><img class="el-dot el-aero" src="/wuwa-assets/elements/aero.webp" alt="">Aero</div>
+        <div class="chip" data-val="spectro"><img class="el-dot el-spectro" src="/wuwa-assets/elements/spectro.webp" alt="">Spectro</div>
+        <div class="chip" data-val="havoc"><img class="el-dot el-havoc" src="/wuwa-assets/elements/havoc.webp" alt="">Havoc</div>
       </div>
       <div class="char-grid">
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1210)"><img class="portrait-img" src="/wuwa-assets/characters/1210.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Aemeath</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1306)"><img class="portrait-img" src="/wuwa-assets/characters/1306.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Augusta</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1206)"><img class="portrait-img" src="/wuwa-assets/characters/1206.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Brant</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1301)"><img class="portrait-img" src="/wuwa-assets/characters/1301.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Calcharo</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1603)"><img class="portrait-img" src="/wuwa-assets/characters/1603.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Camellya</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1607)"><img class="portrait-img" src="/wuwa-assets/characters/1607.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Cantarella</span></div>
-        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1107)"><img class="portrait-img" src="/wuwa-assets/characters/1107.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Carlotta</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1409)"><img class="portrait-img" src="/wuwa-assets/characters/1409.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Cartethyia</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1205)"><img class="portrait-img" src="/wuwa-assets/characters/1205.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Changli</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1508)"><img class="portrait-img" src="/wuwa-assets/characters/1508.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Chisa</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1407)"><img class="portrait-img" src="/wuwa-assets/characters/1407.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Ciaccona</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1211)"><img class="portrait-img" src="/wuwa-assets/characters/1211.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Denia</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1203)"><img class="portrait-img" src="/wuwa-assets/characters/1203.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Encore</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1208)"><img class="portrait-img" src="/wuwa-assets/characters/1208.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Galbrena</span></div>
-        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1108)"><img class="portrait-img" src="/wuwa-assets/characters/1108.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Hiyuki</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1311)"><img class="portrait-img" src="/wuwa-assets/characters/1311.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Hsin</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1410)"><img class="portrait-img" src="/wuwa-assets/characters/1410.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Iuno</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1405)"><img class="portrait-img" src="/wuwa-assets/characters/1405.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Jianxin</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1212)"><img class="portrait-img" src="/wuwa-assets/characters/1212.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Jingran</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1304)"><img class="portrait-img" src="/wuwa-assets/characters/1304.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Jinhsi</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1404)"><img class="portrait-img" src="/wuwa-assets/characters/1404.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Jiyan</span></div>
-        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1104)"><img class="portrait-img" src="/wuwa-assets/characters/1104.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Lingyang</span></div>
-        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1109)"><img class="portrait-img" src="/wuwa-assets/characters/1109.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Lucilla</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1511)"><img class="portrait-img" src="/wuwa-assets/characters/1511.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Lucy</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1207)"><img class="portrait-img" src="/wuwa-assets/characters/1207.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Lupa</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1510)"><img class="portrait-img" src="/wuwa-assets/characters/1510.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Luuk Herssen</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1509)"><img class="portrait-img" src="/wuwa-assets/characters/1509.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Lynae</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1209)"><img class="portrait-img" src="/wuwa-assets/characters/1209.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Mornye</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1506)"><img class="portrait-img" src="/wuwa-assets/characters/1506.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Phoebe</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1608)"><img class="portrait-img" src="/wuwa-assets/characters/1608.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Phrolova</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1413)"><img class="portrait-img" src="/wuwa-assets/characters/1413.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Qingxiao</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1411)"><img class="portrait-img" src="/wuwa-assets/characters/1411.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Qiuyuan</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1308)"><img class="portrait-img" src="/wuwa-assets/characters/1308.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rebecca</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1606)"><img class="portrait-img" src="/wuwa-assets/characters/1606.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Roccia</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1406)"><img class="portrait-img" src="/wuwa-assets/characters/1406.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Rover: Aero</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1408)"><img class="portrait-img" src="/wuwa-assets/characters/1408.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Rover: Aero</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1309)"><img class="portrait-img" src="/wuwa-assets/characters/1309.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rover: Electro</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1310)"><img class="portrait-img" src="/wuwa-assets/characters/1310.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Rover: Electro</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1604)"><img class="portrait-img" src="/wuwa-assets/characters/1604.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Rover: Havoc</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1605)"><img class="portrait-img" src="/wuwa-assets/characters/1605.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Rover: Havoc</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1501)"><img class="portrait-img" src="/wuwa-assets/characters/1501.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Rover: Spectro</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1502)"><img class="portrait-img" src="/wuwa-assets/characters/1502.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Rover: Spectro</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1505)"><img class="portrait-img" src="/wuwa-assets/characters/1505.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Shorekeeper</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1412)"><img class="portrait-img" src="/wuwa-assets/characters/1412.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Sigrika</span></div>
-        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1110)"><img class="portrait-img" src="/wuwa-assets/characters/1110.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Suisui</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1312)"><img class="portrait-img" src="/wuwa-assets/characters/1312.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Suoming</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1503)"><img class="portrait-img" src="/wuwa-assets/characters/1503.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Verina</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1305)"><img class="portrait-img" src="/wuwa-assets/characters/1305.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Xiangli Yao</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1610)"><img class="portrait-img" src="/wuwa-assets/characters/1610.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Yangyang: Xuanling</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1302)"><img class="portrait-img" src="/wuwa-assets/characters/1302.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Yinlin</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1507)"><img class="portrait-img" src="/wuwa-assets/characters/1507.webp" alt=""><span class="ring"></span><span class="el-dot el-spectro p-el"></span><span class="p-name">Zani</span></div>
-        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1105)"><img class="portrait-img" src="/wuwa-assets/characters/1105.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Zhezhi</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1403)"><img class="portrait-img" src="/wuwa-assets/characters/1403.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Aalto</span></div>
-        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1103)"><img class="portrait-img" src="/wuwa-assets/characters/1103.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Baizhi</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1307)"><img class="portrait-img" src="/wuwa-assets/characters/1307.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Buling</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1202)"><img class="portrait-img" src="/wuwa-assets/characters/1202.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Chixia</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1602)"><img class="portrait-img" src="/wuwa-assets/characters/1602.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Danjin</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1504)"><img class="portrait-img" src="/wuwa-assets/characters/1504.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Lumi</span></div>
-        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1204)"><img class="portrait-img" src="/wuwa-assets/characters/1204.webp" alt=""><span class="ring"></span><span class="el-dot el-fusion p-el"></span><span class="p-name">Mortefi</span></div>
-        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1102)"><img class="portrait-img" src="/wuwa-assets/characters/1102.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Sanhua</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1601)"><img class="portrait-img" src="/wuwa-assets/characters/1601.webp" alt=""><span class="ring"></span><span class="el-dot el-havoc p-el"></span><span class="p-name">Taoqi</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1402)"><img class="portrait-img" src="/wuwa-assets/characters/1402.webp" alt=""><span class="ring"></span><span class="el-dot el-aero p-el"></span><span class="p-name">Yangyang</span></div>
-        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1106)"><img class="portrait-img" src="/wuwa-assets/characters/1106.webp" alt=""><span class="ring"></span><span class="el-dot el-glacio p-el"></span><span class="p-name">Youhu</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1303)"><img class="portrait-img" src="/wuwa-assets/characters/1303.webp" alt=""><span class="ring"></span><span class="el-dot el-electro p-el"></span><span class="p-name">Yuanwu</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1210)"><img class="portrait-img" src="/wuwa-assets/characters/1210.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Aemeath</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1306)"><img class="portrait-img" src="/wuwa-assets/characters/1306.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Augusta</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1206)"><img class="portrait-img" src="/wuwa-assets/characters/1206.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Brant</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1301)"><img class="portrait-img" src="/wuwa-assets/characters/1301.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Calcharo</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1603)"><img class="portrait-img" src="/wuwa-assets/characters/1603.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Camellya</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1607)"><img class="portrait-img" src="/wuwa-assets/characters/1607.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Cantarella</span></div>
+        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1107)"><img class="portrait-img" src="/wuwa-assets/characters/1107.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Carlotta</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1409)"><img class="portrait-img" src="/wuwa-assets/characters/1409.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Cartethyia</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1205)"><img class="portrait-img" src="/wuwa-assets/characters/1205.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Changli</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1508)"><img class="portrait-img" src="/wuwa-assets/characters/1508.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Chisa</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1407)"><img class="portrait-img" src="/wuwa-assets/characters/1407.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Ciaccona</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1211)"><img class="portrait-img" src="/wuwa-assets/characters/1211.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Denia</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1203)"><img class="portrait-img" src="/wuwa-assets/characters/1203.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Encore</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1208)"><img class="portrait-img" src="/wuwa-assets/characters/1208.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Galbrena</span></div>
+        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1108)"><img class="portrait-img" src="/wuwa-assets/characters/1108.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Hiyuki</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1311)"><img class="portrait-img" src="/wuwa-assets/characters/1311.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Hsin</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1410)"><img class="portrait-img" src="/wuwa-assets/characters/1410.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Iuno</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1405)"><img class="portrait-img" src="/wuwa-assets/characters/1405.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Jianxin</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1212)"><img class="portrait-img" src="/wuwa-assets/characters/1212.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Jingran</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1304)"><img class="portrait-img" src="/wuwa-assets/characters/1304.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Jinhsi</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1404)"><img class="portrait-img" src="/wuwa-assets/characters/1404.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Jiyan</span></div>
+        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1104)"><img class="portrait-img" src="/wuwa-assets/characters/1104.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Lingyang</span></div>
+        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1109)"><img class="portrait-img" src="/wuwa-assets/characters/1109.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Lucilla</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1511)"><img class="portrait-img" src="/wuwa-assets/characters/1511.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Lucy</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1207)"><img class="portrait-img" src="/wuwa-assets/characters/1207.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Lupa</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1510)"><img class="portrait-img" src="/wuwa-assets/characters/1510.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Luuk Herssen</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1509)"><img class="portrait-img" src="/wuwa-assets/characters/1509.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Lynae</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1209)"><img class="portrait-img" src="/wuwa-assets/characters/1209.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Mornye</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1506)"><img class="portrait-img" src="/wuwa-assets/characters/1506.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Phoebe</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1608)"><img class="portrait-img" src="/wuwa-assets/characters/1608.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Phrolova</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1413)"><img class="portrait-img" src="/wuwa-assets/characters/1413.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Qingxiao</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1411)"><img class="portrait-img" src="/wuwa-assets/characters/1411.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Qiuyuan</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1308)"><img class="portrait-img" src="/wuwa-assets/characters/1308.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Rebecca</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1606)"><img class="portrait-img" src="/wuwa-assets/characters/1606.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Roccia</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1406)"><img class="portrait-img" src="/wuwa-assets/characters/1406.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Rover: Aero</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1408)"><img class="portrait-img" src="/wuwa-assets/characters/1408.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Rover: Aero</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1309)"><img class="portrait-img" src="/wuwa-assets/characters/1309.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Rover: Electro</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1310)"><img class="portrait-img" src="/wuwa-assets/characters/1310.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Rover: Electro</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1604)"><img class="portrait-img" src="/wuwa-assets/characters/1604.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Rover: Havoc</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1605)"><img class="portrait-img" src="/wuwa-assets/characters/1605.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Rover: Havoc</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1501)"><img class="portrait-img" src="/wuwa-assets/characters/1501.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Rover: Spectro</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1502)"><img class="portrait-img" src="/wuwa-assets/characters/1502.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Rover: Spectro</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1505)"><img class="portrait-img" src="/wuwa-assets/characters/1505.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Shorekeeper</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1412)"><img class="portrait-img" src="/wuwa-assets/characters/1412.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Sigrika</span></div>
+        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1110)"><img class="portrait-img" src="/wuwa-assets/characters/1110.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Suisui</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1312)"><img class="portrait-img" src="/wuwa-assets/characters/1312.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Suoming</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1503)"><img class="portrait-img" src="/wuwa-assets/characters/1503.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Verina</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1305)"><img class="portrait-img" src="/wuwa-assets/characters/1305.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Xiangli Yao</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1610)"><img class="portrait-img" src="/wuwa-assets/characters/1610.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Yangyang: Xuanling</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1302)"><img class="portrait-img" src="/wuwa-assets/characters/1302.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Yinlin</span></div>
+        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1507)"><img class="portrait-img" src="/wuwa-assets/characters/1507.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Zani</span></div>
+        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1105)"><img class="portrait-img" src="/wuwa-assets/characters/1105.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Zhezhi</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1403)"><img class="portrait-img" src="/wuwa-assets/characters/1403.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Aalto</span></div>
+        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1103)"><img class="portrait-img" src="/wuwa-assets/characters/1103.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Baizhi</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1307)"><img class="portrait-img" src="/wuwa-assets/characters/1307.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Buling</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1202)"><img class="portrait-img" src="/wuwa-assets/characters/1202.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Chixia</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1602)"><img class="portrait-img" src="/wuwa-assets/characters/1602.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Danjin</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1504)"><img class="portrait-img" src="/wuwa-assets/characters/1504.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Lumi</span></div>
+        <div class="portrait lg fusion" data-el="fusion" onclick="openChar(1204)"><img class="portrait-img" src="/wuwa-assets/characters/1204.webp" alt=""><span class="ring"></span><img class="el-dot el-fusion p-el" src="/wuwa-assets/elements/fusion.webp" alt=""><span class="p-name">Mortefi</span></div>
+        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1102)"><img class="portrait-img" src="/wuwa-assets/characters/1102.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Sanhua</span></div>
+        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1601)"><img class="portrait-img" src="/wuwa-assets/characters/1601.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Taoqi</span></div>
+        <div class="portrait lg aero" data-el="aero" onclick="openChar(1402)"><img class="portrait-img" src="/wuwa-assets/characters/1402.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Yangyang</span></div>
+        <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1106)"><img class="portrait-img" src="/wuwa-assets/characters/1106.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Youhu</span></div>
+        <div class="portrait lg electro" data-el="electro" onclick="openChar(1303)"><img class="portrait-img" src="/wuwa-assets/characters/1303.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Yuanwu</span></div>
       </div>
     </div>
   </div>
@@ -813,10 +600,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div>
           <h2>Aemeath</h2>
           <div class="hero-tags">
-            <div class="hero-tag"><span class="el-dot el-fusion"></span> Fusion</div>
+            <div class="hero-tag"><img class="el-dot el-fusion" src="/wuwa-assets/elements/fusion.webp" alt=""> Fusion</div>
             <div class="hero-tag">Меч</div>
             <div class="hero-tag">5★</div>
-            <div class="hero-tag tier">T0.5 · DPS</div>
+            <div class="hero-tag tier" id="showcase-tier-toa"></div>
+            <div class="hero-tag tier" id="showcase-tier-ww"></div>
           </div>
         </div>
       </div>
@@ -951,9 +739,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div>
           <h2 id="g-name"></h2>
           <div class="hero-tags">
-            <div class="hero-tag"><span class="el-dot" id="g-el-dot"></span><span id="g-element"></span></div>
+            <div class="hero-tag"><img class="el-dot" id="g-el-dot" src="" alt=""><span id="g-element"></span></div>
             <div class="hero-tag" id="g-weapon"></div>
             <div class="hero-tag" id="g-rarity"></div>
+            <div class="hero-tag tier" id="g-tier-toa" style="display:none"></div>
+            <div class="hero-tag tier" id="g-tier-ww" style="display:none"></div>
           </div>
         </div>
       </div>
@@ -1103,14 +893,16 @@ let ECHO_ITEMS = [];
 let BUILDS = {};
 let GAMEPLAY = {};
 let TEAMS = { tiers: [] };
+let TIERLIST = { modes: [], toa: { tiers: [] }, ww: { tiers: [] } };
 async function loadGameData(){
-  const [characters, weapons, echoData, builds, gameplay, teams] = await Promise.all([
+  const [characters, weapons, echoData, builds, gameplay, teams, tierlist] = await Promise.all([
     fetch('/wuwa-assets/characters/index.json').then((r) => r.json()),
     fetch('/wuwa-assets/weapons/index.json').then((r) => r.json()),
     fetch('/wuvochka/echo-data.json').then((r) => r.json()),
     fetch('/wuvochka/builds.json').then((r) => r.json()),
     fetch('/wuvochka/gameplay.json').then((r) => r.json()),
     fetch('/wuvochka/teams.json').then((r) => r.json()),
+    fetch('/wuvochka/tierlist.json').then((r) => r.json()),
   ]);
   CHARACTERS = characters;
   WEAPONS = weapons;
@@ -1119,6 +911,47 @@ async function loadGameData(){
   BUILDS = builds;
   GAMEPLAY = gameplay;
   TEAMS = teams;
+  TIERLIST = tierlist;
+}
+const ROLE_LABEL_RU = { dps: 'DPS', hybrid: 'Hybrid', support: 'Support' };
+let tierlistMode = 'toa';
+function tierPortraitHtml(id, role){
+  const c = CHARACTERS.find((x) => x.id === id);
+  if (!c) return '';
+  const el = c.element.toLowerCase();
+  return '<div class="portrait sm ' + el + '" data-role="' + role + '" onclick="openChar(' + id + ')"><img class="portrait-img" src="/wuwa-assets/characters/' + id + '.webp" alt=""><span class="ring"></span><img class="el-dot el-' + el + ' p-el" src="/wuwa-assets/elements/' + el + '.webp" alt=""><span class="p-name">' + c.name + '</span></div>';
+}
+function renderTierListView(){
+  const switchEl = document.getElementById('tierlist-mode-switch');
+  const rootEl = document.querySelector('#view-tierlist .tierlist-dynamic');
+  if (!switchEl || !rootEl || !TIERLIST.modes.length) return;
+  switchEl.innerHTML = TIERLIST.modes.map((m) => {
+    return '<div class="chip' + (m.id === tierlistMode ? ' active' : '') + '" onclick="setTierlistMode(\'' + m.id + '\')">' + m.name + '</div>';
+  }).join('');
+  const data = TIERLIST[tierlistMode];
+  rootEl.innerHTML = data.tiers.map((tierGroup) => {
+    const rolesHtml = ['dps', 'hybrid', 'support'].map((role) => {
+      const ids = tierGroup.roles[role] || [];
+      return '<div class="tier-role-col"><div class="tier-role-label">' + ROLE_LABEL_RU[role] + '</div><div class="tier-items">' + ids.map((id) => tierPortraitHtml(id, role)).join('') + '</div></div>';
+    }).join('');
+    return '<div class="tier-row"><div class="tier-badge ' + tierGroup.class + '">' + tierGroup.tier + '</div><div class="tier-content">' + rolesHtml + '</div></div>';
+  }).join('');
+}
+function setTierlistMode(mode){
+  tierlistMode = mode;
+  renderTierListView();
+}
+function findTierInfo(charId, mode){
+  const data = TIERLIST[mode];
+  if (!data) return null;
+  for (const tierGroup of data.tiers) {
+    for (const role of ['dps', 'hybrid', 'support']) {
+      if ((tierGroup.roles[role] || []).includes(charId)) {
+        return { tier: tierGroup.tier, role: ROLE_LABEL_RU[role] };
+      }
+    }
+  }
+  return null;
 }
 function renderTeamsView(){
   const rootEl = document.querySelector('#view-teams .teams-dynamic');
@@ -1249,12 +1082,21 @@ function openChar(id){
     portrait.className = 'portrait hero ' + el;
     document.getElementById('g-portrait-img').src = '/wuwa-assets/characters/' + character.id + '.webp';
     document.getElementById('g-el-dot').className = 'el-dot el-' + el;
+    document.getElementById('g-el-dot').src = '/wuwa-assets/elements/' + el + '.webp';
     document.getElementById('g-element').textContent = character.element;
     document.getElementById('g-weapon').textContent = WEAPON_TYPE_RU[character.weaponType] || character.weaponType;
     document.getElementById('g-rarity').textContent = character.rarity + '★';
     document.getElementById('g-fact-element').textContent = character.element;
     document.getElementById('g-fact-weapon').textContent = WEAPON_TYPE_RU[character.weaponType] || character.weaponType;
     document.getElementById('g-fact-rarity').textContent = character.rarity + '★';
+    const toaInfo = findTierInfo(character.id, 'toa');
+    const toaTagEl = document.getElementById('g-tier-toa');
+    toaTagEl.style.display = toaInfo ? '' : 'none';
+    if (toaInfo) toaTagEl.textContent = 'ToA: ' + toaInfo.tier + ' · ' + toaInfo.role;
+    const wwInfo = findTierInfo(character.id, 'ww');
+    const wwTagEl = document.getElementById('g-tier-ww');
+    wwTagEl.style.display = wwInfo ? '' : 'none';
+    if (wwInfo) wwTagEl.textContent = 'WW: ' + wwInfo.tier + ' · ' + wwInfo.role;
     const buildEl = document.querySelector('#subg-build .build-dynamic');
     buildEl.dataset.charId = character.id;
     renderBuildTab(buildEl, character.id);
@@ -1607,7 +1449,7 @@ function renderEchoSetsGrid(){
     // option collides with another set's. The 4 newest sets have no
     // carrying echo in prydwen's data at all yet, so no photo either.
     const bgHtml = e.bg ? '<img class="portrait-img" src="' + e.bg + '" alt="">' : '';
-    return '<div class="portrait lg ' + el + '" data-el="' + el + '" onclick="openEcho(\'' + nameAttr + '\')">' + bgHtml + '<span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="set-badge-bottom"><img src="' + e.badge + '" alt=""></span><span class="p-name">' + e.name + '</span></div>';
+    return '<div class="portrait lg ' + el + '" data-el="' + el + '" onclick="openEcho(\'' + nameAttr + '\')">' + bgHtml + '<span class="ring"></span><img class="el-dot el-' + el + ' p-el" src="/wuwa-assets/elements/' + el + '.webp" alt=""><span class="set-badge-bottom"><img src="' + e.badge + '" alt=""></span><span class="p-name">' + e.name + '</span></div>';
   }).join('');
 }
 function echoArtHtml(item){
@@ -1702,6 +1544,11 @@ Promise.all([loadGameData(), loadProfile()]).then(() => {
   document.querySelectorAll('.gameplay-dynamic[data-char-id]').forEach((el) => renderGameplayTab(el, Number(el.dataset.charId)));
   document.querySelectorAll('.calc-dynamic[data-char-id]').forEach((el) => renderCalcTab(el, Number(el.dataset.charId)));
   renderTeamsView();
+  renderTierListView();
+  const showcaseToa = findTierInfo(SHOWCASE_CHAR_ID, 'toa');
+  if (showcaseToa) document.getElementById('showcase-tier-toa').textContent = 'ToA: ' + showcaseToa.tier + ' · ' + showcaseToa.role;
+  const showcaseWw = findTierInfo(SHOWCASE_CHAR_ID, 'ww');
+  if (showcaseWw) document.getElementById('showcase-tier-ww').textContent = 'WW: ' + showcaseWw.tier + ' · ' + showcaseWw.role;
   // only the tier-list is actually visible at load — everything else gets
   // staggered lazily by the tab click handler once it's actually rendered.
   document.querySelectorAll('#view-tierlist .tier-items').forEach(applyStagger);
@@ -1815,7 +1662,7 @@ function renderAvatarPicker() {
   grid.innerHTML = CHARACTERS.map((c) => {
     const el = c.element.toLowerCase();
     const ring = c.id === chosenId ? ' style="border-color:var(--accent)"' : '';
-    return '<div class="portrait sm ' + el + '"' + ring + ' onclick="setAvatar(' + c.id + ')"><img class="portrait-img" src="/wuwa-assets/characters/' + c.id + '.webp" alt=""><span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="p-name">' + c.name + '</span></div>';
+    return '<div class="portrait sm ' + el + '"' + ring + ' onclick="setAvatar(' + c.id + ')"><img class="portrait-img" src="/wuwa-assets/characters/' + c.id + '.webp" alt=""><span class="ring"></span><img class="el-dot el-' + el + ' p-el" src="/wuwa-assets/elements/' + el + '.webp" alt=""><span class="p-name">' + c.name + '</span></div>';
   }).join('');
   applyStagger(grid);
 }
@@ -1849,7 +1696,7 @@ function renderProfileGrid(gridId, emptyId, idSet) {
     const c = CHARACTERS.find((x) => x.id === id);
     if (!c) return '';
     const el = c.element.toLowerCase();
-    return '<div class="portrait lg ' + el + '" onclick="openChar(' + id + ')"><img class="portrait-img" src="/wuwa-assets/characters/' + id + '.webp" alt=""><span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="p-name">' + c.name + '</span></div>';
+    return '<div class="portrait lg ' + el + '" onclick="openChar(' + id + ')"><img class="portrait-img" src="/wuwa-assets/characters/' + id + '.webp" alt=""><span class="ring"></span><img class="el-dot el-' + el + ' p-el" src="/wuwa-assets/elements/' + el + '.webp" alt=""><span class="p-name">' + c.name + '</span></div>';
   }).join('');
   applyStagger(grid);
 }
