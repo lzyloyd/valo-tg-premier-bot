@@ -108,6 +108,15 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .profile-empty{font-size:12.5px;color:var(--text-muted);padding:6px 0 16px;}
 .profile-section h3{margin:0 0 11px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;}
 .profile-section{margin-bottom:22px;}
+
+/* link-out card for wuwamatrix.com — Claude Artifact's CSP blocks framing
+   other sites (confirmed at publish time), so this links out instead of
+   embedding; in the real Telegram mini-app an iframe may well work fine. */
+.matrix-icon{width:56px;height:56px;border-radius:16px;margin:0 auto 14px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:26px;}
+.matrix-card{text-align:center;padding:32px 20px;}
+.matrix-card h3{text-transform:none;font-size:16px;color:var(--text);letter-spacing:0;margin-bottom:8px;}
+.matrix-card p{font-size:12.5px;color:var(--text-muted);line-height:1.6;margin:0 0 20px;}
+.matrix-link-btn{display:inline-block;background:var(--accent);color:#0a0e17;font-family:'Exo 2',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;border-radius:12px;text-decoration:none;}
 .hero-tag{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:4px 8px;border-radius:6px;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;gap:4px;}
 .hero-tag.tier{background:var(--accent-soft);color:var(--accent);}
 
@@ -177,13 +186,14 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 
   <div class="app-header">
     <div class="app-title"><img class="mark" src="assets/app/icon.webp" alt=""><h1>Вувочка</h1></div>
-    <div class="app-sub">WUTHERING WAVES · v0.1</div>
+    <div class="app-sub">WUTHERING WAVES · v0.2</div>
   </div>
   <div class="tabs">
     <button class="tab active" data-view="tierlist">Тир-лист</button>
     <button class="tab" data-view="teams">Команды</button>
     <button class="tab" data-view="characters">Персонажи</button>
     <button class="tab" data-view="profile">Профиль</button>
+    <button class="tab" data-view="matrix">Матрица</button>
   </div>
 
   <!-- TIER LIST -->
@@ -778,6 +788,19 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           <div class="char-grid" id="profile-fav-grid"></div>
           <div class="profile-empty" id="profile-fav-empty">Пока пусто — добавляйте персонажей в избранное с их страницы.</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATRIX PLANNER (links out to wuwamatrix.com) -->
+  <div class="view" id="view-matrix">
+    <div class="screen">
+      <div class="card matrix-card">
+        <div class="matrix-icon">🧩</div>
+        <h3>Билд-планировщик Matrix</h3>
+        <p>Считает резонансные цепи, эхо и характеристики для любой сборки.
+          Встроить сам сайт внутрь приложения нельзя — открывается отдельно.</p>
+        <a class="matrix-link-btn" href="https://wuwamatrix.com/?utm_source=prydwen" target="_blank" rel="noopener">Открыть wuwamatrix.com ↗</a>
       </div>
     </div>
   </div>
