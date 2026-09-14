@@ -302,6 +302,15 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .item-info .iname{font-weight:700;font-size:13px;}
 .item-info .irole{font-size:11px;color:var(--text-muted);margin-top:2px;}
 .rank-badge{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:6px;}
+.rank-badge.tier-S{color:var(--tier-0);background:color-mix(in srgb,var(--tier-0) 16%,transparent);}
+.rank-badge.tier-A{color:var(--tier-05);background:color-mix(in srgb,var(--tier-05) 16%,transparent);}
+.rank-badge.tier-B{color:var(--tier-1);background:color-mix(in srgb,var(--tier-1) 16%,transparent);}
+.rank-badge.tier-C{color:var(--tier-2);background:color-mix(in srgb,var(--tier-2) 16%,transparent);}
+.weapon-score{font-family:'JetBrains Mono',monospace;}
+.weapon-score.tier-S{color:var(--tier-0);}
+.weapon-score.tier-A{color:var(--tier-05);}
+.weapon-score.tier-B{color:var(--tier-1);}
+.weapon-score.tier-C{color:var(--tier-2);}
 
 table.stat-table{width:100%;border-collapse:collapse;font-size:12px;}
 table.stat-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);padding-bottom:7px;font-weight:700;}
@@ -338,7 +347,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.32</div>
+    <div class="app-sub">WUTHERING WAVES · v1.33</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1594,8 +1603,9 @@ function renderBuildTab(rootEl, charId){
     const base = WEAPONS.find((x) => x.id === w.id);
     if (!base) return '';
     const score = w.scores ? w.scores[variantId] : null;
+    const tier = tierFromScore(score);
     const scoreLabel = score != null ? score.toFixed(1) + '%' : '—';
-    return '<div class="item-card clickable" onclick="openWeapon(' + w.id + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + w.id + '.webp" alt=""></div><div class="item-info"><div class="iname">' + base.name + ' · ' + scoreLabel + '</div><div class="irole">' + w.note + '</div></div><div class="rank-badge">' + tierFromScore(score) + '</div></div>';
+    return '<div class="item-card clickable" onclick="openWeapon(' + w.id + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + w.id + '.webp" alt=""></div><div class="item-info"><div class="iname">' + base.name + ' · <span class="weapon-score tier-' + tier + '">' + scoreLabel + '</span></div><div class="irole">' + w.note + '</div></div><div class="rank-badge tier-' + tier + '">' + tier + '</div></div>';
   }).join('') + '</div>';
   const setBase = ECHOES.find((x) => x.name === data.echoSet);
   const echoSetAttr = data.echoSet.replace(/'/g, "\\'");

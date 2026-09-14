@@ -300,6 +300,15 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .item-info .iname{font-weight:700;font-size:13px;}
 .item-info .irole{font-size:11px;color:var(--text-muted);margin-top:2px;}
 .rank-badge{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:6px;}
+.rank-badge.tier-S{color:var(--tier-0);background:color-mix(in srgb,var(--tier-0) 16%,transparent);}
+.rank-badge.tier-A{color:var(--tier-05);background:color-mix(in srgb,var(--tier-05) 16%,transparent);}
+.rank-badge.tier-B{color:var(--tier-1);background:color-mix(in srgb,var(--tier-1) 16%,transparent);}
+.rank-badge.tier-C{color:var(--tier-2);background:color-mix(in srgb,var(--tier-2) 16%,transparent);}
+.weapon-score{font-family:'JetBrains Mono',monospace;}
+.weapon-score.tier-S{color:var(--tier-0);}
+.weapon-score.tier-A{color:var(--tier-05);}
+.weapon-score.tier-B{color:var(--tier-1);}
+.weapon-score.tier-C{color:var(--tier-2);}
 
 table.stat-table{width:100%;border-collapse:collapse;font-size:12px;}
 table.stat-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);padding-bottom:7px;font-weight:700;}
@@ -336,7 +345,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.32</div>
+    <div class="app-sub">WUTHERING WAVES · v1.33</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1172,15 +1181,15 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         </div>
         <div class="card">
           <h3>Лучшее оружие</h3>
-          <div class="item-card clickable" onclick="openWeapon(21020076)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020076.webp" alt=""></div><div class="item-info"><div class="iname">Everbright Polestar · 100.0%</div><div class="irole">Сигнатура Aemeath — игнор Fusion-сопротивления на уроне Liberation, лучший выбор.</div></div><div class="rank-badge">S</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020015)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020015.webp" alt=""></div><div class="item-info"><div class="iname">Emerald of Genesis · 86.8%</div><div class="irole">Постоянно доступный второй по силе вариант с восст. энергии и АТК%.</div></div><div class="rank-badge">A</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020026)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020026.webp" alt=""></div><div class="item-info"><div class="iname">Red Spring · 84.7%</div><div class="irole">Крит-статстик 5★, чуть слабее Emerald of Genesis без нужды в восст. энергии.</div></div><div class="rank-badge">A</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020066)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020066.webp" alt=""></div><div class="item-info"><div class="iname">Emerald Sentence · 84.5%</div><div class="irole">АТК/крит. шанс статстик, чуть усиливает урон эхо команде.</div></div><div class="rank-badge">A</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020016)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020016.webp" alt=""></div><div class="item-info"><div class="iname">Blazing Brilliance · 84.2%</div><div class="irole">АТК/крит. урон статстик, свои бонусы урона навыка не задействует.</div></div><div class="rank-badge">A</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020104)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020104.webp" alt=""></div><div class="item-info"><div class="iname">Feather Edge · 79.3%</div><div class="irole">Лучший 4★ (баттлпасс): АТК и урон Liberation, но ниже базовая АТК, чем у 5★.</div></div><div class="rank-badge">B</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020017)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020017.webp" alt=""></div><div class="item-info"><div class="iname">Somnoire Anchor · 76.0%</div><div class="irole">Ивентовый 4★ с накопительными бонусами АТК и крит. шанса.</div></div><div class="rank-badge">B</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020084)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020084.webp" alt=""></div><div class="item-info"><div class="iname">Endless Collapse · 75.6%</div><div class="irole">Снимает потребность в восст. энергии, но почти ничего не даёт сверху.</div></div><div class="rank-badge">B</div></div>
-          <div class="item-card clickable" onclick="openWeapon(21020044)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020044.webp" alt=""></div><div class="item-info"><div class="iname">Commando of Conviction · 75.3%</div><div class="irole">Лучший бесгачевый вариант — доступен с самого старта игры.</div></div><div class="rank-badge">B</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020076)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020076.webp" alt=""></div><div class="item-info"><div class="iname">Everbright Polestar · <span class="weapon-score tier-S">100.0%</span></div><div class="irole">Сигнатура Aemeath — игнор Fusion-сопротивления на уроне Liberation, лучший выбор.</div></div><div class="rank-badge tier-S">S</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020015)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020015.webp" alt=""></div><div class="item-info"><div class="iname">Emerald of Genesis · <span class="weapon-score tier-A">86.8%</span></div><div class="irole">Постоянно доступный второй по силе вариант с восст. энергии и АТК%.</div></div><div class="rank-badge tier-A">A</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020026)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020026.webp" alt=""></div><div class="item-info"><div class="iname">Red Spring · <span class="weapon-score tier-A">84.7%</span></div><div class="irole">Крит-статстик 5★, чуть слабее Emerald of Genesis без нужды в восст. энергии.</div></div><div class="rank-badge tier-A">A</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020066)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020066.webp" alt=""></div><div class="item-info"><div class="iname">Emerald Sentence · <span class="weapon-score tier-A">84.5%</span></div><div class="irole">АТК/крит. шанс статстик, чуть усиливает урон эхо команде.</div></div><div class="rank-badge tier-A">A</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020016)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020016.webp" alt=""></div><div class="item-info"><div class="iname">Blazing Brilliance · <span class="weapon-score tier-A">84.2%</span></div><div class="irole">АТК/крит. урон статстик, свои бонусы урона навыка не задействует.</div></div><div class="rank-badge tier-A">A</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020104)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020104.webp" alt=""></div><div class="item-info"><div class="iname">Feather Edge · <span class="weapon-score tier-B">79.3%</span></div><div class="irole">Лучший 4★ (баттлпасс): АТК и урон Liberation, но ниже базовая АТК, чем у 5★.</div></div><div class="rank-badge tier-B">B</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020017)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020017.webp" alt=""></div><div class="item-info"><div class="iname">Somnoire Anchor · <span class="weapon-score tier-B">76.0%</span></div><div class="irole">Ивентовый 4★ с накопительными бонусами АТК и крит. шанса.</div></div><div class="rank-badge tier-B">B</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020084)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020084.webp" alt=""></div><div class="item-info"><div class="iname">Endless Collapse · <span class="weapon-score tier-B">75.6%</span></div><div class="irole">Снимает потребность в восст. энергии, но почти ничего не даёт сверху.</div></div><div class="rank-badge tier-B">B</div></div>
+          <div class="item-card clickable" onclick="openWeapon(21020044)"><div class="item-icon"><img class="item-icon-img" src="assets/weapons/21020044.webp" alt=""></div><div class="item-info"><div class="iname">Commando of Conviction · <span class="weapon-score tier-B">75.3%</span></div><div class="irole">Лучший бесгачевый вариант — доступен с самого старта игры.</div></div><div class="rank-badge tier-B">B</div></div>
         </div>
         <div class="card">
           <h3>Лучший набор эхо</h3>
