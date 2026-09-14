@@ -18,7 +18,7 @@ const HEATMAP_RANGE = 'B1:P20';
 // exact viewport size: skips the row-number/column-A gutter on the left and
 // the column-letter band on top, and stops right at column P / row 20 with
 // no sliver of column Q bleeding in on the right.
-const CROP = { x: 138, y: 20, width: 1530, height: 668 };
+const CROP = { x: 148, y: 26, width: 1520, height: 650 };
 
 async function screenshotSheetRange(browser, spreadsheetId, gid) {
   const page = await browser.newPage();

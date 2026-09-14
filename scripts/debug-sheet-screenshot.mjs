@@ -22,7 +22,7 @@ try {
   console.log('navigating to', url);
   await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
   await new Promise((r) => setTimeout(r, 1500));
-  const png = await page.screenshot({ type: 'png', clip: { x: 138, y: 20, width: 1530, height: 668 } });
+  const png = await page.screenshot({ type: 'png', clip: { x: 148, y: 26, width: 1520, height: 650 } });
   fs.writeFileSync('/tmp/sheet-screenshot.png', png);
   console.log('saved to /tmp/sheet-screenshot.png');
 } finally {
