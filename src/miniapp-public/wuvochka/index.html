@@ -269,6 +269,13 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .skill-kind.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
 .skill-item{padding:10px 0;border-top:1px solid var(--border);}
 .skill-item:first-child{border-top:none;padding-top:0;}
+.buff-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 0;border-top:1px solid var(--border);font-size:12px;line-height:1.4;}
+.buff-row:first-child{border-top:none;padding-top:0;}
+.buff-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.buff-set-icon,.buff-echo-icon{width:20px;height:20px;border-radius:6px;object-fit:cover;flex-shrink:0;}
+.buff-pair{display:inline-flex;align-items:center;gap:4px;}
+.buff-name{font-weight:700;color:var(--accent);}
+.buff-weapon{font-weight:700;}
 .skill-item .sname{font-weight:700;font-size:13.5px;margin-bottom:3px;}
 .skill-item .sdesc{font-size:12.5px;color:var(--text-muted);line-height:1.55;}
 
@@ -331,7 +338,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.31</div>
+    <div class="app-sub">WUTHERING WAVES · v1.32</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1562,11 +1569,26 @@ function renderBuildTab(rootEl, charId){
     return;
   }
   const variantId = buildVariantId(data, charId);
+  const activeVariant = data.variants ? data.variants.find((v) => v.id === variantId) : null;
   let html = '';
   if (data.variants && data.variants.length > 1) {
     html += '<div class="card"><h3>Расчёт под связку</h3><div class="skill-kind-tabs">' + data.variants.map((v) => {
       return '<div class="skill-kind' + (v.id === variantId ? ' active' : '') + '" onclick="setBuildVariant(' + charId + ',\'' + v.id + '\')">' + v.name + '</div>';
     }).join('') + '</div></div>';
+  }
+  if (activeVariant && activeVariant.teammates && activeVariant.teammates.length) {
+    html += '<div class="card"><h3>Расчёт с учётом баффов от</h3>' + activeVariant.teammates.map((t) => {
+      const tc = CHARACTERS.find((x) => x.id === t.charId);
+      const tw = WEAPONS.find((x) => x.id === t.weaponId);
+      const tSet = ECHOES.find((x) => x.name === t.echoSet);
+      const tSetAttr = t.echoSet.replace(/'/g, "\\'");
+      return '<div class="buff-row">'
+        + (tc ? '<span class="buff-pair"><img class="buff-avatar" src="/wuwa-assets/characters/' + tc.id + '.webp" alt=""><span class="buff-name">' + tc.name + '</span></span>' : '')
+        + ' + <span class="buff-weapon" onclick="openWeapon(' + t.weaponId + ')">' + (tw ? tw.name : t.weaponId) + '</span>'
+        + ' + <span class="buff-pair" onclick="openEcho(\'' + tSetAttr + '\')"><img class="buff-set-icon" src="' + (tSet ? tSet.badge : '') + '" alt=""><span>' + t.echoSet + '</span></span>'
+        + ' + <span class="buff-pair"><img class="buff-echo-icon" src="' + t.echoItemIcon + '" alt=""><span>' + t.echoItemName + '</span></span>'
+        + '</div>';
+    }).join('') + '</div>';
   }
   html += '<div class="card"><h3>Лучшее оружие</h3>' + data.weapons.map((w) => {
     const base = WEAPONS.find((x) => x.id === w.id);

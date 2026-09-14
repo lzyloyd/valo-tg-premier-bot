@@ -1,8 +1,22 @@
 {
   "1210": {
     "variants": [
-      { "id": "tuneRupture", "name": "Tune Rupture" },
-      { "id": "fusionBurst", "name": "Fusion Burst" }
+      {
+        "id": "tuneRupture",
+        "name": "Tune Rupture",
+        "teammates": [
+          { "charId": 1509, "weaponId": 21030046, "echoSet": "Pact of Neonlight Leap", "echoItemIcon": "/wuwa-assets/echoes/6000189.webp", "echoItemName": "Hyvatia" },
+          { "charId": 1209, "weaponId": 21010024, "echoSet": "Halo of Starry Radiance", "echoItemIcon": "/wuwa-assets/echoes/6000190.webp", "echoItemName": "Reactor Husk" }
+        ]
+      },
+      {
+        "id": "fusionBurst",
+        "name": "Fusion Burst",
+        "teammates": [
+          { "charId": 1211, "weaponId": 21050076, "echoSet": "Chromatic Foam", "echoItemIcon": "/wuwa-assets/echoes/6000200.webp", "echoItemName": "Reminiscence: Denia" },
+          { "charId": 1508, "weaponId": 21010056, "echoSet": "Rejuvenating Glow", "echoItemIcon": "/wuwa-assets/echoes/6000060.webp", "echoItemName": "Fallacy of No Return" }
+        ]
+      }
     ],
     "weapons": [
       { "id": 21020076, "scores": { "tuneRupture": 100.0, "fusionBurst": 100.0 }, "note": "Сигнатурное оружие Aemeath — даёт игнор Fusion-сопротивления на уроне Liberation, бонус урона, крит. шанс и высокую базовую АТК. Лучший выбор без вопросов." },

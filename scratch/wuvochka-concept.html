@@ -267,6 +267,13 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .skill-kind.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
 .skill-item{padding:10px 0;border-top:1px solid var(--border);}
 .skill-item:first-child{border-top:none;padding-top:0;}
+.buff-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 0;border-top:1px solid var(--border);font-size:12px;line-height:1.4;}
+.buff-row:first-child{border-top:none;padding-top:0;}
+.buff-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.buff-set-icon,.buff-echo-icon{width:20px;height:20px;border-radius:6px;object-fit:cover;flex-shrink:0;}
+.buff-pair{display:inline-flex;align-items:center;gap:4px;}
+.buff-name{font-weight:700;color:var(--accent);}
+.buff-weapon{font-weight:700;}
 .skill-item .sname{font-weight:700;font-size:13.5px;margin-bottom:3px;}
 .skill-item .sdesc{font-size:12.5px;color:var(--text-muted);line-height:1.55;}
 
@@ -329,7 +336,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.31</div>
+    <div class="app-sub">WUTHERING WAVES · v1.32</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1153,6 +1160,15 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
             <div class="skill-kind">Fusion Burst</div>
           </div>
           <div class="review-text" style="margin-top:8px">Проценты ниже — для связки Tune Rupture; смена вкладки в этом прототипе не пересчитывает список (в реальном приложении — пересчитывает).</div>
+        </div>
+        <div class="card">
+          <h3>Расчёт с учётом баффов от</h3>
+          <div class="buff-row">
+            <span class="buff-pair"><img class="buff-avatar" src="assets/characters/1509.webp" alt=""><span class="buff-name">Lynae</span></span> + <span class="buff-weapon">Spectrum Blaster</span> + <span class="buff-pair"><img class="buff-set-icon" src="assets/sets/set_24.webp" alt=""><span>Pact of Neonlight Leap</span></span> + <span class="buff-pair"><img class="buff-echo-icon" src="assets/echoes/6000189.webp" alt=""><span>Hyvatia</span></span>
+          </div>
+          <div class="buff-row">
+            <span class="buff-pair"><img class="buff-avatar" src="assets/characters/1209.webp" alt=""><span class="buff-name">Mornye</span></span> + <span class="buff-weapon">Discord</span> + <span class="buff-pair"><img class="buff-set-icon" src="assets/sets/set_23.webp" alt=""><span>Halo of Starry Radiance</span></span> + <span class="buff-pair"><img class="buff-echo-icon" src="assets/echoes/6000190.webp" alt=""><span>Reactor Husk</span></span>
+          </div>
         </div>
         <div class="card">
           <h3>Лучшее оружие</h3>
