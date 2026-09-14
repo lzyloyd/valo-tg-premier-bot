@@ -186,7 +186,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 
   <div class="app-header">
     <div class="app-title"><img class="mark" src="assets/app/icon.webp" alt=""><h1>Вувочка</h1></div>
-    <div class="app-sub">WUTHERING WAVES · v0.2</div>
+    <div class="app-sub">WUTHERING WAVES · v0.3</div>
   </div>
   <div class="tabs">
     <button class="tab active" data-view="tierlist">Тир-лист</button>
@@ -919,7 +919,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         </div>
         <div class="card">
           <h3>Лучший набор эхо</h3>
-          <div class="item-card"><div class="item-icon"><img class="item-icon-img" src="assets/echoes/6000053.webp" alt=""></div><div class="item-info"><div class="iname">Molten Rift · 4 части</div><div class="irole">+40% бонус урона Fusion</div></div></div>
+          <div class="item-card clickable" onclick="openEcho(6000054)"><div class="item-icon"><img class="item-icon-img" src="assets/echoes/6000054.webp" alt=""></div><div class="item-info"><div class="iname">Molten Rift · 2/5 предметов</div><div class="irole">Урон Fusion +10% / +30% после навыка резонанса</div></div></div>
         </div>
         <div class="card">
           <h3>Приоритет характеристик эхо</h3>
@@ -1102,6 +1102,39 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
     </div>
   </div>
 
+  <!-- ECHO DETAIL -->
+  <div class="view" id="view-echo">
+    <div class="screen">
+      <div class="back-row" onclick="closeEcho()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        Назад
+      </div>
+
+      <div class="char-hero">
+        <div class="portrait hero"><img class="portrait-img" id="ec-portrait-img" src="" alt=""><span class="ring"></span></div>
+        <div>
+          <h2 id="ec-name"></h2>
+          <div class="hero-tags">
+            <div class="hero-tag"><span class="el-dot" id="ec-el-dot"></span><span id="ec-element"></span></div>
+            <div class="hero-tag" id="ec-set"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Бонус комплекта</h3>
+        <div class="rating-row"><span class="rating-label">2 предмета</span></div>
+        <div class="review-text" id="ec-2pc"></div>
+        <div class="rating-row" style="margin-top:10px"><span class="rating-label">5 предметов</span></div>
+        <div class="review-text" id="ec-5pc"></div>
+      </div>
+      <div class="card">
+        <h3 id="ec-skill-name"></h3>
+        <div class="review-text" id="ec-skill-desc"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="credit-bar">Данные адаптированы с <a href="#">prydwen.gg</a> · сделано <a href="#">@lzyloyd</a></div>
 </div>
 
@@ -1109,6 +1142,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 const CHARACTERS = [{"id":1402,"name":"Yangyang","element":"Aero","weaponType":"Sword","rarity":4},{"id":1202,"name":"Chixia","element":"Fusion","weaponType":"Pistols","rarity":4},{"id":1503,"name":"Verina","element":"Spectro","weaponType":"Rectifier","rarity":5},{"id":1501,"name":"Rover: Spectro","element":"Spectro","weaponType":"Sword","rarity":5},{"id":1102,"name":"Sanhua","element":"Glacio","weaponType":"Sword","rarity":4},{"id":1601,"name":"Taoqi","element":"Havoc","weaponType":"Broadblade","rarity":4},{"id":1502,"name":"Rover: Spectro","element":"Spectro","weaponType":"Sword","rarity":5},{"id":1103,"name":"Baizhi","element":"Glacio","weaponType":"Rectifier","rarity":4},{"id":1203,"name":"Encore","element":"Fusion","weaponType":"Rectifier","rarity":5},{"id":1602,"name":"Danjin","element":"Havoc","weaponType":"Sword","rarity":4},{"id":1403,"name":"Aalto","element":"Aero","weaponType":"Pistols","rarity":4},{"id":1404,"name":"Jiyan","element":"Aero","weaponType":"Broadblade","rarity":5},{"id":1204,"name":"Mortefi","element":"Fusion","weaponType":"Pistols","rarity":4},{"id":1603,"name":"Camellya","element":"Havoc","weaponType":"Sword","rarity":5},{"id":1301,"name":"Calcharo","element":"Electro","weaponType":"Broadblade","rarity":5},{"id":1302,"name":"Yinlin","element":"Electro","weaponType":"Rectifier","rarity":5},{"id":1104,"name":"Lingyang","element":"Glacio","weaponType":"Gauntlets","rarity":5},{"id":1303,"name":"Yuanwu","element":"Electro","weaponType":"Gauntlets","rarity":4},{"id":1604,"name":"Rover: Havoc","element":"Havoc","weaponType":"Sword","rarity":5},{"id":1605,"name":"Rover: Havoc","element":"Havoc","weaponType":"Sword","rarity":5},{"id":1405,"name":"Jianxin","element":"Aero","weaponType":"Gauntlets","rarity":5},{"id":1304,"name":"Jinhsi","element":"Spectro","weaponType":"Broadblade","rarity":5},{"id":1305,"name":"Xiangli Yao","element":"Electro","weaponType":"Gauntlets","rarity":5},{"id":1205,"name":"Changli","element":"Fusion","weaponType":"Sword","rarity":5},{"id":1105,"name":"Zhezhi","element":"Glacio","weaponType":"Rectifier","rarity":5},{"id":1504,"name":"Lumi","element":"Electro","weaponType":"Broadblade","rarity":4},{"id":1106,"name":"Youhu","element":"Glacio","weaponType":"Gauntlets","rarity":4},{"id":1505,"name":"Shorekeeper","element":"Spectro","weaponType":"Rectifier","rarity":5},{"id":1606,"name":"Roccia","element":"Havoc","weaponType":"Gauntlets","rarity":5},{"id":1107,"name":"Carlotta","element":"Glacio","weaponType":"Pistols","rarity":5},{"id":1206,"name":"Brant","element":"Fusion","weaponType":"Sword","rarity":5},{"id":1506,"name":"Phoebe","element":"Spectro","weaponType":"Rectifier","rarity":5},{"id":1406,"name":"Rover: Aero","element":"Aero","weaponType":"Sword","rarity":5},{"id":1607,"name":"Cantarella","element":"Havoc","weaponType":"Rectifier","rarity":5},{"id":1407,"name":"Ciaccona","element":"Aero","weaponType":"Pistols","rarity":5},{"id":1507,"name":"Zani","element":"Spectro","weaponType":"Gauntlets","rarity":5},{"id":1408,"name":"Rover: Aero","element":"Aero","weaponType":"Sword","rarity":5},{"id":1207,"name":"Lupa","element":"Fusion","weaponType":"Broadblade","rarity":5},{"id":1608,"name":"Phrolova","element":"Havoc","weaponType":"Rectifier","rarity":5},{"id":1409,"name":"Cartethyia","element":"Aero","weaponType":"Sword","rarity":5},{"id":1306,"name":"Augusta","element":"Electro","weaponType":"Broadblade","rarity":5},{"id":1410,"name":"Iuno","element":"Aero","weaponType":"Gauntlets","rarity":5},{"id":1307,"name":"Buling","element":"Electro","weaponType":"Rectifier","rarity":4},{"id":1208,"name":"Galbrena","element":"Fusion","weaponType":"Pistols","rarity":5},{"id":1508,"name":"Chisa","element":"Havoc","weaponType":"Broadblade","rarity":5},{"id":1411,"name":"Qiuyuan","element":"Aero","weaponType":"Sword","rarity":5},{"id":1509,"name":"Lynae","element":"Spectro","weaponType":"Pistols","rarity":5},{"id":1209,"name":"Mornye","element":"Fusion","weaponType":"Broadblade","rarity":5},{"id":1510,"name":"Luuk Herssen","element":"Spectro","weaponType":"Gauntlets","rarity":5},{"id":1210,"name":"Aemeath","element":"Fusion","weaponType":"Sword","rarity":5},{"id":1412,"name":"Sigrika","element":"Aero","weaponType":"Gauntlets","rarity":5},{"id":1211,"name":"Denia","element":"Fusion","weaponType":"Rectifier","rarity":5},{"id":1308,"name":"Rebecca","element":"Electro","weaponType":"Pistols","rarity":5},{"id":1109,"name":"Lucilla","element":"Glacio","weaponType":"Rectifier","rarity":5},{"id":1511,"name":"Lucy","element":"Spectro","weaponType":"Pistols","rarity":5},{"id":1108,"name":"Hiyuki","element":"Glacio","weaponType":"Sword","rarity":5},{"id":1309,"name":"Rover: Electro","element":"Electro","weaponType":"Sword","rarity":5},{"id":1310,"name":"Rover: Electro","element":"Electro","weaponType":"Sword","rarity":5},{"id":1610,"name":"Yangyang: Xuanling","element":"Havoc","weaponType":"Sword","rarity":5},{"id":1110,"name":"Suisui","element":"Glacio","weaponType":"Rectifier","rarity":5},{"id":1413,"name":"Qingxiao","element":"Aero","weaponType":"Sword","rarity":5},{"id":1311,"name":"Hsin","element":"Electro","weaponType":"Rectifier","rarity":5},{"id":1212,"name":"Jingran","element":"Fusion","weaponType":"Broadblade","rarity":5},{"id":1312,"name":"Suoming","element":"Electro","weaponType":"Sword","rarity":5}];
 const WEAPON_FACTS = {"21020015":{"name":"Emerald of Genesis","weaponType":"Sword","rarity":5,"passiveName":"Stormy Resolution","passiveDesc":"Восстановление энергии увеличивается на 12.8%/16%/19.2%/22.4%/25.6%. При использовании навыка резонанса АТК увеличивается на 6%/7.5%/9%/10.5%/12%, эффект стакается до 2 раз и длится 10 секунд.","flavor":"Внимайте: ледяной клинок таит в себе стремительное течение, сплетающееся в водоворот мыслей. Обратите эту грозную силу против врагов."},"21020016":{"name":"Blazing Brilliance","weaponType":"Sword","rarity":5,"passiveName":"Crimson Phoenix","passiveDesc":"АТК увеличивается на 12%/15%/18%/21%/24%. При нанесении урона персонаж получает 1 заряд эффекта «Пылающее перо» (не чаще раза в 0.5с), а при использовании навыка резонанса — сразу 5 зарядов. Каждый заряд даёт 4%/5%/6%/7%/8% доп. урона навыка резонанса, максимум 14 зарядов. По достижении максимума все заряды снимаются через 12 секунд.","flavor":"Выковано из самой сути и перьев легендарной птицы — этот клинок пылает светом, что заливает мир своим сиянием. С каждой вспышкой огня он обращает всё на своём пути в пепел."}};
 const WEAPON_TYPE_RU = {"Sword":"Меч","Broadblade":"Клинок","Pistols":"Пистолеты","Gauntlets":"Перчатки","Rectifier":"Ректификатор"};
+const ECHO_FACTS = {"6000054":{"name":"Lava Larva","element":"Fusion","setName":"Molten Rift","twoPiece":"Урон Fusion +10%.","fivePiece":"Урон Fusion +30% на 15 секунд после применения навыка резонанса.","skillName":"Навык эхо","skillDesc":"Призывает Лавовую личинку, которая непрерывно атакует врагов — каждый удар наносит 38.40% урона Fusion. Личинка исчезает, если сменить персонажа или отойти слишком далеко.","cooldown":8}};
 </script>
 
 <script>
@@ -1211,6 +1245,28 @@ function openWeapon(id){
   window.scrollTo(0,0);
 }
 function closeWeapon(){
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+  document.getElementById(lastCharViewId).classList.add('active');
+}
+
+function openEcho(id){
+  const e = ECHO_FACTS[id];
+  if (!e) return;
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+  const el = e.element.toLowerCase();
+  document.getElementById('ec-name').textContent = e.name;
+  document.getElementById('ec-portrait-img').src = 'assets/echoes/' + id + '.webp';
+  document.getElementById('ec-el-dot').className = 'el-dot el-' + el;
+  document.getElementById('ec-element').textContent = e.element;
+  document.getElementById('ec-set').textContent = e.setName;
+  document.getElementById('ec-2pc').textContent = e.twoPiece;
+  document.getElementById('ec-5pc').textContent = e.fivePiece;
+  document.getElementById('ec-skill-name').textContent = e.skillName + ' (КД ' + e.cooldown + 'с)';
+  document.getElementById('ec-skill-desc').textContent = e.skillDesc;
+  document.getElementById('view-echo').classList.add('active');
+  window.scrollTo(0,0);
+}
+function closeEcho(){
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   document.getElementById(lastCharViewId).classList.add('active');
 }
