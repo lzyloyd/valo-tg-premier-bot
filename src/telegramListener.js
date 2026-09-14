@@ -130,20 +130,41 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
   try {
     await gotoTrackerProfile(page);
     for (const matchId of matchIds) {
+      const short = matchId.slice(0, 8);
       try {
         const raw = await fetchMatchDetail(page, matchId);
+        const queueId = raw.metadata.queueId?.toLowerCase() ?? null;
+
+        // The command trusts the caller's claim about what kind of match
+        // this is (it's how the sheet decides TRS vs. no-TRS layout) — check
+        // it against tracker.gg's own record instead, so a premier link
+        // pasted into "...праки:" (or vice versa) doesn't get logged askew.
+        if (mode === 'Premier' && queueId !== 'premier') {
+          lines.push(`❌ ${short}… — это не премьер-матч (queueId: ${queueId ?? 'кастомка'}), пропущен`);
+          continue;
+        }
+        if (mode === 'Праки' && queueId !== null) {
+          lines.push(`❌ ${short}… — это не кастомка (queueId: ${queueId}), пропущен`);
+          continue;
+        }
+
         const match = buildMatchView(raw, {}, {
           trackedRiotId: config.trackedRiotId,
           requireTracked: false,
           ourRosterRiotIds: config.teamRosterRiotIds,
         });
-        const { tabTitle, gameNumber, written, skipped } = await appendMatchToStatsSheet({
+        const { tabTitle, gameNumber, written, skipped, alreadyLogged } = await appendMatchToStatsSheet({
           mapName: match.mapName,
           mode,
           players: match.ourTeam,
+          matchId,
         });
+        if (alreadyLogged) {
+          lines.push(`↩️ ${short}… уже был записан в "${tabTitle}" (Game ${gameNumber}), пропущен`);
+          continue;
+        }
         const skippedNote = skipped.length ? `, не найдены в таблице: ${skipped.join(', ')}` : '';
-        lines.push(`✅ ${matchId.slice(0, 8)}… → "${tabTitle}", Game ${gameNumber} (${written.length} игроков${skippedNote})`);
+        lines.push(`✅ ${short}… → "${tabTitle}", Game ${gameNumber} (${written.length} игроков${skippedNote})`);
 
         // Every Premier map also feeds one running "overall" tab that isn't
         // derived from the per-map tabs — it needs its own write.
@@ -152,13 +173,18 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
             mapName: match.mapName,
             mode,
             players: match.ourTeam,
+            matchId,
             tabTitle: OVERALL_PREMIER_TAB,
           });
-          lines.push(`   ↳ "${OVERALL_PREMIER_TAB}", Game ${overall.gameNumber}`);
+          lines.push(
+            overall.alreadyLogged
+              ? `   ↳ уже был записан в "${OVERALL_PREMIER_TAB}" (Game ${overall.gameNumber})`
+              : `   ↳ "${OVERALL_PREMIER_TAB}", Game ${overall.gameNumber}`,
+          );
         }
       } catch (err) {
         console.error(`[listener] failed to log match ${matchId} to stats sheet:`, err);
-        lines.push(`❌ ${matchId.slice(0, 8)}… — ${err.message}`);
+        lines.push(`❌ ${short}… — ${err.message}`);
       }
     }
   } finally {

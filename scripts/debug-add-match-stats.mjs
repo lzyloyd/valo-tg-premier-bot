@@ -24,7 +24,7 @@ try {
     ourRosterRiotIds: config.teamRosterRiotIds,
   });
   console.log('mapName:', match.mapName, '| ourTeam:', match.ourTeam.map((p) => p.riotId));
-  const result = await appendMatchToStatsSheet({ mapName: match.mapName, mode, players: match.ourTeam });
+  const result = await appendMatchToStatsSheet({ mapName: match.mapName, mode, players: match.ourTeam, matchId });
   console.log(result);
 } finally {
   await page.close();

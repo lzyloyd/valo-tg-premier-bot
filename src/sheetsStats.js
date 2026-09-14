@@ -3,6 +3,7 @@ import { LABEL_TO_RIOT_ID } from './statsRoster.js';
 import {
   getSpreadsheetMeta,
   getValues,
+  getCellNotes,
   batchUpdateValues,
   clearValues,
   batchUpdate,
@@ -81,15 +82,18 @@ const WHITE = { red: 1, green: 1, blue: 1 };
  * point), making it unreadable. Every write reapplies both explicitly
  * rather than trusting whatever the tab already has.
  */
-async function formatGameColumn(spreadsheetId, sheetId, colIndex) {
+async function formatGameColumn(spreadsheetId, sheetId, colIndex, matchId) {
   const col0 = colIndex - 1;
   const lastRow0 = ANCHOR_FIRST_ROW - 1 + BLOCK_SIZE * ROSTER_SIZE;
   await batchUpdate(spreadsheetId, [
     {
       repeatCell: {
         range: { sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: col0, endColumnIndex: col0 + 1 },
-        cell: { userEnteredFormat: { backgroundColor: HEADER_BG, textFormat: { foregroundColor: WHITE, bold: true } } },
-        fields: 'userEnteredFormat(backgroundColor,textFormat)',
+        cell: {
+          userEnteredFormat: { backgroundColor: HEADER_BG, textFormat: { foregroundColor: WHITE, bold: true } },
+          note: matchId ?? undefined,
+        },
+        fields: matchId ? 'userEnteredFormat(backgroundColor,textFormat),note' : 'userEnteredFormat(backgroundColor,textFormat)',
       },
     },
     {
@@ -217,12 +221,18 @@ async function getPlayerAnchorRows(spreadsheetId, tabTitle) {
   return map;
 }
 
-async function findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mode) {
+async function findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mode, matchId) {
   const row1 = (await getValues(spreadsheetId, `'${tabTitle}'!${FIRST_GAME_COLUMN}1:BZ1`))[0] ?? [];
+  const row1Notes = (await getCellNotes(spreadsheetId, `'${tabTitle}'!${FIRST_GAME_COLUMN}1:BZ1`))[0] ?? [];
+
   let lastGameNumber = 0;
   let firstEmptyOffset = -1;
   for (let i = 0; i < row1.length; i++) {
     const cell = row1[i];
+    if (matchId && row1Notes[i] === matchId) {
+      const m = /Game (\d+)/.exec(cell ?? '');
+      return { alreadyLogged: true, gameNumber: m ? Number(m[1]) : null };
+    }
     if (!cell) {
       if (firstEmptyOffset === -1) firstEmptyOffset = i;
       continue;
@@ -265,9 +275,12 @@ async function findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mod
  * columns rather than per-map ones). `players` is buildMatchView's
  * ourTeam/theirTeam player list — only entries recognized as one of our own
  * roster (via statsRoster.js) actually get written; everyone else is
- * silently skipped.
+ * silently skipped. `matchId` is stashed as a note on the "Game N" header
+ * cell — re-logging the same match (e.g. the same link pasted twice, or
+ * across a manual re-run) is detected via that note and skipped rather than
+ * added as a duplicate column.
  */
-export async function appendMatchToStatsSheet({ mapName, mode, players, tabTitle = `${mapName} - ${mode}` }) {
+export async function appendMatchToStatsSheet({ mapName, mode, players, matchId, tabTitle = `${mapName} - ${mode}` }) {
   const spreadsheetId = config.statsSpreadsheetId;
   if (!spreadsheetId) throw new Error('STATS_SPREADSHEET_ID is not configured');
   const statRows = statRowsForMode(mode);
@@ -277,12 +290,11 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, tabTitle
   if (anchorRows.size === 0) throw new Error(`Tab "${tabTitle}" has no recognizable player rows`);
   const firstAnchorRow = Math.min(...anchorRows.values());
 
-  const { colIndex, gameNumber, needsInsert, insertBeforeIndex, finalEndColIndex } = await findTargetGameColumn(
-    spreadsheetId,
-    tabTitle,
-    firstAnchorRow,
-    mode,
-  );
+  const targetColumn = await findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mode, matchId);
+  if (targetColumn.alreadyLogged) {
+    return { tabTitle, gameNumber: targetColumn.gameNumber, written: [], skipped: [], alreadyLogged: true };
+  }
+  const { colIndex, gameNumber, needsInsert, insertBeforeIndex, finalEndColIndex } = targetColumn;
   if (needsInsert) {
     await batchUpdate(spreadsheetId, [
       {
@@ -331,6 +343,6 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, tabTitle
   }
 
   await batchUpdateValues(spreadsheetId, data);
-  await formatGameColumn(spreadsheetId, sheet.sheetId, colIndex);
+  await formatGameColumn(spreadsheetId, sheet.sheetId, colIndex, matchId);
   return { tabTitle, gameNumber, written, skipped };
 }

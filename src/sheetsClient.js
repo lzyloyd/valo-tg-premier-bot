@@ -63,6 +63,15 @@ export async function clearValues(spreadsheetId, range) {
   return authedFetch(`${BASE}/${spreadsheetId}/values/${encodeURIComponent(range)}:clear`, { method: 'POST' });
 }
 
+/** Cell notes for an A1 range (row-major, same shape as getValues) — used to stash a match id on its "Game N" header cell so re-logging the same match can be detected. */
+export async function getCellNotes(spreadsheetId, range) {
+  const json = await authedFetch(
+    `${BASE}/${spreadsheetId}?ranges=${encodeURIComponent(range)}&fields=sheets.data.rowData.values.note`,
+  );
+  const rowData = json.sheets?.[0]?.data?.[0]?.rowData ?? [];
+  return rowData.map((row) => (row.values ?? []).map((v) => v.note ?? null));
+}
+
 export async function batchUpdate(spreadsheetId, requests) {
   return authedFetch(`${BASE}/${spreadsheetId}:batchUpdate`, {
     method: 'POST',
