@@ -359,7 +359,7 @@ async function findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mod
  * re-run) is detected via that note and skipped rather than added as a
  * duplicate column.
  */
-export async function appendMatchToStatsSheet({ mapName, mode, players, matchId, tabTitle = `${mapName} - ${mode}` }) {
+export async function appendMatchToStatsSheet({ mapName, mode, players, matchId, matchDate, tabTitle = `${mapName} - ${mode}` }) {
   const spreadsheetId = config.statsSpreadsheetId;
   if (!spreadsheetId) throw new Error('STATS_SPREADSHEET_ID is not configured');
   const layout = LAYOUT[mode];
@@ -435,6 +435,15 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
   await batchUpdateValues(spreadsheetId, data);
   await formatGameColumn(spreadsheetId, sheet.sheetId, colIndex, matchId);
   if (percentRows.length) await batchUpdate(spreadsheetId, percentFormatRequests(sheet.sheetId, percentRows));
+
+  // Only per-map tabs get reordered by date — the overall summary tab stays
+  // pinned first regardless, so this call (tabTitle === OVERALL_PREMIER_TAB)
+  // skips it.
+  if (tabTitle !== OVERALL_PREMIER_TAB) {
+    await updateTabLastMatchDate(spreadsheetId, sheet.sheetId, tabTitle, matchDate);
+    await reorderStatsTabsByDate(spreadsheetId);
+  }
+
   return { tabTitle, gameNumber, written, skipped, sheetId: sheet.sheetId };
 }
 
@@ -442,6 +451,44 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
 export async function getTabSheetId(spreadsheetId, tabTitle) {
   const sheets = await getSpreadsheetMeta(spreadsheetId);
   return sheets.find((s) => s.title === tabTitle)?.sheetId ?? null;
+}
+
+// Stashes a tab's latest known match date (ISO string) as a note on an
+// otherwise-unused cell — lets tabs be reordered by real match chronology
+// across BOTH modes together. "Append new tabs at the end" alone only
+// grouped tabs by whichever mode happened to get its first match logged
+// first, not by actual date.
+const TAB_DATE_CELL = 'A1';
+
+async function updateTabLastMatchDate(spreadsheetId, sheetId, tabTitle, matchDateIso) {
+  if (!matchDateIso) return;
+  const existing = (await getCellNotes(spreadsheetId, `'${tabTitle}'!${TAB_DATE_CELL}`))[0]?.[0];
+  if (existing && existing >= matchDateIso) return; // this tab's stored date is already at least as new
+  await batchUpdate(spreadsheetId, [
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 1 },
+        cell: { note: matchDateIso },
+        fields: 'note',
+      },
+    },
+  ]);
+}
+
+/** Re-sorts every "<Map> - <Mode>" tab by its stored last-match-date note, keeping the overall summary tab pinned first. */
+export async function reorderStatsTabsByDate(spreadsheetId) {
+  const sheets = await getSpreadsheetMeta(spreadsheetId);
+  const mapTabs = sheets.filter((s) => s.title !== OVERALL_PREMIER_TAB);
+  const dated = [];
+  for (const s of mapTabs) {
+    const note = (await getCellNotes(spreadsheetId, `'${s.title}'!${TAB_DATE_CELL}`))[0]?.[0];
+    dated.push({ sheetId: s.sheetId, lastMatchDate: note ?? '' });
+  }
+  dated.sort((a, b) => (a.lastMatchDate < b.lastMatchDate ? -1 : a.lastMatchDate > b.lastMatchDate ? 1 : 0));
+  const requests = dated.map(({ sheetId }, i) => ({
+    updateSheetProperties: { properties: { sheetId, index: i + 1 }, fields: 'index' },
+  }));
+  if (requests.length) await batchUpdate(spreadsheetId, requests);
 }
 
 /**

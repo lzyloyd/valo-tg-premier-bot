@@ -166,6 +166,7 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
           mode,
           players: match.ourTeam,
           matchId,
+          matchDate: match.dateStarted,
         });
         if (alreadyLogged) {
           lines.push(`↩️ ${short}… уже был записан в "${tabTitle}" (Game ${gameNumber}), пропущен`);
