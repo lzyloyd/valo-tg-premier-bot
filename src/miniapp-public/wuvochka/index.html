@@ -1682,11 +1682,13 @@ function renderEchoSetsGrid(){
     const el = e.element.toLowerCase();
     const nameAttr = e.name.replace(/'/g, "\\'");
     // The set's own badge is a small overlay near the name — the big card
-    // photo is a real echo that carries this set (any one will do; unlike
-    // the Artifact prototype we're not sharing one image across a whole set
-    // anymore, so just reuse the first carrier found).
-    const carrier = ECHO_ITEMS.find((it) => it.icon && it.sets.includes(e.name));
-    const bgHtml = carrier ? '<img class="portrait-img" src="' + carrier.icon + '" alt="">' : '';
+    // photo is a specific cost-4 echo that carries this set, precomputed
+    // (build-wuvochka-echo-data.mjs) so every set's photo is both a real
+    // cost-4 example and distinct from every other set's, falling back to a
+    // lower-cost carrier only for the handful of sets whose sole cost-4
+    // option collides with another set's. The 4 newest sets have no
+    // carrying echo in prydwen's data at all yet, so no photo either.
+    const bgHtml = e.bg ? '<img class="portrait-img" src="' + e.bg + '" alt="">' : '';
     return '<div class="portrait lg ' + el + '" data-el="' + el + '" onclick="openEcho(\'' + nameAttr + '\')">' + bgHtml + '<span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="set-badge-bottom"><img src="' + e.badge + '" alt=""></span><span class="p-name">' + e.name + '</span></div>';
   }).join('');
 }

@@ -29,6 +29,36 @@ function extractConst(source, name) {
   return new Function(`return (${match[1]});`)();
 }
 
+// Picks each set's card background: a real echo that carries it, preferring
+// cost 4 (the "flagship" tier) and never reusing the same echo for two
+// different sets — several sets' only cost-4 carrier is shared with another
+// set (e.g. Hecate alone carries 7 sets), so a plain per-set lookup would
+// show duplicates. Processes the most-constrained sets (fewest candidates)
+// first — the standard greedy heuristic for this kind of bipartite matching
+// — falling back to a lower-cost carrier only when every cost-4 option for
+// a set has already been claimed by a more-constrained set.
+function assignSetBackgrounds(sets, items) {
+  const candidatesFor = new Map(
+    sets.map((s) => [
+      s.name,
+      items
+        .filter((it) => it.icon && it.sets.includes(s.name))
+        .sort((a, b) => (b.cost ?? -1) - (a.cost ?? -1)),
+    ]),
+  );
+  const order = [...candidatesFor.keys()].sort((a, b) => candidatesFor.get(a).length - candidatesFor.get(b).length);
+  const used = new Set();
+  const bg = new Map();
+  for (const setName of order) {
+    const pick = candidatesFor.get(setName).find((it) => !used.has(it.name));
+    if (pick) {
+      used.add(pick.name);
+      bg.set(setName, pick.icon);
+    }
+  }
+  return bg;
+}
+
 async function main() {
   const source = await fs.readFile(PROTOTYPE_PATH, 'utf8');
   const echoSets = extractConst(source, 'ECHOES'); // the 34 sonata sets
@@ -54,10 +84,12 @@ async function main() {
     };
   });
 
+  const setBackgrounds = assignSetBackgrounds(echoSets, items);
   const sets = echoSets.map((s) => ({
     name: s.name,
     element: s.element,
     badge: `/wuwa-assets/echo-sets/${s.icon}.webp`,
+    bg: setBackgrounds.get(s.name) || null,
     bonuses: echoFacts[s.name]?.bonuses || null,
   }));
 
@@ -66,6 +98,12 @@ async function main() {
   if (withIcon < items.length) {
     console.log('  (no match — will fall back to the item\'s first set\'s badge on the frontend):');
     for (const it of items) if (!it.icon) console.log(`    - ${it.name}`);
+  }
+  const setsWithoutBg = sets.filter((s) => !s.bg);
+  console.log(`[build-wuvochka-echo-data] ${sets.length - setsWithoutBg.length}/${sets.length} sets got a unique cost-preferring background`);
+  if (setsWithoutBg.length) {
+    console.log('  (no carrying echo in prydwen\'s data at all — no set page background either):');
+    for (const s of setsWithoutBg) console.log(`    - ${s.name}`);
   }
 
   await fs.mkdir(path.dirname(OUT_PATH), { recursive: true });
