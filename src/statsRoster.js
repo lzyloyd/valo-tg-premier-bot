@@ -1,24 +1,21 @@
-// The stats Google Sheet keys each player's row block by whatever Riot ID
-// they had when the sheet was set up — three of the seven have since
-// changed their tag/name in-game, so a fresh match's platformUserIdentifier
-// no longer matches the sheet's label text directly. This maps each
-// teammate's CURRENT Riot ID (lowercased) to their (possibly stale) sheet
-// label, so lookups by current Riot ID still find the right row.
-export const SHEET_PLAYER_LABELS = {
-  'space#mench': 'Space#flick',
-  'ahotnik#2410': 'toshir0000#6666',
-  'mench lamperouge#space': 'Mench#space',
-  'antiyou#9265': 'ANTiYou#9265',
-  'yozh#anf': 'YozH#anf',
-  'ジ lzyloyd#pivo': 'ジ lzyloyd#pivo',
-  'mania#uma': 'Mania#uma',
-};
+// The stats Google Sheet keys each player's row block by a Riot ID label —
+// but which one varies by tab: the Premier tabs were set up earlier and
+// still use three players' OLD Riot ID (before they changed their in-game
+// tag/name), while at least one Praки tab already got updated to the
+// CURRENT id. So each roster entry lists every label text that might appear
+// in column Q/the game columns for that person, and matching tries all of
+// them rather than assuming one fixed label per player.
+export const ROSTER = [
+  { riotId: 'Space#mench', sheetLabels: ['Space#flick', 'Space#mench'] },
+  { riotId: 'AHotNik#2410', sheetLabels: ['toshir0000#6666', 'AHotNik#2410'] },
+  { riotId: 'Mench Lamperouge#space', sheetLabels: ['Mench#space', 'Mench Lamperouge#space'] },
+  { riotId: 'ANTiYou#9265', sheetLabels: ['ANTiYou#9265'] },
+  { riotId: 'YozH#anf', sheetLabels: ['YozH#anf'] },
+  { riotId: 'ジ lzyloyd#pivo', sheetLabels: ['ジ lzyloyd#pivo'] },
+  { riotId: 'Mania#uma', sheetLabels: ['Mania#uma'] },
+];
 
-export function sheetLabelForRiotId(riotId) {
-  return SHEET_PLAYER_LABELS[riotId.toLowerCase()] ?? null;
-}
-
-// For matching a player-block anchor row even where the sheet's column Q
-// happens to be blank for that row (seen on at least one existing tab) —
-// falls back to any cell in the row whose text is one of these labels.
-export const KNOWN_SHEET_LABELS_LOWER = new Set(Object.values(SHEET_PLAYER_LABELS).map((s) => s.toLowerCase()));
+// Any label text (lowercased) -> the roster's canonical (current) Riot ID (lowercased).
+export const LABEL_TO_RIOT_ID = new Map(
+  ROSTER.flatMap((r) => [r.riotId, ...r.sheetLabels].map((label) => [label.toLowerCase(), r.riotId.toLowerCase()])),
+);

@@ -1,5 +1,5 @@
 import { config } from './config.js';
-import { sheetLabelForRiotId, KNOWN_SHEET_LABELS_LOWER } from './statsRoster.js';
+import { LABEL_TO_RIOT_ID } from './statsRoster.js';
 import {
   getSpreadsheetMeta,
   getValues,
@@ -105,10 +105,11 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
 /**
  * Player-block anchor rows are always ANCHOR_FIRST_ROW, +BLOCK_SIZE, +2*BLOCK_SIZE...
  * (fixed by the template, not derived from where text happens to be) — that
- * sidesteps an inconsistency seen on a real tab where column Q was blank for
- * one player's row while every other player's label was present there. The
- * label is read from column Q first, falling back to any known-label text
- * elsewhere in that row (game columns sometimes carry the same label too).
+ * sidesteps an inconsistency seen across real tabs where column Q is blank
+ * on some rows, and different tabs label the same player under different
+ * (old vs. current) Riot IDs. Every cell in the row is checked against every
+ * known label for every player (LABEL_TO_RIOT_ID), and the match is recorded
+ * under that player's canonical current Riot ID either way.
  */
 async function getPlayerAnchorRows(spreadsheetId, tabTitle) {
   const anchorRowNumbers = Array.from({ length: ROSTER_SIZE }, (_, i) => ANCHOR_FIRST_ROW + i * BLOCK_SIZE);
@@ -118,8 +119,14 @@ async function getPlayerAnchorRows(spreadsheetId, tabTitle) {
   const map = new Map();
   for (const rowNumber of anchorRowNumbers) {
     const rowValues = values[rowNumber - ANCHOR_FIRST_ROW] ?? [];
-    const label = rowValues.find((cell) => typeof cell === 'string' && KNOWN_SHEET_LABELS_LOWER.has(cell.toLowerCase()));
-    if (label) map.set(label.toLowerCase(), rowNumber);
+    for (const cell of rowValues) {
+      if (typeof cell !== 'string') continue;
+      const riotId = LABEL_TO_RIOT_ID.get(cell.toLowerCase());
+      if (riotId) {
+        map.set(riotId, rowNumber);
+        break;
+      }
+    }
   }
   return map;
 }
@@ -199,8 +206,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players }) {
 
   const firstStatOffset = statRows[0] === null ? 1 : 0;
   for (const p of players) {
-    const label = sheetLabelForRiotId(p.riotId);
-    const anchorRow = label ? anchorRows.get(label.toLowerCase()) : null;
+    const anchorRow = anchorRows.get(p.riotId.toLowerCase());
     if (!anchorRow) {
       skipped.push(p.riotId);
       continue;
