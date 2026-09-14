@@ -20,10 +20,11 @@
 
   --good:#3ddba8; --bad:#ff5a6e;
 
-  /* scales continuously with viewport width instead of jumping between
-     fixed breakpoints - 70vw grows smoothly, clamped to a phone-width
-     floor and a comfortable desktop ceiling */
-  --app-max-width:clamp(480px, 70vw, 1080px);
+  /* fills the full available width on any normal window (block elements
+     are 100% wide by default) and only caps on very wide screens - no
+     percentage-of-viewport shrink factor, so there's no side gutter
+     until the cap actually kicks in */
+  --app-max-width:1080px;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:'PT Sans',sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:hidden;}
@@ -39,7 +40,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .app-title{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer;}
 .app-title .mark{width:44px;height:44px;border-radius:12px;flex-shrink:0;object-fit:cover;}
 .app-title h1{margin:0;font-size:21px;font-weight:800;letter-spacing:.01em;}
-.app-sub{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin:5px 0 0 56px;}
+.app-version{font-size:11px;font-weight:700;color:var(--text-muted);font-family:'JetBrains Mono',monospace;vertical-align:middle;margin-left:2px;}
 
 .account-btn{background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;}
 .account-btn:hover .account-avatar{border-color:var(--accent);}
@@ -164,7 +165,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .team-column-picks{display:flex;flex-direction:column;align-items:center;gap:10px;}
 .team-column-picks.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;justify-items:center;}
 .team-column-pick{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;max-width:100%;}
-.team-column-pick img{width:46px;height:46px;border-radius:10px;object-fit:cover;}
+.team-column-pick img{width:clamp(46px, calc(36px + 2.5vw), 68px);height:clamp(46px, calc(36px + 2.5vw), 68px);border-radius:10px;object-fit:cover;}
 .team-column-pick span{font-size:9.5px;color:var(--text-muted);text-align:center;line-height:1.2;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .teams-legend{font-size:11px;color:var(--text-muted);line-height:1.5;padding:2px 2px 16px;}
 .teams-legend b{color:var(--accent);font-weight:700;}
@@ -316,7 +317,9 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .rating-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
 .rating-row:last-child{margin-bottom:0;}
 .rating-label{font-size:12px;color:var(--text-muted);}
-.stars{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:var(--accent);letter-spacing:1px;}
+.stars{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;letter-spacing:1px;}
+.star-on{color:var(--tier-0);}
+.star-off{color:var(--text-muted);}
 
 .proscons{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .proscons .col h4{margin:0 0 7px;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;}
@@ -372,12 +375,11 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка</h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v1.94</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.93</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -835,9 +837,9 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <div class="subview active" id="sub-review">
         <div class="card">
           <h3>Оценки</h3>
-          <div class="rating-row"><span class="rating-label">Tower of Adversity</span><span class="stars">★★★★☆</span></div>
-          <div class="rating-row"><span class="rating-label">Whimpering Wastes</span><span class="stars">★★★★★</span></div>
-          <div class="rating-row"><span class="rating-label">F2P-дружелюбность</span><span class="stars">★★★☆☆</span></div>
+          <div class="rating-row"><span class="rating-label">Tower of Adversity</span><span class="stars"><span class="star-on">★★★★</span><span class="star-off">☆</span></span></div>
+          <div class="rating-row"><span class="rating-label">Whimpering Wastes</span><span class="stars"><span class="star-on">★★★★★</span></span></div>
+          <div class="rating-row"><span class="rating-label">F2P-дружелюбность</span><span class="stars"><span class="star-on">★★★</span><span class="star-off">☆☆</span></span></div>
         </div>
         <div class="card">
           <h3>Плюсы и минусы</h3>
