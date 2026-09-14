@@ -17,7 +17,7 @@ const HEATMAP_RANGE = 'B1:P20';
 // Calibrated against the B1:P20 heatmap area at this exact viewport size:
 // trims Sheets' row-number/column-letter gutters and stops right at column
 // P / row 20, with no sliver of column Q bleeding in on the right.
-const CROP = { x: 34, y: 20, width: 1566, height: 645 };
+const CROP = { x: 34, y: 20, width: 1566, height: 668 };
 
 async function screenshotSheetRange(browser, spreadsheetId, gid, range) {
   const page = await browser.newPage();

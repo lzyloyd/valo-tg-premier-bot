@@ -25,7 +25,7 @@ try {
   await new Promise((r) => setTimeout(r, 1500));
   await page.mouse.click(105, 780);
   await new Promise((r) => setTimeout(r, 200));
-  const png = await page.screenshot({ type: 'png', clip: { x: 34, y: 20, width: 1566, height: 645 } });
+  const png = await page.screenshot({ type: 'png', clip: { x: 34, y: 20, width: 1566, height: 668 } });
   fs.writeFileSync('/tmp/sheet-screenshot.png', png);
   console.log('saved to /tmp/sheet-screenshot.png');
 } finally {
