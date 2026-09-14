@@ -199,6 +199,24 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
     ]);
   }
 
+  // The clone also still has whatever dark "Game N" cell formatting the
+  // master had accumulated for its own (much longer) game history —
+  // clearValues below only wipes the values, not the formatting, so those
+  // extra columns would otherwise sit there as blank dark rectangles. Reset
+  // the whole game-column region back to default formatting first; only the
+  // columns actually written from here on (via formatGameColumn) get styled.
+  const gameAreaStartCol0 = colToIndex(layout.firstGameColumn) - 1;
+  const gameAreaLastRow0 = ANCHOR_FIRST_ROW - 1 + BLOCK_SIZE * ROSTER_SIZE;
+  await batchUpdate(spreadsheetId, [
+    {
+      repeatCell: {
+        range: { sheetId: newSheetId, startRowIndex: 0, endRowIndex: gameAreaLastRow0, startColumnIndex: gameAreaStartCol0, endColumnIndex: colToIndex('BZ') },
+        cell: { userEnteredFormat: {} },
+        fields: 'userEnteredFormat',
+      },
+    },
+  ]);
+
   // The clone still has the master's old per-game data — wipe every game
   // column's header + all 7 players' raw rows (column Q/P player labels are
   // identical for every tab, so those stay).
