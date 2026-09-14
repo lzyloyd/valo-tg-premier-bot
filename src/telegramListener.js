@@ -5,7 +5,8 @@ import { getBrowser } from './browser.js';
 import { fetchMatchDetail, fetchTeamStandings, gotoTrackerProfile } from './trackerClient.js';
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
-import { sendPhotoTo, sendTextTo, matchCaption } from './telegram.js';
+import { sendPhotoTo, sendTextTo, sendAnimationTo, matchCaption } from './telegram.js';
+import { fetchRandomGifUrl } from './giphy.js';
 import { appendMatchToStatsSheet, getTabSheetId, OVERALL_PREMIER_TAB } from './sheetsStats.js';
 import { announceMapWeekComplete, sendSeasonStats } from './sheetsAnnounce.js';
 
@@ -33,6 +34,7 @@ const SEASON_STATS_RE = /^отправь\s+статистику\s+за\s+сез�
 // announcement, for a week that only had 1 premier match (never reaches the
 // auto-trigger's 2nd game).
 const MAP_SUMMARY_RE = /^отправь\s+сводку\s+по\s+карте\s+(\S+)/i;
+const LEGEND_RE = /^легенда$/i;
 
 function extractAllMatchIds(text) {
   return [...text.matchAll(MATCH_URL_RE_G)].map((m) => m[1]);
@@ -240,6 +242,16 @@ async function sendMapSummaryCommand(mapName, message) {
   await sendTextTo(message.chat.id, message.message_thread_id, `Отправлено в "Статистика": "${tabTitle}".`);
 }
 
+// "Резалтик, легенда" — a random "sigma" gif, just for fun.
+async function legendReply(message) {
+  const url = await fetchRandomGifUrl('sigma');
+  if (!url) {
+    await sendTextTo(message.chat.id, message.message_thread_id, 'Гифка не нашлась, попробуй ещё раз.');
+    return;
+  }
+  await sendAnimationTo(message.chat.id, message.message_thread_id, url);
+}
+
 function healthcheckReply() {
   const uptimeMin = Math.floor(process.uptime() / 60);
   return `✅ На связи, вижу сообщения. Аптайм процесса: ${uptimeMin} мин.`;
@@ -251,6 +263,10 @@ async function handleCommand(commandText, message) {
   try {
     if (HEALTHCHECK_RE.test(trimmed)) {
       await sendTextTo(message.chat.id, message.message_thread_id, healthcheckReply());
+      return;
+    }
+    if (LEGEND_RE.test(trimmed)) {
+      await legendReply(message);
       return;
     }
     if (SCHEDULE_RE.test(trimmed)) {

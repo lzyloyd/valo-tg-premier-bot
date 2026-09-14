@@ -42,6 +42,16 @@ export async function sendPhotoTo(chatId, threadId, captionText, pngBuffer) {
   await callApi('sendPhoto', form);
 }
 
+// Passing a URL (not a file upload) lets Telegram fetch it server-side —
+// no need to download the gif ourselves just to re-upload it.
+export async function sendAnimationTo(chatId, threadId, animationUrl) {
+  const form = new FormData();
+  form.append('chat_id', chatId);
+  if (threadId) form.append('message_thread_id', threadId);
+  form.append('animation', animationUrl);
+  await callApi('sendAnimation', form);
+}
+
 export async function sendTextTo(chatId, threadId, text) {
   const form = new FormData();
   form.append('chat_id', chatId);
