@@ -17,3 +17,8 @@ export const SHEET_PLAYER_LABELS = {
 export function sheetLabelForRiotId(riotId) {
   return SHEET_PLAYER_LABELS[riotId.toLowerCase()] ?? null;
 }
+
+// For matching a player-block anchor row even where the sheet's column Q
+// happens to be blank for that row (seen on at least one existing tab) —
+// falls back to any cell in the row whose text is one of these labels.
+export const KNOWN_SHEET_LABELS_LOWER = new Set(Object.values(SHEET_PLAYER_LABELS).map((s) => s.toLowerCase()));
