@@ -23,14 +23,29 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 #app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);}
 
 /* header + nav */
-.app-header{padding:18px 16px 0;background:var(--surface);}
-.app-title{display:flex;align-items:center;gap:9px;}
-.app-title .mark{width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;}
-.app-title h1{margin:0;font-size:18px;font-weight:800;letter-spacing:.01em;}
-.app-sub{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin:3px 0 0 37px;}
-.tabs{display:flex;gap:2px;padding:14px 12px 0;background:var(--surface);position:sticky;top:0;z-index:5;border-bottom:1px solid var(--border);}
-.tab{flex:1;border:none;background:none;color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:13px;padding:10px 4px 12px;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.02em;}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.app-header{padding:20px 16px 14px;background:var(--surface);position:sticky;top:0;z-index:6;border-bottom:1px solid var(--border);}
+.app-header-top{display:flex;align-items:center;gap:12px;}
+.menu-btn{background:none;border:none;color:var(--text);cursor:pointer;padding:6px;margin-left:-6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.menu-btn svg{width:24px;height:24px;}
+.app-title{display:flex;align-items:center;gap:12px;flex:1;min-width:0;}
+.app-title .mark{width:44px;height:44px;border-radius:12px;flex-shrink:0;object-fit:cover;}
+.app-title h1{margin:0;font-size:21px;font-weight:800;letter-spacing:.01em;}
+.app-sub{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin:5px 0 0 56px;}
+
+.account-btn{background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;}
+.account-avatar{width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--surface-2);font-size:17px;}
+.account-avatar img{width:100%;height:100%;object-fit:cover;}
+
+/* sidebar nav */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(4,6,10,.55);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:20;}
+.sidebar-overlay.open{opacity:1;pointer-events:auto;}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:230px;max-width:78vw;background:var(--surface);border-right:1px solid var(--border);z-index:21;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:18px 0;overflow-y:auto;}
+.sidebar.open{transform:translateX(0);}
+.sidebar-header{display:flex;align-items:center;gap:10px;padding:0 20px 18px;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.sidebar-header img{width:32px;height:32px;border-radius:9px;object-fit:cover;}
+.sidebar-header span{font-family:'Exo 2',sans-serif;font-weight:800;font-size:15px;}
+.sidebar .tab{flex:none;width:100%;text-align:left;padding:13px 20px;border-bottom:none;border-left:3px solid transparent;border-radius:0;font-size:14px;letter-spacing:.02em;font-family:'Exo 2',sans-serif;font-weight:700;color:var(--text-muted);background:none;cursor:pointer;}
+.sidebar .tab.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft);border-bottom-color:transparent;}
 
 .screen{padding:16px 16px 12px;flex:1;}
 .view{display:none;}
@@ -83,13 +98,13 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-items{display:flex;flex-wrap:wrap;gap:8px;flex:1;align-content:flex-start;}
 
 /* team tier list */
-.team-card{display:flex;align-items:center;gap:12px;padding:11px;background:var(--surface-2);border-radius:12px;flex:1;}
+.team-card{display:flex;align-items:center;gap:14px;padding:15px;background:var(--surface-2);border-radius:14px;flex:1;min-width:0;}
 .mini-stack{display:flex;}
-.mini{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-weight:800;font-size:10.5px;margin-left:-9px;border:2px solid var(--surface-2);color:#fff;}
+.mini{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12px;margin-left:-12px;border:2px solid var(--surface-2);color:#fff;}
 .mini:first-child{margin-left:0;}
 .team-meta{flex:1;min-width:0;}
-.team-meta .name{font-family:'Exo 2',sans-serif;font-weight:700;font-size:13px;}
-.team-meta .desc{font-size:10.5px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.team-meta .name{font-family:'Exo 2',sans-serif;font-weight:700;font-size:15px;}
+.team-meta .desc{font-size:11.5px;color:var(--text-muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 /* character grid */
 .char-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
@@ -108,6 +123,9 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .profile-empty{font-size:12.5px;color:var(--text-muted);padding:6px 0 16px;}
 .profile-section h3{margin:0 0 11px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;}
 .profile-section{margin-bottom:22px;}
+.avatar-picker-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.avatar-picker-preview{width:56px;height:56px;border-radius:50%;overflow:hidden;border:2px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.avatar-picker-preview img{width:100%;height:100%;object-fit:cover;}
 
 /* link-out card for wuwamatrix.com — Claude Artifact's CSP blocks framing
    other sites (confirmed at publish time), so this links out instead of
@@ -185,10 +203,21 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 <div id="app">
 
   <div class="app-header">
-    <div class="app-title"><img class="mark" src="assets/app/icon.webp" alt=""><h1>Вувочка</h1></div>
-    <div class="app-sub">WUTHERING WAVES · v0.3</div>
+    <div class="app-header-top">
+      <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="app-title"><img class="mark" src="assets/app/icon.webp" alt=""><h1>Вувочка</h1></div>
+      <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
+        <span class="account-avatar" id="account-avatar">👤</span>
+      </button>
+    </div>
+    <div class="app-sub">WUTHERING WAVES · v0.4</div>
   </div>
-  <div class="tabs">
+
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header"><img src="assets/app/icon.webp" alt=""><span>Вувочка</span></div>
     <button class="tab active" data-view="tierlist">Тир-лист</button>
     <button class="tab" data-view="teams">Команды</button>
     <button class="tab" data-view="characters">Персонажи</button>
@@ -779,6 +808,14 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       </div>
       <div id="profile-content">
         <div class="profile-section">
+          <h3>Аватар в шапке</h3>
+          <div class="avatar-picker-row">
+            <div class="avatar-picker-preview" id="avatar-picker-preview">👤</div>
+            <div class="profile-empty" style="padding:0;">Нажмите на персонажа, чтобы сделать его своей аватаркой в шапке.</div>
+          </div>
+          <div class="tier-items" id="avatar-picker-grid"></div>
+        </div>
+        <div class="profile-section">
           <h3>Мои персонажи</h3>
           <div class="char-grid" id="profile-owned-grid"></div>
           <div class="profile-empty" id="profile-owned-empty">Пока никого не отметили — откройте персонажа и нажмите «Отметить как мой».</div>
@@ -1151,8 +1188,22 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
   document.getElementById('view-' + t.dataset.view).classList.add('active');
-  if (t.dataset.view === 'profile') renderProfile();
+  if (t.dataset.view === 'profile') { renderProfile(); renderAvatarPicker(); }
+  closeSidebar();
+  window.scrollTo(0,0);
 }));
+
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+function goToProfile(){
+  document.querySelector('.tab[data-view="profile"]').click();
+}
 document.querySelectorAll('.subtab').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.subtab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.subview').forEach(x => x.classList.remove('active'));
@@ -1280,6 +1331,7 @@ function closeEcho(){
 const PROFILE_STORAGE_KEY = 'wuvochka-profile-v1';
 let favorites = new Set();
 let owned = new Set();
+let avatarCharId = null;
 
 function loadProfile() {
   try {
@@ -1288,15 +1340,17 @@ function loadProfile() {
     const data = JSON.parse(raw);
     favorites = new Set(data.favorites || []);
     owned = new Set(data.owned || []);
+    avatarCharId = data.avatarCharId ?? null;
   } catch (e) {
     // private browsing / storage blocked — just start empty, no persistence this session
   }
 }
 loadProfile();
+updateAccountAvatar();
 
 function persistProfile() {
   try {
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify({ favorites: [...favorites], owned: [...owned] }));
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify({ favorites: [...favorites], owned: [...owned], avatarCharId }));
   } catch (e) {
     // best effort only
   }
@@ -1306,6 +1360,7 @@ function toggleFavorite() {
   if (currentCharId == null) return;
   if (favorites.has(currentCharId)) favorites.delete(currentCharId); else favorites.add(currentCharId);
   refreshFavToggleUI();
+  updateAccountAvatar();
   persistProfile();
 }
 function toggleOwned() {
@@ -1313,6 +1368,35 @@ function toggleOwned() {
   if (owned.has(currentCharId)) owned.delete(currentCharId); else owned.add(currentCharId);
   refreshFavToggleUI();
   persistProfile();
+}
+
+function setAvatar(id) {
+  avatarCharId = id;
+  updateAccountAvatar();
+  renderAvatarPicker();
+  persistProfile();
+}
+
+function updateAccountAvatar() {
+  const chosenId = avatarCharId ?? (favorites.size ? [...favorites][0] : null);
+  const el = document.getElementById('account-avatar');
+  if (chosenId == null) {
+    el.innerHTML = '👤';
+    return;
+  }
+  el.innerHTML = '<img src="assets/characters/' + chosenId + '.webp" alt="">';
+}
+
+function renderAvatarPicker() {
+  const chosenId = avatarCharId ?? (favorites.size ? [...favorites][0] : null);
+  const preview = document.getElementById('avatar-picker-preview');
+  preview.innerHTML = chosenId == null ? '👤' : '<img src="assets/characters/' + chosenId + '.webp" alt="">';
+  const grid = document.getElementById('avatar-picker-grid');
+  grid.innerHTML = CHARACTERS.map((c) => {
+    const el = c.element.toLowerCase();
+    const ring = c.id === chosenId ? ' style="border-color:var(--accent)"' : '';
+    return '<div class="portrait sm ' + el + '"' + ring + ' onclick="setAvatar(' + c.id + ')"><img class="portrait-img" src="assets/characters/' + c.id + '.webp" alt=""><span class="ring"></span><span class="el-dot el-' + el + ' p-el"></span><span class="p-name">' + c.name + '</span></div>';
+  }).join('');
 }
 
 function refreshFavToggleUI() {
