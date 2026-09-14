@@ -229,5 +229,138 @@
         }
       ]
     }
+  },
+  "1212": {
+    "rotationsNote": "Ниже — реальные ротации с prydwen.gg: стандартная и ускоренная версия для S2+, которые используются как база для расчётов урона.",
+    "rotations": [
+      {
+        "title": "Стандартная ротация",
+        "note": "Интро и ультимативный навык нужно применить в самом начале, чтобы получить бонус Fire of Life на все дальнейшие Тяжёлые атаки — именно они наносят основной урон Jingran.",
+        "steps": [
+          "Интро",
+          "Ультимативный навык: Burial of Thousand Souls",
+          "Тяжёлая: Stardome Meander",
+          "Базовая (Yin) 2",
+          "Базовая (Yin) 3",
+          "Базовая (Yin) 4",
+          "Тяжёлая: Soul Raid",
+          "Навык: Scorching Yang",
+          "Базовая: Afterlife's Guide",
+          "Тяжёлая: Stardome Meander",
+          "Навык: Encroaching Yin",
+          "Базовая: Netherworld Traverse",
+          "Тяжёлая: Soul Raid",
+          "Аутро"
+        ]
+      },
+      {
+        "title": "Ротация на S2+",
+        "note": "С S2 Jingran может сразу применить Stardome Meander в опенере свапом, а базовые атаки в стойке Yang быстрее атак в стойке Yin — за счёт этого вся ротация проходит немного быстрее.",
+        "steps": [
+          "Только в опенере: Тяжёлая: Stardome Meander (свап)",
+          "Интро",
+          "Ультимативный навык: Burial of Thousand Souls",
+          "Тяжёлая: Soul Raid",
+          "Базовая (Yang) 2",
+          "Базовая (Yang) 3",
+          "Базовая (Yang) 4",
+          "Тяжёлая: Stardome Meander",
+          "Навык: Encroaching Yin",
+          "Базовая: Netherworld Traverse",
+          "Тяжёлая: Soul Raid",
+          "Навык: Scorching Yang",
+          "Базовая: Afterlife's Guide",
+          "Тяжёлая: Stardome Meander",
+          "Аутро"
+        ]
+      }
+    ],
+    "synergies": [
+      {
+        "charIds": [1410, 1207],
+        "title": "Iuno / Lupa",
+        "text": "Два лучших архетипа команд Jingran — саппорт под тяжёлые атаки со щитами и Mono Fusion. Iuno закрывает первый, Lupa открывает второй — сильнейшие синергии Jingran на сегодня, хотя ставить их в одну команду не стоит: Lupa хочет команду полностью из персонажей Fusion."
+      },
+      {
+        "charIds": [1204, 1308],
+        "title": "Mortefi / Rebecca",
+        "text": "Лучший напарник Lupa в команде Jingran — Mortefi: баффер Fusion под тяжёлые атаки, включает Lupa и одновременно баффает Jingran. Может работать и без Lupa, но тогда Rebecca обычно даёт более сильный бафф тяжёлых атак — правда, она Electro и не открывает Mono Fusion, так что в моно-командах Fusion она всегда хуже Mortefi."
+      },
+      {
+        "charIds": [1505, 1209, 1503],
+        "title": "The Shorekeeper / Mornye / Verina",
+        "text": "Jingran хорошо берёт любой обычный саппорт — выделенного саппорта под HP-скейлеров или архетип щитов в игре нет. Shorekeeper обычно самый гибкий и почти всегда лучший выбор. Mornye — безопасная альтернатива, которая заодно включает Mono Fusion с Lupa. Verina — постоянно доступный саппорт, если Shorekeeper заменить нечем."
+      }
+    ],
+    "teams": [
+      {
+        "title": "Лучшая команда",
+        "slots": [
+          [1212],
+          [1410],
+          [1505, 1503]
+        ],
+        "text": "Хотя Shorekeeper — идеал, Iuno+Verina по силе должны превосходить любые альтернативы Mono Fusion/F2P с небольшим отрывом (не считая quickswap)."
+      },
+      {
+        "title": "Mono Fusion",
+        "slots": [
+          [1212],
+          [1204, 1209],
+          [1207]
+        ],
+        "text": "Держите Mortefi на Moonlit Clouds с главным эхо Stonewall Bracer во 2 слоте, либо Mornye на Halo of Starry Radiance с главным эхо Spacetrek Explorer в 3 слоте — в зависимости от команды, чтобы Lupa могла усилить Jingran аутро-баффом."
+      },
+      {
+        "title": "F2P команда",
+        "slots": [
+          [1212],
+          [1308, 1204],
+          [1505, 1503]
+        ],
+        "text": "В таких командах саппорт должен носить сет Halo of Starry Radiance с главным эхо Spacetrek Explorer."
+      }
+    ],
+    "calculations": {
+      "scenario": "1 цель, ротация 13.37с",
+      "note": "Числа ниже — DPS и суммарный урон именно Jingran (без урона тиммейтов) за идеальную ротацию с доступными интро и ультой с начала, и они СЧИТАЮТСЯ с баффами от команды из блока выше. Это метрика для сравнения сиквенсов и ротаций самого Jingran, не тир-лист и не повод его тянуть.",
+      "variants": [
+        {
+          "id": "default",
+          "name": "Основной расчёт",
+          "characterBuild": {
+            "weaponId": 21010076,
+            "echoSet": "Lamp of Nether Road",
+            "mainEcho": { "name": "Myriad Snare: Rustfire Chassis", "icon": "/wuwa-assets/echoes/6000217.webp" },
+            "costSlots": [
+              { "slot": "4-cost", "stat": "Крит. урон" },
+              { "slot": "3-cost", "stat": "HP%" },
+              { "slot": "3-cost", "stat": "Крит. урон" },
+              { "slot": "1-cost", "stat": "HP%" },
+              { "slot": "1-cost", "stat": "HP%" }
+            ],
+            "substats": "Восст. энергии (18.3%), Крит. шанс (40.4%), Крит. урон (80.7%), HP (17.2%), АТК (8.6%), Бонус урона тяжёлых атак (17.2%)"
+          },
+          "sequences": [
+            { "seq": "S0", "dmg": "2 171 250", "dps": "162 397", "pct": 100.0 },
+            { "seq": "S1", "dmg": "2 332 662", "dps": "174 469", "pct": 107.43 },
+            { "seq": "S2", "dmg": "2 919 050", "dps": "224 197", "pct": 138.05 },
+            { "seq": "S3", "dmg": "3 533 757", "dps": "271 409", "pct": 167.13 },
+            { "seq": "S4", "dmg": "3 725 972", "dps": "286 172", "pct": 176.22 },
+            { "seq": "S5", "dmg": "3 725 972", "dps": "286 172", "pct": 176.22 },
+            { "seq": "S6", "dmg": "5 977 682", "dps": "459 115", "pct": 282.71 }
+          ],
+          "damageSources": [
+            { "label": "Базовая атака", "value": 15667, "pct": 0.7 },
+            { "label": "Тяжёлая атака", "value": 1824337, "pct": 84.0 },
+            { "label": "Навык резонанса", "value": 78044, "pct": 3.6 },
+            { "label": "Liberation", "value": 0, "pct": 0 },
+            { "label": "Интро", "value": 27754, "pct": 1.3 },
+            { "label": "Аутро", "value": 181825, "pct": 8.4 },
+            { "label": "Эхо", "value": 43624, "pct": 2.0 }
+          ]
+        }
+      ]
+    }
   }
 }

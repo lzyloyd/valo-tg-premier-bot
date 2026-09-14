@@ -110,7 +110,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .portrait.r1{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--r1) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait .ring{position:absolute;inset:7px;border:1.5px solid rgba(255,255,255,.16);border-radius:10px;pointer-events:none;}
 .portrait .glyph{font-family:'Exo 2',sans-serif;font-weight:800;color:rgba(255,255,255,.92);text-shadow:0 3px 14px rgba(0,0,0,.4);}
-.portrait .p-el{position:absolute;top:2px;right:2px;padding:6px;background:radial-gradient(circle, rgba(0,0,0,.6) 0%, rgba(0,0,0,.32) 55%, transparent 80%);}
+.portrait .p-el{position:absolute;top:2px;right:2px;padding:6px;background:radial-gradient(circle closest-side, rgba(0,0,0,.85) 0%, rgba(0,0,0,.85) 60%, rgba(0,0,0,.4) 82%, transparent 100%);}
 .set-badge-bottom{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:34px;height:34px;border-radius:50%;overflow:hidden;border:1.5px solid rgba(255,255,255,.25);background:var(--surface-3);box-shadow:0 2px 8px rgba(0,0,0,.5);z-index:1;}
 .set-badge-bottom img{width:100%;height:100%;object-fit:contain;display:block;}
 .portrait .p-name{position:absolute;left:0;right:0;bottom:0;text-align:center;font-weight:700;color:#fff;
@@ -379,7 +379,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.1</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.2</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -468,13 +468,9 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div class="portrait lg electro" data-el="electro" onclick="openChar(1308)"><img class="portrait-img" src="/wuwa-assets/characters/1308.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Rebecca</span></div>
         <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1606)"><img class="portrait-img" src="/wuwa-assets/characters/1606.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Roccia</span></div>
         <div class="portrait lg aero" data-el="aero" onclick="openChar(1406)"><img class="portrait-img" src="/wuwa-assets/characters/1406.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Rover: Aero</span></div>
-        <div class="portrait lg aero" data-el="aero" onclick="openChar(1408)"><img class="portrait-img" src="/wuwa-assets/characters/1408.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Rover: Aero</span></div>
         <div class="portrait lg electro" data-el="electro" onclick="openChar(1309)"><img class="portrait-img" src="/wuwa-assets/characters/1309.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Rover: Electro</span></div>
-        <div class="portrait lg electro" data-el="electro" onclick="openChar(1310)"><img class="portrait-img" src="/wuwa-assets/characters/1310.webp" alt=""><span class="ring"></span><img class="el-dot el-electro p-el" src="/wuwa-assets/elements/electro.webp" alt=""><span class="p-name">Rover: Electro</span></div>
         <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1604)"><img class="portrait-img" src="/wuwa-assets/characters/1604.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Rover: Havoc</span></div>
-        <div class="portrait lg havoc" data-el="havoc" onclick="openChar(1605)"><img class="portrait-img" src="/wuwa-assets/characters/1605.webp" alt=""><span class="ring"></span><img class="el-dot el-havoc p-el" src="/wuwa-assets/elements/havoc.webp" alt=""><span class="p-name">Rover: Havoc</span></div>
         <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1501)"><img class="portrait-img" src="/wuwa-assets/characters/1501.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Rover: Spectro</span></div>
-        <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1502)"><img class="portrait-img" src="/wuwa-assets/characters/1502.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Rover: Spectro</span></div>
         <div class="portrait lg spectro" data-el="spectro" onclick="openChar(1505)"><img class="portrait-img" src="/wuwa-assets/characters/1505.webp" alt=""><span class="ring"></span><img class="el-dot el-spectro p-el" src="/wuwa-assets/elements/spectro.webp" alt=""><span class="p-name">Shorekeeper</span></div>
         <div class="portrait lg aero" data-el="aero" onclick="openChar(1412)"><img class="portrait-img" src="/wuwa-assets/characters/1412.webp" alt=""><span class="ring"></span><img class="el-dot el-aero p-el" src="/wuwa-assets/elements/aero.webp" alt=""><span class="p-name">Sigrika</span></div>
         <div class="portrait lg glacio" data-el="glacio" onclick="openChar(1110)"><img class="portrait-img" src="/wuwa-assets/characters/1110.webp" alt=""><span class="ring"></span><img class="el-dot el-glacio p-el" src="/wuwa-assets/elements/glacio.webp" alt=""><span class="p-name">Suisui</span></div>
@@ -768,7 +764,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       </div>
 
       <div class="subview-g active" id="subg-review">
-        <div class="card"><h3>Обзор</h3><div class="review-text">Оценки, плюсы и минусы появятся здесь, когда мы разберём гайды по этому персонажу.</div></div>
+        <div class="review-dynamic"></div>
       </div>
       <div class="subview-g" id="subg-kit">
         <div class="card">
@@ -897,15 +893,17 @@ let ECHOES = [];
 let ECHO_ITEMS = [];
 let BUILDS = {};
 let GAMEPLAY = {};
+let REVIEWS = {};
 let TEAMS = { tiers: [] };
 let TIERLIST = { modes: [], toa: { tiers: [] }, ww: { tiers: [] } };
 async function loadGameData(){
-  const [characters, weapons, echoData, builds, gameplay, teams, tierlist] = await Promise.all([
+  const [characters, weapons, echoData, builds, gameplay, reviews, teams, tierlist] = await Promise.all([
     fetch('/wuwa-assets/characters/index.json').then((r) => r.json()),
     fetch('/wuwa-assets/weapons/index.json').then((r) => r.json()),
     fetch('/wuvochka/echo-data.json').then((r) => r.json()),
     fetch('/wuvochka/builds.json').then((r) => r.json()),
     fetch('/wuvochka/gameplay.json').then((r) => r.json()),
+    fetch('/wuvochka/reviews.json').then((r) => r.json()),
     fetch('/wuvochka/teams.json').then((r) => r.json()),
     fetch('/wuvochka/tierlist.json').then((r) => r.json()),
   ]);
@@ -915,6 +913,7 @@ async function loadGameData(){
   ECHO_ITEMS = echoData.items;
   BUILDS = builds;
   GAMEPLAY = gameplay;
+  REVIEWS = reviews;
   TEAMS = teams;
   TIERLIST = tierlist;
 }
@@ -1002,6 +1001,7 @@ async function api(path, body) {
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+  viewHistory = [];
   t.classList.add('active');
   const view = document.getElementById('view-' + t.dataset.view);
   view.classList.add('active');
@@ -1085,7 +1085,7 @@ function openChar(id){
   const character = CHARACTERS.find(c => c.id === id);
   if (!character) return;
   currentCharId = id;
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  pushViewHistory();
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
 
   if (id === SHOWCASE_CHAR_ID) {
@@ -1109,6 +1109,7 @@ function openChar(id){
     document.getElementById('g-fact-weapon').textContent = WEAPON_TYPE_RU[character.weaponType] || character.weaponType;
     document.getElementById('g-fact-rarity').textContent = character.rarity + '★';
     document.getElementById('g-tier-tags').innerHTML = tierTagsHtml(character.id);
+    renderReviewTab(document.querySelector('#subg-review .review-dynamic'), character.id);
     const buildEl = document.querySelector('#subg-build .build-dynamic');
     buildEl.dataset.charId = character.id;
     renderBuildTab(buildEl, character.id);
@@ -1129,9 +1130,7 @@ function openChar(id){
   window.scrollTo(0,0);
 }
 function closeChar(){
-  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  document.querySelector('.tab[data-view="characters"]').classList.add('active');
-  document.getElementById('view-characters').classList.add('active');
+  popViewHistory('view-characters');
 }
 
 // A single lastCharViewId variable broke down once users could bounce between
@@ -1201,6 +1200,29 @@ function tierFromScore(score){
 function buildVariantId(data, charId){
   if (!data.variants || !data.variants.length) return 'default';
   return buildActiveVariant[charId] || data.variants[0].id;
+}
+function renderReviewTab(rootEl, charId){
+  const data = REVIEWS[charId];
+  if (!data) {
+    rootEl.innerHTML = '<div class="card"><h3>Обзор</h3><div class="review-text">Оценки, плюсы и минусы появятся здесь, когда мы разберём гайды по этому персонажу.</div></div>';
+    return;
+  }
+  let html = '';
+  if (data.ratings && data.ratings.length) {
+    html += '<div class="card"><h3>Оценки</h3>' + data.ratings.map((r) => {
+      return '<div class="rating-row"><span class="rating-label">' + r.label + '</span><span class="hero-tag tier">' + r.value + '</span></div>';
+    }).join('') + '</div>';
+  }
+  if ((data.pros && data.pros.length) || (data.cons && data.cons.length)) {
+    html += '<div class="card"><h3>Плюсы и минусы</h3><div class="proscons">'
+      + '<div class="col pros"><h4>Плюсы</h4><ul>' + (data.pros || []).map((p) => '<li>' + p + '</li>').join('') + '</ul></div>'
+      + '<div class="col cons"><h4>Минусы</h4><ul>' + (data.cons || []).map((c) => '<li>' + c + '</li>').join('') + '</ul></div>'
+      + '</div></div>';
+  }
+  if (data.text) {
+    html += '<div class="card"><h3>Наш обзор</h3><div class="review-text">' + data.text + '</div></div>';
+  }
+  rootEl.innerHTML = html || '<div class="card"><h3>Обзор</h3><div class="review-text">Оценки, плюсы и минусы появятся здесь, когда мы разберём гайды по этому персонажу.</div></div>';
 }
 function renderBuildTab(rootEl, charId){
   const data = BUILDS[charId];
