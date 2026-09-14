@@ -27,27 +27,35 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 /* header + nav */
 .app-header{padding:20px 16px 14px;background:var(--surface);position:sticky;top:0;z-index:6;border-bottom:1px solid var(--border);}
 .app-header-top{display:flex;align-items:center;gap:12px;}
-.menu-btn{background:none;border:none;color:var(--text);cursor:pointer;padding:6px;margin-left:-6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.menu-btn{background:none;border:none;color:var(--text);cursor:pointer;padding:6px;margin-left:-6px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background-color .15s ease;}
+.menu-btn:hover{background:var(--surface-2);}
 .menu-btn svg{width:24px;height:24px;}
-.app-title{display:flex;align-items:center;gap:12px;flex:1;min-width:0;}
+.app-title{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer;}
 .app-title .mark{width:44px;height:44px;border-radius:12px;flex-shrink:0;object-fit:cover;}
 .app-title h1{margin:0;font-size:21px;font-weight:800;letter-spacing:.01em;}
 .app-sub{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin:5px 0 0 56px;}
 
 .account-btn{background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;}
-.account-avatar{width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--surface-2);font-size:17px;}
+.account-btn:hover .account-avatar{border-color:var(--accent);}
+.account-avatar{width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--surface-2);font-size:17px;transition:border-color .15s ease;}
 .account-avatar img{width:100%;height:100%;object-fit:cover;}
 
 /* sidebar nav */
 .sidebar-overlay{position:fixed;inset:0;background:rgba(4,6,10,.55);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:20;}
 .sidebar-overlay.open{opacity:1;pointer-events:auto;}
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:230px;max-width:78vw;background:var(--surface);border-right:1px solid var(--border);z-index:21;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:18px 0;overflow-y:auto;}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:250px;max-width:78vw;background:var(--surface);border-right:1px solid var(--border);z-index:21;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:8px 0 16px;overflow-y:auto;}
 .sidebar.open{transform:translateX(0);}
-.sidebar-header{display:flex;align-items:center;gap:10px;padding:0 20px 18px;border-bottom:1px solid var(--border);margin-bottom:8px;}
-.sidebar-header img{width:32px;height:32px;border-radius:9px;object-fit:cover;}
-.sidebar-header span{font-family:'Exo 2',sans-serif;font-weight:800;font-size:15px;}
-.sidebar .tab{flex:none;width:100%;text-align:left;padding:13px 20px;border-bottom:none;border-left:3px solid transparent;border-radius:0;font-size:14px;letter-spacing:.02em;font-family:'Exo 2',sans-serif;font-weight:700;color:var(--text-muted);background:none;cursor:pointer;}
-.sidebar .tab.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft);border-bottom-color:transparent;}
+.sidebar-header{display:flex;align-items:center;gap:11px;padding:16px 20px 16px;margin-bottom:8px;cursor:pointer;}
+.sidebar-header img{width:36px;height:36px;border-radius:10px;object-fit:cover;}
+.sidebar-header span{font-family:'Exo 2',sans-serif;font-weight:800;font-size:16px;}
+.sidebar-header .close-x{margin-left:auto;color:var(--text-muted);width:18px;height:18px;flex-shrink:0;}
+.sidebar-group-label{padding:16px 20px 7px;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted);opacity:.65;}
+.sidebar-group-label:first-of-type{padding-top:4px;}
+.sidebar .tab{display:flex;align-items:center;gap:13px;flex:none;width:calc(100% - 16px);text-align:left;padding:11px 14px;margin:1px 8px;border-radius:10px;border:none;font-size:13.5px;letter-spacing:.01em;font-family:'Exo 2',sans-serif;font-weight:700;color:var(--text-muted);background:none;cursor:pointer;transition:background-color .15s ease,color .15s ease;}
+.sidebar .tab .nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;filter:grayscale(.4);opacity:.85;}
+.sidebar .tab:hover{background:var(--surface-2);color:var(--text);}
+.sidebar .tab.active{color:var(--accent);background:var(--accent-soft);}
+.sidebar .tab.active .nav-icon{filter:none;opacity:1;}
 
 .screen{padding:16px 16px 12px;flex:1;}
 .view{display:none;}
@@ -62,12 +70,16 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 
 /* filters — wrap, never scroll */
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
-.chip{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:11.5px;padding:7px 12px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.chip{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:11.5px;padding:7px 12px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background-color .15s ease,border-color .15s ease;}
+.chip:not(.active):hover{background:var(--surface-3);border-color:#2d3d59;}
 .chip.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
 
 /* portrait — the one recurring "character art" component */
 .portrait{position:relative;border-radius:14px;overflow:hidden;cursor:pointer;border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
+.portrait:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 10px 22px rgba(0,0,0,.35);border-color:#324566;z-index:2;}
+@media (prefers-reduced-motion:reduce){.portrait,.portrait-img{transition:none!important;}}
 .portrait.fusion{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-fusion) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.glacio{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-glacio) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
 .portrait.electro{background:radial-gradient(120% 100% at 28% 6%, color-mix(in srgb,var(--el-electro) 50%,var(--surface-2)) 0%, var(--surface-2) 62%);}
@@ -106,11 +118,22 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-badge.t4{background:var(--tier-4);color:var(--text);}
 .tier-items{display:flex;flex-wrap:wrap;gap:8px;flex:1;align-content:flex-start;}
 
+/* character tier-list gets its own roomier layout: badge as a pill header
+   above a proper grid, instead of a thin bar squeezed next to wrapped
+   small portraits (felt cramped) */
+#view-tierlist .tier-row{flex-direction:column;align-items:stretch;gap:0;padding:16px;margin-bottom:16px;}
+#view-tierlist .tier-badge{width:auto;align-self:flex-start;padding:6px 16px;border-radius:20px;margin-bottom:14px;}
+#view-tierlist .tier-items{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+#view-tierlist .tier-items .portrait.sm{width:100%;}
+@media (max-width:380px){#view-tierlist .tier-items{grid-template-columns:repeat(3,1fr);}}
+
 /* team tier list */
 .team-card{display:flex;align-items:center;gap:14px;padding:15px;background:var(--surface-2);border-radius:14px;flex:1;min-width:0;}
 .mini-stack{display:flex;}
-.mini{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12px;margin-left:-12px;border:2px solid var(--surface-2);color:#fff;}
-.mini:first-child{margin-left:0;}
+.mini{position:relative;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12px;margin-left:-12px;border:2px solid var(--surface-2);color:#fff;}
+.mini:first-child{margin-left:0;box-shadow:0 0 0 2px var(--accent);z-index:1;}
+.teams-legend{font-size:11px;color:var(--text-muted);line-height:1.5;padding:2px 2px 16px;}
+.teams-legend b{color:var(--accent);font-weight:700;}
 .team-meta{flex:1;min-width:0;}
 .team-meta .name{font-family:'Exo 2',sans-serif;font-weight:700;font-size:15px;}
 .team-meta .desc{font-size:11.5px;color:var(--text-muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -119,14 +142,16 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .char-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
 
 /* character detail */
-.back-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;color:var(--text-muted);font-size:12.5px;font-weight:700;font-family:'Exo 2',sans-serif;}
+.back-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;color:var(--text-muted);font-size:12.5px;font-weight:700;font-family:'Exo 2',sans-serif;transition:color .15s ease;width:fit-content;}
+.back-row:hover{color:var(--accent);}
 .back-row svg{width:14px;height:14px;}
 .char-hero{display:flex;gap:14px;align-items:center;padding:16px;background:linear-gradient(135deg,var(--surface-2),var(--surface));border-radius:16px;border:1px solid var(--border);margin-bottom:16px;}
 .char-hero h2{margin:0;font-size:19px;font-weight:800;}
 .hero-tags{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;}
 .fav-row{display:flex;gap:8px;margin-bottom:16px;}
 .fav-row[hidden]{display:none;}
-.fav-btn,.own-btn{flex:1;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12px;padding:10px 6px;border-radius:10px;cursor:pointer;}
+.fav-btn,.own-btn{flex:1;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12px;padding:10px 6px;border-radius:10px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease;}
+.fav-btn:not(.active):hover,.own-btn:not(.active):hover{background:var(--surface-3);border-color:#2d3d59;}
 .fav-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
 .own-btn.active{background:rgba(61,219,168,.14);border-color:var(--good);color:var(--good);}
 .profile-empty{font-size:12.5px;color:var(--text-muted);padding:6px 0 16px;}
@@ -135,6 +160,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .avatar-picker-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
 .avatar-picker-preview{width:56px;height:56px;border-radius:50%;overflow:hidden;border:2px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
 .avatar-picker-preview img{width:100%;height:100%;object-fit:cover;}
+.avatar-change-btn{padding:8px 16px;font-size:11.5px;border-radius:9px;}
+#avatar-picker-grid[hidden]{display:none;}
 
 /* link-out card for wuwamatrix.com — Claude Artifact's CSP blocks framing
    other sites (confirmed at publish time), so this links out instead of
@@ -143,21 +170,26 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .matrix-card{text-align:center;padding:32px 20px;}
 .matrix-card h3{text-transform:none;font-size:16px;color:var(--text);letter-spacing:0;margin-bottom:8px;}
 .matrix-card p{font-size:12.5px;color:var(--text-muted);line-height:1.6;margin:0 0 20px;}
-.matrix-link-btn{display:inline-block;background:var(--accent);color:#0a0e17;font-family:'Exo 2',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;border-radius:12px;text-decoration:none;}
+.matrix-link-btn{display:inline-block;background:var(--accent);color:#0a0e17;font-family:'Exo 2',sans-serif;font-weight:800;font-size:13px;padding:12px 22px;border-radius:12px;text-decoration:none;border:none;cursor:pointer;transition:filter .15s ease,transform .15s ease;}
+.matrix-link-btn:hover{filter:brightness(1.1);}
+.matrix-link-btn:active{transform:scale(.97);}
 .hero-tag{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:4px 8px;border-radius:6px;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;gap:4px;}
 .hero-tag.tier{background:var(--accent-soft);color:var(--accent);}
 
 .subtabs{display:flex;gap:2px;overflow-x:auto;margin-bottom:16px;border-bottom:1px solid var(--border);}
-.subtab,.subtab-g{flex-shrink:0;border:none;background:none;color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12px;padding:9px 11px 11px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.subtab,.subtab-g{flex-shrink:0;border:none;background:none;color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12px;padding:9px 11px 11px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s ease;}
+.subtab:not(.active):hover,.subtab-g:not(.active):hover{color:var(--text);}
 .subtab.active,.subtab-g.active{color:var(--accent);border-bottom-color:var(--accent);}
 .subview{display:none;} .subview.active{display:block;}
 .subview-g{display:none;} .subview-g.active{display:block;}
-.item-card.clickable{cursor:pointer;}
+.item-card.clickable{cursor:pointer;border-radius:10px;transition:background-color .15s ease;}
+.item-card.clickable:hover{background:var(--surface-2);}
 
 .card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px 15px;margin-bottom:11px;}
 .card h3{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;}
 .skill-kind-tabs{display:flex;gap:4px;margin-bottom:11px;}
-.skill-kind{flex:1;text-align:center;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-size:10.5px;font-weight:700;padding:7px 4px;border-radius:8px;cursor:pointer;font-family:'Exo 2',sans-serif;}
+.skill-kind{flex:1;text-align:center;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-size:10.5px;font-weight:700;padding:7px 4px;border-radius:8px;cursor:pointer;font-family:'Exo 2',sans-serif;transition:background-color .15s ease;}
+.skill-kind:not(.active):hover{background:var(--surface-3);}
 .skill-kind.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
 .skill-item{padding:10px 0;border-top:1px solid var(--border);}
 .skill-item:first-child{border-top:none;padding-top:0;}
@@ -204,7 +236,8 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 
 .credit-bar{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 16px;font-size:10px;color:var(--text-muted);text-align:center;font-family:'JetBrains Mono',monospace;}
 .credit-bar a{color:var(--accent);text-decoration:none;}
-.portrait-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;}
+.portrait-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .5s cubic-bezier(.16,1,.3,1);}
+.portrait:hover .portrait-img{transform:scale(1.1);}
 .mini-img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
 .item-icon-img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
 </style>
@@ -216,24 +249,30 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title"><img class="mark" src="assets/app/icon.webp" alt=""><h1>Вувочка</h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="assets/app/icon.webp" alt=""><h1>Вувочка</h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v0.5</div>
+    <div class="app-sub">WUTHERING WAVES · v0.6</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
   <div class="sidebar" id="sidebar">
-    <div class="sidebar-header"><img src="assets/app/icon.webp" alt=""><span>Вувочка</span></div>
-    <button class="tab active" data-view="tierlist">Тир-лист</button>
-    <button class="tab" data-view="teams">Команды</button>
-    <button class="tab" data-view="characters">Персонажи</button>
-    <button class="tab" data-view="weapons">Оружие</button>
-    <button class="tab" data-view="echoes">Эхо</button>
-    <button class="tab" data-view="profile">Профиль</button>
-    <button class="tab" data-view="matrix">Матрица</button>
+    <div class="sidebar-header" onclick="goToTierList()" role="button">
+      <img src="assets/app/icon.webp" alt=""><span>Вувочка</span>
+      <svg class="close-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" onclick="event.stopPropagation();closeSidebar()"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </div>
+    <div class="sidebar-group-label">Рейтинги</div>
+    <button class="tab active" data-view="tierlist"><span class="nav-icon">📊</span>Тир-лист</button>
+    <button class="tab" data-view="teams"><span class="nav-icon">👥</span>Команды</button>
+    <div class="sidebar-group-label">Справочник</div>
+    <button class="tab" data-view="characters"><span class="nav-icon">⭐</span>Персонажи</button>
+    <button class="tab" data-view="weapons"><span class="nav-icon">⚔️</span>Оружие</button>
+    <button class="tab" data-view="echoes"><span class="nav-icon">🔮</span>Эхо</button>
+    <div class="sidebar-group-label">Прочее</div>
+    <button class="tab" data-view="profile"><span class="nav-icon">👤</span>Профиль</button>
+    <button class="tab" data-view="matrix"><span class="nav-icon">🧩</span>Матрица</button>
   </div>
 
   <!-- TIER LIST -->
@@ -355,6 +394,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
   <!-- TEAM TIER LIST -->
   <div class="view" id="view-teams">
     <div class="screen">
+      <div class="teams-legend"><b>Обведённый персонаж</b> — обязательное ядро состава; остальные — гибкие саппорты, которых можно заменять на аналоги по роли.</div>
       <div class="tier-row">
         <div class="tier-badge t0">T0</div>
         <div class="team-card">
@@ -854,9 +894,12 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
           <h3>Аватар в шапке</h3>
           <div class="avatar-picker-row">
             <div class="avatar-picker-preview" id="avatar-picker-preview">👤</div>
-            <div class="profile-empty" style="padding:0;">Нажмите на персонажа, чтобы сделать его своей аватаркой в шапке.</div>
+            <div style="flex:1;min-width:0;">
+              <div class="profile-empty" style="padding:0 0 8px;" id="avatar-picker-name">Персонаж не выбран</div>
+              <button class="matrix-link-btn avatar-change-btn" onclick="toggleAvatarPicker()" id="avatar-change-btn">Сменить аватар</button>
+            </div>
           </div>
-          <div class="tier-items" id="avatar-picker-grid"></div>
+          <div class="tier-items" id="avatar-picker-grid" hidden></div>
         </div>
         <div class="profile-section">
           <h3>Мои персонажи</h3>
@@ -1249,6 +1292,9 @@ function closeSidebar(){
 function goToProfile(){
   document.querySelector('.tab[data-view="profile"]').click();
 }
+function goToTierList(){
+  document.querySelector('.tab[data-view="tierlist"]').click();
+}
 document.querySelectorAll('.subtab').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.subtab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.subview').forEach(x => x.classList.remove('active'));
@@ -1276,7 +1322,10 @@ document.querySelectorAll('.filters').forEach(group => {
       chip.classList.add('active');
       const val = chip.dataset.val;
       targetRoot.querySelectorAll('[data-' + attr + ']').forEach(el => {
-        const match = val === 'all' || el.dataset[attr] === val;
+        // space-separated so one character/item can belong to more than one
+        // bucket at once (e.g. a role-flexible DPS/Hybrid pick)
+        const values = el.dataset[attr].split(' ');
+        const match = val === 'all' || values.includes(val);
         el.classList.toggle('hidden-by-filter', !match);
       });
     });
@@ -1442,6 +1491,13 @@ function setAvatar(id) {
   updateAccountAvatar();
   renderAvatarPicker();
   persistProfile();
+  document.getElementById('avatar-picker-grid').hidden = true;
+}
+
+function toggleAvatarPicker() {
+  const grid = document.getElementById('avatar-picker-grid');
+  grid.hidden = !grid.hidden;
+  document.getElementById('avatar-change-btn').textContent = grid.hidden ? 'Сменить аватар' : 'Свернуть список';
 }
 
 function updateAccountAvatar() {
@@ -1458,6 +1514,8 @@ function renderAvatarPicker() {
   const chosenId = avatarCharId ?? (favorites.size ? [...favorites][0] : null);
   const preview = document.getElementById('avatar-picker-preview');
   preview.innerHTML = chosenId == null ? '👤' : '<img src="assets/characters/' + chosenId + '.webp" alt="">';
+  const chosenChar = chosenId == null ? null : CHARACTERS.find((c) => c.id === chosenId);
+  document.getElementById('avatar-picker-name').textContent = chosenChar ? chosenChar.name : 'Персонаж не выбран';
   const grid = document.getElementById('avatar-picker-grid');
   grid.innerHTML = CHARACTERS.map((c) => {
     const el = c.element.toLowerCase();
