@@ -331,7 +331,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
     </div>
-    <div class="app-sub">WUTHERING WAVES · v1.30</div>
+    <div class="app-sub">WUTHERING WAVES · v1.31</div>
   </div>
 
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -1047,12 +1047,41 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       </div>
 
       <div class="subtabs">
-        <button class="subtab active" data-sub="kit">Кит</button>
         <button class="subtab" data-sub="review">Обзор</button>
+        <button class="subtab active" data-sub="kit">Навыки</button>
         <button class="subtab" data-sub="build">Билд</button>
         <button class="subtab" data-sub="gameplay">Геймплей</button>
         <button class="subtab" data-sub="calc">Расчёты</button>
         <span class="subtab-indicator"></span>
+      </div>
+
+      <!-- REVIEW -->
+      <div class="subview" id="sub-review">
+        <div class="card">
+          <h3>Оценки</h3>
+          <div class="rating-row"><span class="rating-label">Tower of Adversity</span><span class="stars">★★★★☆</span></div>
+          <div class="rating-row"><span class="rating-label">Whimpering Wastes</span><span class="stars">★★★★★</span></div>
+          <div class="rating-row"><span class="rating-label">F2P-дружелюбность</span><span class="stars">★★★☆☆</span></div>
+        </div>
+        <div class="card">
+          <h3>Плюсы и минусы</h3>
+          <div class="proscons">
+            <div class="col pros"><h4>Плюсы</h4><ul>
+              <li>Высокая мобильность за счёт смены форм</li>
+              <li>Мощное окно урона на ульте</li>
+              <li>Хорошо тянет и ToA, и WW</li>
+            </ul></div>
+            <div class="col cons"><h4>Минусы</h4><ul>
+              <li>Требует точного тайминга синхро-атак</li>
+              <li>Не прощает спам кнопок новичкам</li>
+              <li>Делит саппортов с другими Fusion DPS</li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Наш обзор</h3>
+          <div class="review-text">Aemeath — гибкий DPS на стихии Fusion, чей урон построен вокруг переключения между собой и механическим доспехом. Основная часть урона приходится на связки тяжёлых атак и синхро-удары после смены формы, поэтому персонаж вознаграждает точный тайминг ротации, а не бездумный спам кнопок. Для игроков, готовых разобраться в механике — один из сильнейших DPS патча.</div>
+        </div>
       </div>
 
       <!-- KIT -->
@@ -1110,35 +1139,6 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
             <div class="pill">Руда третьего уровня ×60</div>
             <div class="pill">Кредиты ковки ×420000</div>
           </div>
-        </div>
-      </div>
-
-      <!-- REVIEW -->
-      <div class="subview" id="sub-review">
-        <div class="card">
-          <h3>Оценки</h3>
-          <div class="rating-row"><span class="rating-label">Tower of Adversity</span><span class="stars">★★★★☆</span></div>
-          <div class="rating-row"><span class="rating-label">Whimpering Wastes</span><span class="stars">★★★★★</span></div>
-          <div class="rating-row"><span class="rating-label">F2P-дружелюбность</span><span class="stars">★★★☆☆</span></div>
-        </div>
-        <div class="card">
-          <h3>Плюсы и минусы</h3>
-          <div class="proscons">
-            <div class="col pros"><h4>Плюсы</h4><ul>
-              <li>Высокая мобильность за счёт смены форм</li>
-              <li>Мощное окно урона на ульте</li>
-              <li>Хорошо тянет и ToA, и WW</li>
-            </ul></div>
-            <div class="col cons"><h4>Минусы</h4><ul>
-              <li>Требует точного тайминга синхро-атак</li>
-              <li>Не прощает спам кнопок новичкам</li>
-              <li>Делит саппортов с другими Fusion DPS</li>
-            </ul></div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Наш обзор</h3>
-          <div class="review-text">Aemeath — гибкий DPS на стихии Fusion, чей урон построен вокруг переключения между собой и механическим доспехом. Основная часть урона приходится на связки тяжёлых атак и синхро-удары после смены формы, поэтому персонаж вознаграждает точный тайминг ротации, а не бездумный спам кнопок. Для игроков, готовых разобраться в механике — один из сильнейших DPS патча.</div>
         </div>
       </div>
 
@@ -1232,14 +1232,17 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       </div>
 
       <div class="subtabs">
-        <button class="subtab-g active" data-subg="kit">Кит</button>
         <button class="subtab-g" data-subg="review">Обзор</button>
+        <button class="subtab-g active" data-subg="kit">Навыки</button>
         <button class="subtab-g" data-subg="build">Билд</button>
         <button class="subtab-g" data-subg="gameplay">Геймплей</button>
         <button class="subtab-g" data-subg="calc">Расчёты</button>
         <span class="subtab-indicator"></span>
       </div>
 
+      <div class="subview-g" id="subg-review">
+        <div class="card"><h3>Обзор</h3><div class="review-text">Оценки, плюсы и минусы появятся здесь, когда мы разберём гайды по этому персонажу.</div></div>
+      </div>
       <div class="subview-g active" id="subg-kit">
         <div class="card">
           <h3>Основные данные</h3>
@@ -1251,11 +1254,8 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         </div>
         <div class="card">
           <h3>Разбор навыков</h3>
-          <div class="review-text">Подробный разбор активных и пассивных навыков появится здесь, когда мы разберём кит этого персонажа.</div>
+          <div class="review-text">Подробный разбор активных и пассивных навыков появится здесь, когда мы разберём навыки этого персонажа.</div>
         </div>
-      </div>
-      <div class="subview-g" id="subg-review">
-        <div class="card"><h3>Обзор</h3><div class="review-text">Оценки, плюсы и минусы появятся здесь, когда мы разберём гайды по этому персонажу.</div></div>
       </div>
       <div class="subview-g" id="subg-build">
         <div class="build-dynamic"></div>
