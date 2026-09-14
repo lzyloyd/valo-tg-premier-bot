@@ -149,11 +149,15 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   const template = sheets.find((s) => s.title.endsWith(` - ${mode}`)) ?? sheets.find((s) => s.title !== sheets[0].title);
   if (!template) throw new Error(`No template tab found to clone for a new "${tabTitle}" tab`);
 
+  // Always append at the very end (never right after the template) — tabs
+  // are only ever created the first time a map/mode is actually logged, so
+  // appending keeps them in the order matches actually happened, with the
+  // overall summary tab (created once, up front) staying first.
   const dupRes = await batchUpdate(spreadsheetId, [
     {
       duplicateSheet: {
         sourceSheetId: template.sheetId,
-        insertSheetIndex: template.index + 1,
+        insertSheetIndex: sheets.length,
         newSheetName: tabTitle,
       },
     },
@@ -170,7 +174,7 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   // heatmap cells to "-" so nothing shows #DIV/0! before it has data.
   await resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode);
 
-  return { sheetId: newSheetId, title: tabTitle, index: template.index + 1 };
+  return { sheetId: newSheetId, title: tabTitle, index: sheets.length };
 }
 
 /**
