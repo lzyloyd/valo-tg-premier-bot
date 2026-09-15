@@ -160,12 +160,13 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .team-card{background:var(--surface-2);border-radius:14px;overflow:hidden;}
 .team-card-header{padding:10px 12px;font-family:'Exo 2',sans-serif;font-weight:800;font-size:14px;letter-spacing:.03em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);text-align:center;text-transform:uppercase;}
 .team-card-body{display:flex;align-items:stretch;}
-.team-hero{width:120px;height:120px;flex-shrink:0;align-self:flex-start;cursor:pointer;}
-.team-hero img{width:100%;height:100%;border-radius:10px;object-fit:cover;display:block;}
+.team-hero{width:142px;flex-shrink:0;align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;}
+.team-hero img{width:120px;height:120px;border-radius:10px;object-fit:cover;display:block;}
+.team-hero span{font-size:9.5px;color:var(--text-muted);text-align:center;line-height:1.2;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .team-columns{flex:1;display:flex;min-width:0;}
-.team-column{flex:1;padding:10px 4px;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);min-width:0;}
+.team-column{container-type:inline-size;flex:1;padding:10px 4px;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);min-width:0;}
 .team-column-picks{display:flex;flex-direction:column;align-items:center;gap:8px;}
-.team-column-pick img{width:60px;height:60px;border-radius:10px;object-fit:cover;}
+.team-column-pick img{width:clamp(80px, 30cqw, 120px);height:clamp(80px, 30cqw, 120px);border-radius:10px;object-fit:cover;}
 .team-column-pick{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;max-width:100%;}
 .team-column-pick span{font-size:9.5px;color:var(--text-muted);text-align:center;line-height:1.2;max-width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .teams-legend{font-size:11px;color:var(--text-muted);line-height:1.5;padding:2px 2px 16px;}
@@ -381,7 +382,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.52</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.53</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -1165,7 +1166,7 @@ function teamCardHtml(title, slots){
   const mainChar = CHARACTERS.find((x) => x.id === mainId);
   const elClass = mainChar ? 'el-' + mainChar.element.toLowerCase() : '';
   const heroHtml = mainChar
-    ? '<div class="team-hero" onclick="openChar(' + mainId + ')"><img src="/wuwa-assets/characters/' + mainId + '.webp" alt=""></div>'
+    ? '<div class="team-hero" onclick="openChar(' + mainId + ')"><img src="/wuwa-assets/characters/' + mainId + '.webp" alt=""><span>' + mainChar.name + '</span></div>'
     : '<div class="team-hero"></div>';
   const columnsHtml = slots.slice(1).map((slot) => '<div class="team-column">' + slotPicksHtml(slot) + '</div>').join('');
   return '<div class="team-card"><div class="team-card-header ' + elClass + '">' + title + '</div><div class="team-card-body">' + heroHtml + '<div class="team-columns">' + columnsHtml + '</div></div></div>';
