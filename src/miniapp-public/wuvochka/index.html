@@ -392,7 +392,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.9</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.91</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -780,6 +780,14 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         </div>
       </div>
 
+      <div class="card" id="w-stats-card">
+        <h3>Характеристики на 90 уровне</h3>
+        <table class="stat-table">
+          <tr><th>Параметр</th><th>Значение</th></tr>
+          <tr><td id="w-main-stat-name"></td><td id="w-main-stat-value"></td></tr>
+          <tr><td id="w-sub-stat-name"></td><td id="w-sub-stat-value"></td></tr>
+        </table>
+      </div>
       <div class="card">
         <h3 id="w-passive-name"></h3>
         <div class="review-text" id="w-passive-desc"></div>
@@ -1372,6 +1380,16 @@ function openWeapon(id){
   document.getElementById('w-portrait-img').src = '/wuwa-assets/weapons/' + id + '.webp';
   document.getElementById('w-type').textContent = WEAPON_TYPE_RU[base.weaponType] || base.weaponType;
   document.getElementById('w-rarity').textContent = base.rarity + '★';
+  const statsCard = document.getElementById('w-stats-card');
+  if (w && w.mainStatName) {
+    statsCard.style.display = '';
+    document.getElementById('w-main-stat-name').textContent = w.mainStatName;
+    document.getElementById('w-main-stat-value').textContent = w.mainStatValue;
+    document.getElementById('w-sub-stat-name').textContent = w.subStatName;
+    document.getElementById('w-sub-stat-value').textContent = w.subStatValue;
+  } else {
+    statsCard.style.display = 'none';
+  }
   document.getElementById('w-passive-name').textContent = w ? w.passiveName : 'Пассивка';
   document.getElementById('w-passive-desc').textContent = w ? w.passiveDesc : 'Описание пассивки появится здесь позже.';
   document.getElementById('w-flavor').textContent = w ? w.flavor : 'Описание оружия появится здесь позже.';
