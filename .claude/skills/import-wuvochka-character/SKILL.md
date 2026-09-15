@@ -42,7 +42,13 @@ Practical extraction pattern (`javascript_tool`, `javascript_exec`): find the sm
 whose `textContent` contains a distinctive heading (`/i.test(e.textContent)`), sort matches by
 length, then walk up `parentElement` a few times until the container includes the next
 section's heading too — then read `.innerText`. This is more reliable than guessing class
-names, since prydwen's markup changes between characters.
+names, since prydwen's markup changes between characters. All of this works with pure DOM
+text extraction — you don't need a visible/active tab or a working screenshot for it, and
+shouldn't reach for one; screenshots on this site are unreliable when the target content
+isn't the currently-active tab (scroll_to on a hidden panel silently doesn't move the visible
+viewport) and a first-visit cookie-consent dialog can eat a screenshot attempt too — click the
+"Do not consent" option once if it appears, then go back to DOM queries rather than fighting
+the screenshot tool further.
 
 Pull these sections (skip ones that don't exist for this character):
 - **Review tab**: Ratings (ToA/WW tier — cross-check against `tierlist.json`, don't re-derive
@@ -51,11 +57,20 @@ Pull these sections (skip ones that don't exist for this character):
   Conclusion").
 - **Build tab**: Best Weapons (ranked list with % score + note), Best Echo Sets (set + main
   echo item), Best Echo Stats (cost slots + stat), Best Endgame Stats, Skill Priority.
-- **Gameplay and teams tab**: Rotation(s) (steps), Synergies, Example Teams. Team member
-  composition isn't reliable from prose — instead pull `document.querySelectorAll('img[alt]')`
-  filtered to character-name alts, in DOM order, and reconstruct slot groupings from that
-  (matches the pattern: 1 main DPS, then N alternates for slot 2, then N alternates for slot 3
-  per team block).
+- **Gameplay and teams tab**: Rotation(s) (steps), Synergies, Example Teams. For team
+  composition, don't guess from flat `img[alt]` order across the whole page — teams can
+  outnumber their own headings (Rebecca's page had 4 real teams under headers "Best Team",
+  "Edgerunners Team", "Phoebe Team", "Alternative Heavy Attack Teams", where only "Best Team"
+  looked like a ribbon at first glance) and alt-order alone can't tell where one ends and the
+  next begins. Instead query the real structure directly:
+  `document.querySelectorAll('.team-showcase .team-row')` — each `.team-row` is one team, its
+  preceding `.team-header` sibling is the team's title, and each of its 3 `.column` children
+  is one slot: `col.querySelector('.big')` holds the recommended pick's `img[alt]` (slot 0 may
+  have more than one `.big` img if several DPS are equally viable — our schema only renders
+  `slots[0][0]` as the hero, so pick the first and mention the rest in the team's `text`), and
+  `col.querySelector('.small')` holds the flexible alternates' `img[alt]`s in order. A
+  `.team-notes` element between two `.team-row`s is a note that belongs to the row right
+  before it.
 - **Calculations tab**: scenario (rotation time), the "done using added buffs from" teammates
   (weapon/set/main-echo per teammate), sequence table (S0–S6 dmg/dps/%), damage-source
   breakdown. If there's more than one calc variant (rare — Aemeath has Tune Rupture / Fusion
