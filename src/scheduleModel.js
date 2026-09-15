@@ -207,7 +207,7 @@ export function buildSummaryText(week) {
   for (const day of days) {
     lines.push(`${day.label} ${formatDayDate(day.dateIso)} · ${day.kind}`);
     if (daysOff.includes(day.key)) {
-      lines.push('🏖 выходной');
+      lines.push('☀️ выходной');
     } else {
       const sessions = computeDaySessions(day, week.responses);
       if (sessions.length === 0) {

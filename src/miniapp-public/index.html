@@ -222,7 +222,7 @@ function renderMeScreen() {
             <div class="day-date">${shortDate(d.dateIso)}</div>
             <div class="day-kind">${d.kind}</div>
           </div>
-          <div class="day-off-label">🏖 Выходной</div>
+          <div class="day-off-label">☀️ Выходной</div>
         </div>`;
       }
       const my = draft[d.key];
@@ -281,7 +281,7 @@ function renderTeamScreen() {
   const rowFor = (time) => {
     const cells = state.days
       .map((d) => {
-        if (state.daysOff.includes(d.key)) return `<div style="text-align:center">🏖</div>`;
+        if (state.daysOff.includes(d.key)) return `<div style="text-align:center">☀️</div>`;
         return d.slots.includes(time) ? `<div>${teamCell(availableFor(d.key, time))}</div>` : `<div style="text-align:center;color:var(--text-muted)">—</div>`;
       })
       .join('');
@@ -312,7 +312,7 @@ function renderAdminScreen() {
   const dayoffToggles = state.days
     .map((d) => {
       const isOff = state.daysOff.includes(d.key);
-      return `<button class="dayoff-btn${isOff ? ' active' : ''}" data-day="${d.key}" data-off="${isOff ? '0' : '1'}">${d.label}${isOff ? ' 🏖' : ''}</button>`;
+      return `<button class="dayoff-btn${isOff ? ' active' : ''}" data-day="${d.key}" data-off="${isOff ? '0' : '1'}">${d.label}${isOff ? ' ☀️' : ''}</button>`;
     })
     .join('');
   return `<div class="screen">
