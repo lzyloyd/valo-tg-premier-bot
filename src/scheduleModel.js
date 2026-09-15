@@ -9,6 +9,9 @@ export const SUB_ROSTER = ['men4ikcs', 'mania_boo']; // in preference order — 
 
 export const QUORUM = 5;
 
+// No-show warnings never reset and never expire — see attendanceStore.js.
+export const MAX_WARNINGS = 3;
+
 // A week runs Tue-Sun. Practice days share the same two slots but only one
 // of them actually happens (pickOneSlot); Saturday's Premier plays both
 // times as independent sessions; Sunday's tournament is optional and only
@@ -231,6 +234,19 @@ export function buildSummaryText(week) {
 function describeAnswer(entry) {
   if (!entry || entry.avail !== 'yes') return 'не может';
   return entry.slots.length ? entry.slots.join(', ') : 'может';
+}
+
+// Posted to "Сборы" the moment the admin marks someone absent from a
+// specific session — see attendanceStore.js for why the count itself never
+// resets. At the cap, the wording calls out the roster consequence
+// (moved to reserve) instead of just another plain warning.
+export function buildMissWarningText(username, session, count) {
+  const day = DAYS.find((d) => d.key === session.dayKey);
+  const label = `${day.label.toLowerCase()} ${session.slot} (${day.kind})`;
+  if (count >= MAX_WARNINGS) {
+    return `🚨 @${username} не пришёл(а) на ${label} — ${count}/${MAX_WARNINGS}. Лимит предупреждений исчерпан, игрок переводится в запас.`;
+  }
+  return `⚠️ @${username} не пришёл(а) на ${label}. Предупреждений: ${count}/${MAX_WARNINGS}.`;
 }
 
 export function buildEditAlertText(edit) {

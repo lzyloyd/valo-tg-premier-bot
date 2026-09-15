@@ -46,6 +46,9 @@ export const config = {
   // the summary. Usernames can change; ids don't.
   adminUserId: process.env.ADMIN_USER_ID ? Number(process.env.ADMIN_USER_ID) : null,
   scheduleDataPath: path.join(dataDir, 'schedule.json'),
+  // Who-didn't-show-up warning counts — persists across weekly schedule
+  // resets (unlike schedule.json), since the count never resets.
+  attendanceDataPath: path.join(dataDir, 'attendance.json'),
 
   // "Вувочка" (Wuthering Waves companion) mini app — shares the same
   // MINIAPP_PORT/MINIAPP_PUBLIC_URL server above, served from /wuvochka/.

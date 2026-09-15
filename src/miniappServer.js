@@ -3,9 +3,23 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { config } from './config.js';
 import { verifyInitData } from './telegramAuth.js';
-import { DAYS, ROSTER, QUORUM, weekDayDates, weekStartFromIso, buildSummaryText, hasFullyAnswered } from './scheduleModel.js';
+import {
+  DAYS,
+  ROSTER,
+  QUORUM,
+  MAX_WARNINGS,
+  weekDayDates,
+  weekStartFromIso,
+  mskIsoDate,
+  buildSummaryText,
+  buildMissWarningText,
+  hasFullyAnswered,
+  computeWeekSessions,
+} from './scheduleModel.js';
 import { loadCurrentWeek, setResponse, setDayOff } from './scheduleStore.js';
+import { loadAttendance, recordMiss } from './attendanceStore.js';
 import { sendSummary, handlePostDeadlineEdit, scheduleUpcomingSessionReminders } from './scheduleNotifications.js';
+import { sendTextTo } from './telegram.js';
 import { WUVOCHKA_ROSTER } from './wuvochkaModel.js';
 import { loadProfile, toggleFavorite, toggleOwned, setAvatar } from './wuvochkaStore.js';
 
@@ -39,17 +53,39 @@ function authenticateWuvochka(req, res) {
   return { username, id: user.id };
 }
 
-function weekView(week, auth) {
+// One row per roster member for the admin's "Явка" block: their all-time
+// no-show count, and which of this week's already-started sessions they
+// could still be marked absent from (already-marked ones are left out so
+// the button for that exact session simply disappears after use).
+async function buildAttendanceView(week) {
+  const attendance = await loadAttendance();
+  const now = new Date();
+  const startedSessions = computeWeekSessions(week).filter((s) => s.startsAt <= now);
+  return ROSTER.map((username) => {
+    const record = attendance[username];
+    const markedThisWeek = new Set(
+      (record?.history ?? []).filter((h) => h.weekStart === week.weekStart).map((h) => `${h.dayKey}|${h.slot}`),
+    );
+    const options = startedSessions
+      .filter((s) => s.lineup.includes(username) && !markedThisWeek.has(`${s.dayKey}|${s.slot}`))
+      .map((s) => ({ dayKey: s.dayKey, dayLabel: s.dayLabel, slot: s.slot, kind: DAYS.find((d) => d.key === s.dayKey).kind }));
+    return { username, count: record?.count ?? 0, options };
+  });
+}
+
+async function weekView(week, auth) {
   const weekStart = weekStartFromIso(week.weekStart);
   const daysOff = week.daysOff ?? [];
   return {
     days: weekDayDates(weekStart),
     quorum: QUORUM,
     roster: ROSTER,
+    maxWarnings: MAX_WARNINGS,
     responses: week.responses,
     daysOff,
     edits: auth.isAdmin ? week.edits : [],
     summaryPreview: auth.isAdmin ? buildSummaryText(week) : null,
+    attendance: auth.isAdmin ? await buildAttendanceView(week) : null,
     answeredCount: ROSTER.filter((u) => hasFullyAnswered(week.responses, u, daysOff)).length,
     me: { username: auth.username, isAdmin: auth.isAdmin, lastSaved: week.lastSaved?.[auth.username] || null },
   };
@@ -77,7 +113,7 @@ export function startMiniAppServer() {
     const auth = authenticate(req, res);
     if (!auth) return;
     const week = await loadCurrentWeek();
-    res.json(weekView(week, auth));
+    res.json(await weekView(week, auth));
   });
 
   app.post('/api/update', async (req, res) => {
@@ -96,7 +132,7 @@ export function startMiniAppServer() {
           console.error('[miniapp] failed to handle post-deadline edit:', err),
         );
       }
-      res.json(weekView(week, auth));
+      res.json(await weekView(week, auth));
     } catch (err) {
       console.error('[miniapp] update failed:', err);
       res.status(500).json({ error: 'Не получилось сохранить, попробуй ещё раз.' });
@@ -121,10 +157,48 @@ export function startMiniAppServer() {
       scheduleUpcomingSessionReminders().catch((err) =>
         console.error('[miniapp] failed to reschedule session reminders after day-off toggle:', err),
       );
-      res.json(weekView(week, auth));
+      res.json(await weekView(week, auth));
     } catch (err) {
       console.error('[miniapp] set-day-off failed:', err);
       res.status(500).json({ error: 'Не получилось сохранить, попробуй ещё раз.' });
+    }
+  });
+
+  app.post('/api/mark-miss', async (req, res) => {
+    const auth = authenticate(req, res);
+    if (!auth) return;
+    if (!auth.isAdmin) {
+      res.status(403).json({ error: 'Только админ может отмечать неявки.' });
+      return;
+    }
+    const { username, dayKey, slot } = req.body ?? {};
+    if (!ROSTER.includes(username) || !DAYS.some((d) => d.key === dayKey) || typeof slot !== 'string') {
+      res.status(400).json({ error: 'Некорректные данные.' });
+      return;
+    }
+    try {
+      const week = await loadCurrentWeek();
+      const now = new Date();
+      const session = computeWeekSessions(week).find(
+        (s) => s.dayKey === dayKey && s.slot === slot && s.startsAt <= now && s.lineup.includes(username),
+      );
+      if (!session) {
+        res.status(400).json({ error: 'Эта сессия не найдена, ещё не началась, или игрок не в составе.' });
+        return;
+      }
+      const record = await recordMiss(username, week.weekStart, dayKey, slot, {
+        dayLabel: session.dayLabel,
+        dateIso: mskIsoDate(session.startsAt),
+      });
+      if (!record) {
+        res.status(409).json({ error: 'Уже отмечено.' });
+        return;
+      }
+      await sendTextTo(config.scheduleChatId, config.scheduleThreadId, buildMissWarningText(username, session, record.count));
+      res.json(await weekView(week, auth));
+    } catch (err) {
+      console.error('[miniapp] mark-miss failed:', err);
+      res.status(500).json({ error: 'Не получилось отметить, попробуй ещё раз.' });
     }
   });
 

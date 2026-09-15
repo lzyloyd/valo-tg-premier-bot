@@ -78,6 +78,14 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .tg-bubble{background:var(--surface-2);border-radius:0 12px 12px 12px;padding:10px 12px;white-space:pre-wrap;font-size:12.5px;line-height:1.6;}
 .alert-item{border:1px solid var(--warn-border);background:var(--warn-bg);border-radius:10px;padding:9px 11px;margin-bottom:7px;font-size:12px;}
 .empty-note{font-size:11.5px;color:var(--text-muted);}
+.attendance-list{display:flex;flex-direction:column;gap:8px;}
+.attendance-row{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:9px 10px;background:var(--surface);}
+.attendance-name{font-weight:700;font-size:12px;flex:0 0 96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.attendance-count{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;color:var(--text-muted);flex:0 0 30px;}
+.attendance-count.maxed{color:var(--accent);}
+.attendance-opts{display:flex;flex-wrap:wrap;gap:4px;flex:1;justify-content:flex-end;}
+.miss-btn{border:1px solid var(--accent);background:rgba(255,90,104,.12);color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:10.5px;padding:5px 8px;border-radius:7px;cursor:pointer;white-space:nowrap;}
+.miss-btn[disabled]{opacity:.5;cursor:not-allowed;}
 .loading{padding:40px;text-align:center;color:var(--text-muted);}
 </style>
 </head>
@@ -315,6 +323,23 @@ function renderAdminScreen() {
       return `<button class="dayoff-btn${isOff ? ' active' : ''}" data-day="${d.key}" data-off="${isOff ? '0' : '1'}">${d.label}${isOff ? ' ☀️' : ''}</button>`;
     })
     .join('');
+  const attendanceRows = state.attendance
+    .map((row) => {
+      const opts = row.options.length
+        ? row.options
+            .map(
+              (o) =>
+                `<button class="miss-btn" data-username="${row.username}" data-day="${o.dayKey}" data-slot="${o.slot}" data-label="${DAY_ABBR[o.dayKey]} ${o.slot}" data-kind="${o.kind}">${DAY_ABBR[o.dayKey]} ${o.slot}</button>`,
+            )
+            .join('')
+        : `<span class="empty-note">нет прошедших игр</span>`;
+      return `<div class="attendance-row">
+        <div class="attendance-name">@${row.username}</div>
+        <div class="attendance-count${row.count >= state.maxWarnings ? ' maxed' : ''}">${row.count}/${state.maxWarnings}</div>
+        <div class="attendance-opts">${opts}</div>
+      </div>`;
+    })
+    .join('');
   return `<div class="screen">
     <div class="admin-lock">🔒 Видно только тебе</div>
     <div class="section-lbl">Выходные дни</div>
@@ -327,6 +352,8 @@ function renderAdminScreen() {
     <div class="tg-bubble-wrap"><div class="tg-bubble">${state.summaryPreview}</div></div>
     <div class="section-lbl" style="margin-top:14px">Правки после дедлайна</div>
     ${edits}
+    <div class="section-lbl" style="margin-top:14px">Явка</div>
+    <div class="attendance-list">${attendanceRows}</div>
   </div>`;
 }
 
@@ -372,6 +399,31 @@ function bindEvents() {
       } catch (err) {
         tg?.showAlert?.(err.message) ?? alert(err.message);
         btn.disabled = false;
+      }
+    }),
+  );
+
+  document.querySelectorAll('.miss-btn').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const username = btn.dataset.username;
+      const dayKey = btn.dataset.day;
+      const slot = btn.dataset.slot;
+      const dayLabel = state.days.find((d) => d.key === dayKey)?.label ?? dayKey;
+      const question = `Отметить @${username} как не пришедшего на ${dayLabel} ${slot} (${btn.dataset.kind})?\nВ «Сборы» сразу уйдёт предупреждение.`;
+      const markMiss = async () => {
+        btn.disabled = true;
+        try {
+          state = await api('/api/mark-miss', { username, dayKey, slot });
+          render();
+        } catch (err) {
+          tg?.showAlert?.(err.message) ?? alert(err.message);
+          btn.disabled = false;
+        }
+      };
+      if (tg?.showConfirm) {
+        tg.showConfirm(question, (ok) => { if (ok) markMiss(); });
+      } else if (confirm(question)) {
+        markMiss();
       }
     }),
   );
