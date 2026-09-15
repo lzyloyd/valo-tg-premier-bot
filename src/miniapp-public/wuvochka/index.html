@@ -392,7 +392,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.91</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.0</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -1267,7 +1267,12 @@ function renderBuildTab(rootEl, charId){
     const base = WEAPONS.find((x) => x.id === w.id);
     if (!base) return '';
     const score = w.scores ? w.scores[variantId] : null;
-    if (w.scores && score == null) return '';
+    if (score == null) {
+      // Support/utility characters often have no numeric weapon score on the
+      // source — show the ranked entry without a score badge rather than
+      // hiding it (the ranking order and note are still real information).
+      return '<div class="item-card clickable" onclick="openWeapon(' + w.id + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + w.id + '.webp" alt=""></div><div class="item-info"><div class="iname">' + base.name + '</div><div class="irole">' + w.note + '</div></div></div>';
+    }
     const tier = tierFromScore(score);
     const scoreLabel = score.toFixed(1) + '%';
     return '<div class="item-card clickable" onclick="openWeapon(' + w.id + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + w.id + '.webp" alt=""></div><div class="item-info"><div class="iname">' + base.name + ' · <span class="weapon-score tier-' + tier + '">' + scoreLabel + '</span></div><div class="irole">' + w.note + '</div></div><div class="rank-badge tier-' + tier + '">' + tier + '</div></div>';
