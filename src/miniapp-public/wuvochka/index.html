@@ -152,7 +152,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-role-heading.dps{color:var(--bad);}
 .tier-role-heading.hybrid{color:var(--el-electro);}
 .tier-role-heading.support{color:var(--tier-0);}
-#view-tierlist .tier-items{display:grid;grid-template-columns:repeat(auto-fill, 128px);gap:10px;}
+#view-tierlist .tier-items{display:grid;grid-template-columns:repeat(auto-fill, minmax(110px, 170px));gap:10px;}
 #view-tierlist .tier-items .portrait.sm{width:100%;}
 
 /* team tier list */
@@ -173,7 +173,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 
 /* character grid */
 .char-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(108px, 1fr));gap:11px;}
-#view-characters .char-grid{grid-template-columns:repeat(auto-fill, 128px);gap:10px;}
+#view-characters .char-grid{grid-template-columns:repeat(auto-fill, minmax(110px, 170px));gap:10px;}
 
 /* character detail */
 .back-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;color:var(--text-muted);font-size:12.5px;font-weight:700;font-family:'Exo 2',sans-serif;transition:color .15s ease;width:fit-content;}
@@ -234,6 +234,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 
 .echo-cost-row{flex-wrap:nowrap;}
 .echo-cost-row .chip{flex:1;justify-content:center;padding:9px 4px;white-space:nowrap;}
+#tierlist-mode-switch.filters{flex-wrap:nowrap;}
+#tierlist-mode-switch .chip{flex:1;justify-content:center;}
 .show-sets-btn{width:100%;background:var(--surface-2);color:var(--accent);border:1px solid var(--border);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12.5px;padding:10px 14px;border-radius:10px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease;}
 .show-sets-btn:hover{background:var(--surface-3);border-color:var(--accent);}
 
@@ -330,6 +332,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .proscons li{margin-bottom:5px;}
 
 .review-text{font-size:13px;line-height:1.65;color:var(--text);}
+.review-text + .review-subhead{margin-top:14px;}
+.review-subhead{font-family:'Exo 2',sans-serif;font-weight:800;font-size:13px;color:var(--accent);margin:0 0 6px;}
 
 .item-card{display:flex;gap:11px;align-items:center;padding:10px 0;border-top:1px solid var(--border);}
 .item-card:first-child{border-top:none;padding-top:0;}
@@ -377,7 +381,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.42</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.5</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -916,6 +920,7 @@ function renderTierListView(){
     }).join('');
     return '<div class="tier-block"><div class="tier-header ' + tierGroup.class + '">' + tierGroup.tier + '</div>' + rolesHtml + '</div>';
   }).join('');
+  document.querySelectorAll('#view-tierlist .tier-items').forEach((el) => sizeStaticGrid(el, 110, 170, 10));
 }
 function setTierlistMode(mode){
   tierlistMode = mode;
@@ -981,7 +986,8 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
   view.classList.add('active');
   if (t.dataset.view === 'profile') { renderProfile(); renderAvatarPicker(); }
   // grids inside a view that was just display:none can't be measured for
-  // the row-based stagger until they're actually visible — redo it now.
+  // sizing/the row-based stagger until they're actually visible — redo it now.
+  view.querySelectorAll('#view-tierlist .tier-items, #view-characters .char-grid').forEach((el) => sizeStaticGrid(el, 110, 170, 10));
   view.querySelectorAll('.char-grid, .tier-items').forEach(applyStagger);
   closeSidebar();
   window.scrollTo(0,0);
@@ -1203,8 +1209,11 @@ function renderReviewTab(rootEl, charId){
       + '<div class="col cons"><h4>Минусы</h4><ul>' + (data.cons || []).map((c) => '<li>' + c + '</li>').join('') + '</ul></div>'
       + '</div></div>';
   }
-  if (data.text) {
-    html += '<div class="card"><h3>Наш обзор</h3><div class="review-text">' + data.text + '</div></div>';
+  if (data.text || (data.sections && data.sections.length)) {
+    const sections = data.sections && data.sections.length ? data.sections : [{ text: data.text }];
+    html += '<div class="card"><h3>Наш обзор</h3>' + sections.map((s) => {
+      return (s.title ? '<h4 class="review-subhead">' + s.title + '</h4>' : '') + '<div class="review-text">' + s.text + '</div>';
+    }).join('') + '</div>';
   }
   rootEl.innerHTML = html || '<div class="card"><h3>Обзор</h3><div class="review-text">Оценки, плюсы и минусы появятся здесь, когда мы разберём гайды по этому персонажу.</div></div>';
 }
@@ -1433,6 +1442,36 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// repeat(auto-fill, minmax(min,max)) picks its column COUNT using the max
+// track size whenever max is a definite length (not 1fr) - so a bounded max
+// silently shrinks the column count and leaves a gutter instead of just
+// capping the stretch. Computing an explicit column count/width in JS is the
+// only way to both fill the row edge-to-edge and cap how big cards can get.
+function sizeStaticGrid(el, min, max, gap){
+  if (!el) return;
+  const width = el.getBoundingClientRect().width;
+  if (!width) return;
+  const count = Math.max(1, Math.floor((width + gap) / (min + gap)));
+  const colWidth = Math.min(max, (width - (count - 1) * gap) / count);
+  el.style.gridTemplateColumns = 'repeat(' + count + ', ' + colWidth + 'px)';
+}
+function sizeAllStaticGrids(){
+  document.querySelectorAll('#view-tierlist .tier-items').forEach((el) => sizeStaticGrid(el, 110, 170, 10));
+  document.querySelectorAll('#view-characters .char-grid').forEach((el) => sizeStaticGrid(el, 110, 170, 10));
+}
+let staticGridResizeTimer = null;
+function scheduleSizeAllStaticGrids(){
+  clearTimeout(staticGridResizeTimer);
+  staticGridResizeTimer = setTimeout(sizeAllStaticGrids, 80);
+}
+window.addEventListener('resize', scheduleSizeAllStaticGrids);
+// window 'resize' doesn't reliably fire for every layout change that affects
+// these grids (e.g. some viewport/devtools emulation paths, or the container
+// changing size without the window itself resizing) - a ResizeObserver on
+// #app is the robust fallback that catches any of those too.
+if (typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(scheduleSizeAllStaticGrids).observe(document.getElementById('app'));
+}
 function applyStagger(container){
   if (!container) return;
   // Group by actual row (offsetTop) rather than raw index so the reveal is
