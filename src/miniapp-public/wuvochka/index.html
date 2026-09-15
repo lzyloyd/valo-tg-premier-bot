@@ -160,11 +160,17 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .team-card{background:var(--surface-2);border-radius:14px;overflow:hidden;}
 .team-card-header{padding:10px 12px;font-family:'Exo 2',sans-serif;font-weight:800;font-size:14px;letter-spacing:.03em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);text-align:center;text-transform:uppercase;}
 .team-card-body{display:flex;align-items:stretch;}
-.team-hero{width:142px;flex-shrink:0;align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;}
-.team-hero img{width:120px;height:120px;border-radius:10px;object-fit:cover;display:block;}
-.team-hero span{font-size:9.5px;color:var(--text-muted);text-align:center;line-height:1.2;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.team-columns{flex:1;display:flex;min-width:0;}
-.team-column{container-type:inline-size;flex:1;padding:10px 4px;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);min-width:0;}
+.team-hero{container-type:inline-size;flex:1;min-width:0;align-self:stretch;padding:10px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;}
+.team-hero img{width:clamp(80px, 55cqw, 120px);height:clamp(80px, 55cqw, 120px);border-radius:10px;object-fit:cover;display:block;}
+.team-hero span{font-size:9.5px;color:var(--text-muted);text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* display:contents lets each .team-column sit as a direct flex sibling of
+   .team-hero in .team-card-body, instead of splitting a single shared
+   "columns" share between them - that's what makes every slot equal width.
+   Every slot's own image is sized off its own container width (same clamp
+   as the hero), so slots stay equal-width and each image shrinks together
+   with its slot instead of overflowing it on narrow cards. */
+.team-columns{display:contents;}
+.team-column{container-type:inline-size;flex:1;min-width:0;padding:10px 4px;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);}
 .team-column-picks{display:flex;flex-direction:column;align-items:center;gap:8px;}
 .team-column-pick img{width:clamp(80px, 55cqw, 120px);height:clamp(80px, 55cqw, 120px);border-radius:10px;object-fit:cover;}
 .team-column-pick{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;max-width:100%;}
@@ -382,7 +388,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.61</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.62</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
