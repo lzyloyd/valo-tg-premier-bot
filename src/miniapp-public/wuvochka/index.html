@@ -340,6 +340,9 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .proscons li{margin-bottom:5px;}
 
 .review-text{font-size:13px;line-height:1.65;color:var(--text);}
+.review-text p{margin:0 0 8px;}
+.review-text p:last-child{margin-bottom:0;}
+.echo-skill-cd{color:var(--text-muted);font-size:12px;}
 .review-text + .review-subhead{margin-top:14px;}
 .review-subhead{font-family:'Exo 2',sans-serif;font-weight:800;font-size:13px;color:var(--accent);margin:0 0 6px;}
 
@@ -389,7 +392,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.8</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.9</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -841,8 +844,8 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div class="echo-item-sets" id="ei-sets"></div>
       </div>
       <div class="card">
-        <h3>Описание</h3>
-        <div class="review-text">Описание навыка этого эхо появится здесь позже.</div>
+        <h3>Способность эхо</h3>
+        <div class="review-text" id="ei-skill-desc">Описание навыка этого эхо появится здесь позже.</div>
       </div>
     </div>
   </div>
@@ -852,6 +855,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 
 <script>
 let WEAPON_FACTS = {};
+let ECHO_SKILLS = {};
 const WEAPON_TYPE_RU = {"Sword":"Меч","Broadblade":"Клинок","Pistols":"Пистолеты","Gauntlets":"Перчатки","Rectifier":"Ректификатор"};
 let CHARACTERS = [];
 let WEAPONS = [];
@@ -864,7 +868,7 @@ let KIT = {};
 let TEAMS = { tiers: [] };
 let TIERLIST = { modes: [], toa: { tiers: [] }, ww: { tiers: [] } };
 async function loadGameData(){
-  const [characters, weapons, echoData, builds, gameplay, reviews, kit, weaponFacts, teams, tierlist] = await Promise.all([
+  const [characters, weapons, echoData, builds, gameplay, reviews, kit, weaponFacts, echoSkills, teams, tierlist] = await Promise.all([
     fetch('/wuwa-assets/characters/index.json').then((r) => r.json()),
     fetch('/wuwa-assets/weapons/index.json').then((r) => r.json()),
     fetch('/wuvochka/echo-data.json').then((r) => r.json()),
@@ -873,6 +877,7 @@ async function loadGameData(){
     fetch('/wuvochka/reviews.json').then((r) => r.json()),
     fetch('/wuvochka/kit.json').then((r) => r.json()),
     fetch('/wuvochka/weapon-facts.json').then((r) => r.json()),
+    fetch('/wuvochka/echo-skill-facts.json').then((r) => r.json()),
     fetch('/wuvochka/teams.json').then((r) => r.json()),
     fetch('/wuvochka/tierlist.json').then((r) => r.json()),
   ]);
@@ -885,6 +890,7 @@ async function loadGameData(){
   REVIEWS = reviews;
   KIT = kit;
   WEAPON_FACTS = weaponFacts;
+  ECHO_SKILLS = echoSkills;
   TEAMS = teams;
   TIERLIST = tierlist;
 }
@@ -1423,6 +1429,10 @@ function openEchoItem(itemName){
   document.getElementById('ei-sets').innerHTML = item.sets.length
     ? item.sets.map((name) => setPillHtml(name, false)).join('')
     : '<span class="noset-label">Это эхо не входит ни в один из известных комплектов.</span>';
+  const skill = ECHO_SKILLS[item.name];
+  document.getElementById('ei-skill-desc').innerHTML = skill
+    ? skill.skillDesc.split('\n').filter(Boolean).map((p) => '<p>' + p + '</p>').join('') + (skill.cd != null ? '<p class="echo-skill-cd">Перезарядка: ' + skill.cd + 'с</p>' : '')
+    : 'Описание навыка этого эхо появится здесь позже.';
   document.getElementById('view-echo-item').classList.add('active');
   window.scrollTo(0,0);
 }
