@@ -389,7 +389,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.7</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.8</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -851,7 +851,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
 </div>
 
 <script>
-const WEAPON_FACTS = {"21020015":{"name":"Emerald of Genesis","weaponType":"Sword","rarity":5,"passiveName":"Stormy Resolution","passiveDesc":"Восстановление энергии увеличивается на 12.8%/16%/19.2%/22.4%/25.6%. При использовании навыка резонанса АТК увеличивается на 6%/7.5%/9%/10.5%/12%, эффект стакается до 2 раз и длится 10 секунд.","flavor":"Внимайте: ледяной клинок таит в себе стремительное течение, сплетающееся в водоворот мыслей. Обратите эту грозную силу против врагов."},"21020016":{"name":"Blazing Brilliance","weaponType":"Sword","rarity":5,"passiveName":"Crimson Phoenix","passiveDesc":"АТК увеличивается на 12%/15%/18%/21%/24%. При нанесении урона персонаж получает 1 заряд эффекта «Пылающее перо» (не чаще раза в 0.5с), а при использовании навыка резонанса — сразу 5 зарядов. Каждый заряд даёт 4%/5%/6%/7%/8% доп. урона навыка резонанса, максимум 14 зарядов. По достижении максимума все заряды снимаются через 12 секунд.","flavor":"Выковано из самой сути и перьев легендарной птицы — этот клинок пылает светом, что заливает мир своим сиянием. С каждой вспышкой огня он обращает всё на своём пути в пепел."}};
+let WEAPON_FACTS = {};
 const WEAPON_TYPE_RU = {"Sword":"Меч","Broadblade":"Клинок","Pistols":"Пистолеты","Gauntlets":"Перчатки","Rectifier":"Ректификатор"};
 let CHARACTERS = [];
 let WEAPONS = [];
@@ -864,7 +864,7 @@ let KIT = {};
 let TEAMS = { tiers: [] };
 let TIERLIST = { modes: [], toa: { tiers: [] }, ww: { tiers: [] } };
 async function loadGameData(){
-  const [characters, weapons, echoData, builds, gameplay, reviews, kit, teams, tierlist] = await Promise.all([
+  const [characters, weapons, echoData, builds, gameplay, reviews, kit, weaponFacts, teams, tierlist] = await Promise.all([
     fetch('/wuwa-assets/characters/index.json').then((r) => r.json()),
     fetch('/wuwa-assets/weapons/index.json').then((r) => r.json()),
     fetch('/wuvochka/echo-data.json').then((r) => r.json()),
@@ -872,6 +872,7 @@ async function loadGameData(){
     fetch('/wuvochka/gameplay.json').then((r) => r.json()),
     fetch('/wuvochka/reviews.json').then((r) => r.json()),
     fetch('/wuvochka/kit.json').then((r) => r.json()),
+    fetch('/wuvochka/weapon-facts.json').then((r) => r.json()),
     fetch('/wuvochka/teams.json').then((r) => r.json()),
     fetch('/wuvochka/tierlist.json').then((r) => r.json()),
   ]);
@@ -883,6 +884,7 @@ async function loadGameData(){
   GAMEPLAY = gameplay;
   REVIEWS = reviews;
   KIT = kit;
+  WEAPON_FACTS = weaponFacts;
   TEAMS = teams;
   TIERLIST = tierlist;
 }
