@@ -281,7 +281,7 @@ function renderTeamScreen() {
   const rowFor = (time) => {
     const cells = state.days
       .map((d) => {
-        if (state.daysOff.includes(d.key)) return `<div style="text-align:center">☀️</div>`;
+        if (state.daysOff.includes(d.key)) return `<div style="text-align:center;font-size:9.5px;font-weight:700;color:var(--warn);line-height:1.4">☀️<br/>Выходной</div>`;
         return d.slots.includes(time) ? `<div>${teamCell(availableFor(d.key, time))}</div>` : `<div style="text-align:center;color:var(--text-muted)">—</div>`;
       })
       .join('');
