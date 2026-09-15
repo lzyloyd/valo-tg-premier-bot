@@ -62,6 +62,12 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .pip.filled{background:var(--on);opacity:.4;}
 .pip.filled.quorum{opacity:1;}
 .admin-lock{font-size:10.5px;color:var(--text-muted);background:var(--surface-2);border-radius:8px;padding:7px 10px;margin-bottom:14px;}
+.dayoff-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.dayoff-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;padding:8px 11px;border-radius:8px;cursor:pointer;}
+.dayoff-btn.active{background:var(--warn-bg);border-color:var(--warn-border);color:var(--warn);}
+.dayoff-btn[disabled]{opacity:.5;cursor:not-allowed;}
+.day-card.day-off{opacity:.55;}
+.day-off-label{grid-column:2 / span 2;text-align:center;font-size:12px;font-weight:700;color:var(--warn);}
 .admin-progress{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .admin-progress .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;}
 .admin-progress .lbl{font-size:10.5px;color:var(--text-muted);}
@@ -209,6 +215,16 @@ function renderTabs() {
 function renderMeScreen() {
   const cards = state.days
     .map((d) => {
+      if (state.daysOff.includes(d.key)) {
+        return `<div class="day-card day-off">
+          <div class="day-id">
+            <div class="day-name">${d.label}</div>
+            <div class="day-date">${shortDate(d.dateIso)}</div>
+            <div class="day-kind">${d.kind}</div>
+          </div>
+          <div class="day-off-label">🏖 Выходной</div>
+        </div>`;
+      }
       const my = draft[d.key];
       const slots = d.slots
         .map((t) => {
@@ -264,7 +280,10 @@ function renderTeamScreen() {
     .join('')}</div>`;
   const rowFor = (time) => {
     const cells = state.days
-      .map((d) => (d.slots.includes(time) ? `<div>${teamCell(availableFor(d.key, time))}</div>` : `<div style="text-align:center;color:var(--text-muted)">—</div>`))
+      .map((d) => {
+        if (state.daysOff.includes(d.key)) return `<div style="text-align:center">🏖</div>`;
+        return d.slots.includes(time) ? `<div>${teamCell(availableFor(d.key, time))}</div>` : `<div style="text-align:center;color:var(--text-muted)">—</div>`;
+      })
       .join('');
     return `<div class="team-row"><div style="font-weight:700;font-size:11px;padding-left:10px">${time}</div>${cells}</div>`;
   };
@@ -290,8 +309,16 @@ function renderAdminScreen() {
         )
         .join('')
     : `<div class="empty-note">Правок после дедлайна пока нет.</div>`;
+  const dayoffToggles = state.days
+    .map((d) => {
+      const isOff = state.daysOff.includes(d.key);
+      return `<button class="dayoff-btn${isOff ? ' active' : ''}" data-day="${d.key}" data-off="${isOff ? '0' : '1'}">${d.label}${isOff ? ' 🏖' : ''}</button>`;
+    })
+    .join('');
   return `<div class="screen">
     <div class="admin-lock">🔒 Видно только тебе</div>
+    <div class="section-lbl">Выходные дни</div>
+    <div class="dayoff-list">${dayoffToggles}</div>
     <div class="admin-progress">
       <div><div class="num">${state.answeredCount}<span style="color:var(--text-muted);font-size:13px">/${state.roster.length}</span></div><div class="lbl">ответили</div></div>
     </div>
@@ -331,6 +358,21 @@ function bindEvents() {
       draft[day].slots = draft[day].slots.includes(t) ? draft[day].slots.filter((x) => x !== t) : [...draft[day].slots, t];
       render();
       await saveDay(day);
+    }),
+  );
+
+  document.querySelectorAll('.dayoff-btn').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      const day = btn.dataset.day;
+      const isOff = btn.dataset.off === '1';
+      btn.disabled = true;
+      try {
+        state = await api('/api/set-day-off', { day, isOff });
+        render();
+      } catch (err) {
+        tg?.showAlert?.(err.message) ?? alert(err.message);
+        btn.disabled = false;
+      }
     }),
   );
 

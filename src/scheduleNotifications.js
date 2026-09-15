@@ -104,7 +104,7 @@ export async function resetWeekAndAnnounce() {
 // hasn't finished all 6 days yet, and says nothing if everyone already has.
 export async function sendDeadlineReminder() {
   const week = await loadCurrentWeek();
-  const missing = ROSTER.filter((u) => !hasFullyAnswered(week.responses, u));
+  const missing = ROSTER.filter((u) => !hasFullyAnswered(week.responses, u, week.daysOff));
   if (missing.length === 0) return;
   await sendTextTo(
     config.scheduleChatId,

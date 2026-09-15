@@ -114,8 +114,8 @@ export function weekDayDates(weekStart) {
 
 // "Answered" means all 6 days have a yes/no — a stray click on just one day
 // (leaving the other 5 untouched) shouldn't read as a completed submission.
-export function hasFullyAnswered(responses, username) {
-  return DAYS.every((d) => responses[username]?.[d.key]?.avail);
+export function hasFullyAnswered(responses, username, daysOff = []) {
+  return DAYS.filter((d) => !daysOff.includes(d.key)).every((d) => responses[username]?.[d.key]?.avail);
 }
 
 function availableFor(responses, day, slot) {
@@ -184,8 +184,10 @@ export function slotInstant(weekStart, dayKey, time) {
 // what the 60/10-minute-before reminders are scheduled from.
 export function computeWeekSessions(week) {
   const weekStart = weekStartFromIso(week.weekStart);
+  const daysOff = week.daysOff ?? [];
   const sessions = [];
   for (const day of DAYS) {
+    if (daysOff.includes(day.key)) continue;
     for (const { slot, lineup } of computeDaySessions(day, week.responses)) {
       sessions.push({ dayKey: day.key, dayLabel: day.label, slot, lineup, startsAt: slotInstant(weekStart, day.key, slot) });
     }
@@ -199,23 +201,28 @@ export function computeWeekSessions(week) {
  */
 export function buildSummaryText(week) {
   const days = weekDayDates(weekStartFromIso(week.weekStart));
+  const daysOff = week.daysOff ?? [];
   const lines = [`📅 Расписание — ${formatDayDate(days[0].dateIso)}–${formatDayDate(days[5].dateIso)}`, ''];
 
   for (const day of days) {
     lines.push(`${day.label} ${formatDayDate(day.dateIso)} · ${day.kind}`);
-    const sessions = computeDaySessions(day, week.responses);
-    if (sessions.length === 0) {
-      lines.push('▫️ сессии не будет');
+    if (daysOff.includes(day.key)) {
+      lines.push('🏖 выходной');
     } else {
-      for (const s of sessions) {
-        lines.push(`✅ ${s.slot} — играют: ${s.lineup.map((u) => `@${u}`).join(', ')}`);
+      const sessions = computeDaySessions(day, week.responses);
+      if (sessions.length === 0) {
+        lines.push('▫️ сессии не будет');
+      } else {
+        for (const s of sessions) {
+          lines.push(`✅ ${s.slot} — играют: ${s.lineup.map((u) => `@${u}`).join(', ')}`);
+        }
       }
     }
     lines.push('');
   }
 
-  const answered = ROSTER.filter((u) => hasFullyAnswered(week.responses, u));
-  const missing = ROSTER.filter((u) => !hasFullyAnswered(week.responses, u));
+  const answered = ROSTER.filter((u) => hasFullyAnswered(week.responses, u, daysOff));
+  const missing = ROSTER.filter((u) => !hasFullyAnswered(week.responses, u, daysOff));
   lines.push(`Ответили: ${answered.length}/${ROSTER.length}${missing.length ? ` · не ответил(и): ${missing.map((n) => `@${n}`).join(', ')}` : ''}`);
 
   return lines.join('\n');

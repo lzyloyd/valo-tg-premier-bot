@@ -6,6 +6,7 @@ function emptyWeek(weekStart) {
   return {
     weekStart: mskIsoDate(weekStart),
     responses: {},
+    daysOff: [], // day keys the admin marked as a day off this week — no session, not required to answer
     lastSaved: {}, // username -> ISO timestamp of their last save, for the "Расписание" tab's save status
     edits: [], // post-deadline changes, newest first — shown on the admin tab
     summaryMessageId: null, // the sent summary message, kept in sync as post-deadline edits come in
@@ -87,6 +88,21 @@ export async function setResponse(username, day, avail, slots, now = new Date())
 
   await writeFile(week);
   return { week, isPostDeadlineEdit };
+}
+
+// Admin-only toggle for a day this week — marks it as having no session at
+// all, regardless of anyone's availability (see computeWeekSessions /
+// buildSummaryText). Not itself logged as a post-deadline "edit" the way a
+// player's own answer change is; it's an admin action, not a roster answer.
+export async function setDayOff(day, isOff, now = new Date()) {
+  if (!DAYS.some((d) => d.key === day)) throw new Error(`Unknown day: ${day}`);
+
+  const week = await loadCurrentWeek(now);
+  week.daysOff ??= [];
+  week.daysOff = isOff ? [...new Set([...week.daysOff, day])] : week.daysOff.filter((d) => d !== day);
+
+  await writeFile(week);
+  return week;
 }
 
 // Remembers which sent Telegram message is "the" summary for this week, so

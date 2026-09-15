@@ -4,8 +4,8 @@ import express from 'express';
 import { config } from './config.js';
 import { verifyInitData } from './telegramAuth.js';
 import { DAYS, ROSTER, QUORUM, weekDayDates, weekStartFromIso, buildSummaryText, hasFullyAnswered } from './scheduleModel.js';
-import { loadCurrentWeek, setResponse } from './scheduleStore.js';
-import { sendSummary, handlePostDeadlineEdit } from './scheduleNotifications.js';
+import { loadCurrentWeek, setResponse, setDayOff } from './scheduleStore.js';
+import { sendSummary, handlePostDeadlineEdit, scheduleUpcomingSessionReminders } from './scheduleNotifications.js';
 import { WUVOCHKA_ROSTER } from './wuvochkaModel.js';
 import { loadProfile, toggleFavorite, toggleOwned, setAvatar } from './wuvochkaStore.js';
 
@@ -41,14 +41,16 @@ function authenticateWuvochka(req, res) {
 
 function weekView(week, auth) {
   const weekStart = weekStartFromIso(week.weekStart);
+  const daysOff = week.daysOff ?? [];
   return {
     days: weekDayDates(weekStart),
     quorum: QUORUM,
     roster: ROSTER,
     responses: week.responses,
+    daysOff,
     edits: auth.isAdmin ? week.edits : [],
     summaryPreview: auth.isAdmin ? buildSummaryText(week) : null,
-    answeredCount: ROSTER.filter((u) => hasFullyAnswered(week.responses, u)).length,
+    answeredCount: ROSTER.filter((u) => hasFullyAnswered(week.responses, u, daysOff)).length,
     me: { username: auth.username, isAdmin: auth.isAdmin, lastSaved: week.lastSaved?.[auth.username] || null },
   };
 }
@@ -97,6 +99,31 @@ export function startMiniAppServer() {
       res.json(weekView(week, auth));
     } catch (err) {
       console.error('[miniapp] update failed:', err);
+      res.status(500).json({ error: 'Не получилось сохранить, попробуй ещё раз.' });
+    }
+  });
+
+  app.post('/api/set-day-off', async (req, res) => {
+    const auth = authenticate(req, res);
+    if (!auth) return;
+    if (!auth.isAdmin) {
+      res.status(403).json({ error: 'Только админ может отмечать выходные.' });
+      return;
+    }
+    const { day, isOff } = req.body ?? {};
+    const dayDef = DAYS.find((d) => d.key === day);
+    if (!dayDef || typeof isOff !== 'boolean') {
+      res.status(400).json({ error: 'Некорректные данные.' });
+      return;
+    }
+    try {
+      const week = await setDayOff(day, isOff);
+      scheduleUpcomingSessionReminders().catch((err) =>
+        console.error('[miniapp] failed to reschedule session reminders after day-off toggle:', err),
+      );
+      res.json(weekView(week, auth));
+    } catch (err) {
+      console.error('[miniapp] set-day-off failed:', err);
       res.status(500).json({ error: 'Не получилось сохранить, попробуй ещё раз.' });
     }
   });
