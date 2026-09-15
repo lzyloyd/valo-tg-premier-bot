@@ -1,0 +1,22 @@
+{
+  "1212": {
+    "skills": {
+      "active": [
+        { "name": "Базовая атака — Drink Soul / Devil's Bane", "desc": "До 4 ударов подряд в стойке Yin Vessel (Drink Soul) или Yang Font (Devil's Bane), урон Fusion. 3-я и 4-я стадии восстанавливают Qi и наносят урон как тяжёлая атака." },
+        { "name": "Навык резонанса — Encroaching Yin / Scorching Yang", "desc": "Доступен в соответствующей стойке, урон Fusion, можно применять в воздухе. Даёт эффект Cleanse of Impurity на 4с, открывающий доступ к Netherworld Traverse/Afterlife's Guide." },
+        { "name": "Ультимативный навык — Burial of Thousand Souls", "desc": "Урон Fusion (как тяжёлая атака). Срезает HP до 50% (если было больше), даёт 200 Qi, 3 стака Wayfarer's Mark и запускает состояние Yinghuo на 15с, в котором тяжёлые атаки призывают дополнительный урон Fusion." }
+      ],
+      "passive": [
+        { "name": "Forte Circuit — Qi и смена стоек", "desc": "При накоплении 300 Qi тяжёлая атака (Soul Raid в Yin Vessel / Stardome Meander в Yang Font) расходует весь Qi, наносит урон Fusion и переключает Jingran в противоположную стойку." },
+        { "name": "Fire of Life", "desc": "До 100 очков, выдаются ультой. Пока не закончился Yinghuo, каждая тяжёлая атака расходует 25 очков и увеличивает свой множитель урона за каждую 1000 HP сверх 25 000 (максимум учитывается до 25 000 HP)." },
+        { "name": "Nether to Light / Yang Changes, Yin Unites", "desc": "0 DEF по умолчанию. За каждую 1000 Max HP — бонус входящего лечения (до 310%), бонус урона Fusion (до 75%) и дополнительный АТК (до 1800)." },
+        { "name": "Врождённые навыки — Hark the Dust / Trace the Vestige", "desc": "Дают самощит от урона, пока Jingran активен в команде, и стаки Ghost Shroud, когда тиммейты получают щиты — именно на этом строится бонус урона Fusion с Интро." }
+      ],
+      "concerto": [
+        { "name": "Интро-навык — Question the Tombs", "desc": "Урон Fusion, переводит весь накопленный Ghost Shroud в стаки Fortune in Disguise — каждый даёт временный бонус урона Fusion, зависящий от Max HP." },
+        { "name": "Аутро-навык — Rising Fortune and Ebbing Evil", "desc": "Урон Fusion, равный 795% от АТК Jingran." }
+      ]
+    },
+    "minorFortes": ["Крит. шанс <b>+8%</b>", "HP% <b>+12%</b>"]
+  }
+}

@@ -382,7 +382,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.54</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.6</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -638,9 +638,9 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div class="card">
           <h3>Навыки</h3>
           <div class="skill-kind-tabs">
-            <div class="skill-kind active" data-kind="active">Активные</div>
-            <div class="skill-kind" data-kind="passive">Пассивные</div>
-            <div class="skill-kind" data-kind="concerto">Концерто</div>
+            <div class="skill-kind active" data-kind="active" onclick="setKitSkillKind(this,'active')">Активные</div>
+            <div class="skill-kind" data-kind="passive" onclick="setKitSkillKind(this,'passive')">Пассивные</div>
+            <div class="skill-kind" data-kind="concerto" onclick="setKitSkillKind(this,'concerto')">Концерто</div>
           </div>
           <div class="skill-item" data-kind="active">
             <div class="sname">Базовая атака — Infinity Calibration</div>
@@ -678,15 +678,6 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
             <div class="pill">Бонус Fusion <b>+10%</b></div>
             <div class="pill">АТК <b>+50</b></div>
             <div class="pill">Урон Liberation <b>+10%</b></div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Материалы прокачки</h3>
-          <div class="pill-list">
-            <div class="pill">Еженедельный босс — Fallacy of No Return</div>
-            <div class="pill">Элитный монстр — Fusion Core ×46</div>
-            <div class="pill">Руда третьего уровня ×60</div>
-            <div class="pill">Кредиты ковки ×420000</div>
           </div>
         </div>
       </div>
@@ -746,18 +737,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div class="review-dynamic"></div>
       </div>
       <div class="subview-g" id="subg-kit">
-        <div class="card">
-          <h3>Основные данные</h3>
-          <div class="pill-list">
-            <div class="pill">Элемент: <b id="g-fact-element"></b></div>
-            <div class="pill">Оружие: <b id="g-fact-weapon"></b></div>
-            <div class="pill">Редкость: <b id="g-fact-rarity"></b></div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Разбор навыков</h3>
-          <div class="review-text">Подробный разбор активных и пассивных навыков появится здесь, когда мы разберём навыки этого персонажа.</div>
-        </div>
+        <div class="kit-dynamic"></div>
       </div>
       <div class="subview-g" id="subg-build">
         <div class="build-dynamic"></div>
@@ -873,16 +853,18 @@ let ECHO_ITEMS = [];
 let BUILDS = {};
 let GAMEPLAY = {};
 let REVIEWS = {};
+let KIT = {};
 let TEAMS = { tiers: [] };
 let TIERLIST = { modes: [], toa: { tiers: [] }, ww: { tiers: [] } };
 async function loadGameData(){
-  const [characters, weapons, echoData, builds, gameplay, reviews, teams, tierlist] = await Promise.all([
+  const [characters, weapons, echoData, builds, gameplay, reviews, kit, teams, tierlist] = await Promise.all([
     fetch('/wuwa-assets/characters/index.json').then((r) => r.json()),
     fetch('/wuwa-assets/weapons/index.json').then((r) => r.json()),
     fetch('/wuvochka/echo-data.json').then((r) => r.json()),
     fetch('/wuvochka/builds.json').then((r) => r.json()),
     fetch('/wuvochka/gameplay.json').then((r) => r.json()),
     fetch('/wuvochka/reviews.json').then((r) => r.json()),
+    fetch('/wuvochka/kit.json').then((r) => r.json()),
     fetch('/wuvochka/teams.json').then((r) => r.json()),
     fetch('/wuvochka/tierlist.json').then((r) => r.json()),
   ]);
@@ -893,6 +875,7 @@ async function loadGameData(){
   BUILDS = builds;
   GAMEPLAY = gameplay;
   REVIEWS = reviews;
+  KIT = kit;
   TEAMS = teams;
   TIERLIST = tierlist;
 }
@@ -1029,13 +1012,17 @@ document.querySelectorAll('.subtab-g').forEach(t => t.addEventListener('click', 
   document.getElementById('subg-' + t.dataset.subg).classList.add('active');
   moveSubtabIndicator(t);
 }));
-document.querySelectorAll('.skill-kind').forEach(t => t.addEventListener('click', () => {
-  document.querySelectorAll('.skill-kind').forEach(x => x.classList.remove('active'));
-  t.classList.add('active');
-  document.querySelectorAll('.skill-item').forEach(item => {
-    item.style.display = item.dataset.kind === t.dataset.kind ? '' : 'none';
+// Scoped to the enclosing .card so the generic (data-driven) kit tab and
+// Aemeath's hand-written one don't fight over each other's tab state - a
+// single document-wide listener toggled both at once since they share
+// the same .skill-kind/.skill-item classes.
+function setKitSkillKind(btn, kind){
+  const card = btn.closest('.card');
+  card.querySelectorAll('.skill-kind').forEach((x) => x.classList.toggle('active', x.dataset.kind === kind));
+  card.querySelectorAll('.skill-item').forEach((item) => {
+    item.style.display = item.dataset.kind === kind ? '' : 'none';
   });
-}));
+}
 
 // filters: each .filters block declares which attribute on which portraits it controls
 document.querySelectorAll('.filters').forEach(group => {
@@ -1089,11 +1076,9 @@ function openChar(id){
     document.getElementById('g-element').textContent = character.element;
     document.getElementById('g-weapon').textContent = WEAPON_TYPE_RU[character.weaponType] || character.weaponType;
     document.getElementById('g-rarity').textContent = character.rarity + '★';
-    document.getElementById('g-fact-element').textContent = character.element;
-    document.getElementById('g-fact-weapon').textContent = WEAPON_TYPE_RU[character.weaponType] || character.weaponType;
-    document.getElementById('g-fact-rarity').textContent = character.rarity + '★';
     document.getElementById('g-tier-tags').innerHTML = tierTagsHtml(character.id);
     renderReviewTab(document.querySelector('#subg-review .review-dynamic'), character.id);
+    renderKitTab(document.querySelector('#subg-kit .kit-dynamic'), character.id);
     const buildEl = document.querySelector('#subg-build .build-dynamic');
     buildEl.dataset.charId = character.id;
     renderBuildTab(buildEl, character.id);
@@ -1217,6 +1202,26 @@ function renderReviewTab(rootEl, charId){
     }).join('') + '</div>';
   }
   rootEl.innerHTML = html || '<div class="card"><h3>Обзор</h3><div class="review-text">Оценки, плюсы и минусы появятся здесь, когда мы разберём гайды по этому персонажу.</div></div>';
+}
+const SKILL_KIND_LABEL_RU = { active: 'Активные', passive: 'Пассивные', concerto: 'Концерто' };
+function renderKitTab(rootEl, charId){
+  const data = KIT[charId];
+  if (!data || !data.skills) {
+    rootEl.innerHTML = '<div class="card"><h3>Навыки</h3><div class="review-text">Подробный разбор активных и пассивных навыков появится здесь, когда мы разберём навыки этого персонажа.</div></div>';
+    return;
+  }
+  const kinds = ['active', 'passive', 'concerto'].filter((k) => data.skills[k] && data.skills[k].length);
+  const tabsHtml = kinds.map((k, i) => {
+    return '<div class="skill-kind' + (i === 0 ? ' active' : '') + '" data-kind="' + k + '" onclick="setKitSkillKind(this,\'' + k + '\')">' + SKILL_KIND_LABEL_RU[k] + '</div>';
+  }).join('');
+  const itemsHtml = kinds.map((k, i) => data.skills[k].map((s) => {
+    return '<div class="skill-item" data-kind="' + k + '"' + (i === 0 ? '' : ' style="display:none"') + '><div class="sname">' + s.name + '</div><div class="sdesc">' + s.desc + '</div></div>';
+  }).join('')).join('');
+  let html = '<div class="card"><h3>Навыки</h3><div class="skill-kind-tabs">' + tabsHtml + '</div>' + itemsHtml + '</div>';
+  if (data.minorFortes && data.minorFortes.length) {
+    html += '<div class="card"><h3>Малые пассивки (Minor Fortes)</h3><div class="pill-list">' + data.minorFortes.map((m) => '<div class="pill">' + m + '</div>').join('') + '</div></div>';
+  }
+  rootEl.innerHTML = html;
 }
 function renderBuildTab(rootEl, charId){
   const data = BUILDS[charId];
