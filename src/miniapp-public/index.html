@@ -67,7 +67,8 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .dayoff-btn.active{background:var(--warn-bg);border-color:var(--warn-border);color:var(--warn);}
 .dayoff-btn[disabled]{opacity:.5;cursor:not-allowed;}
 .day-card.day-off{opacity:.55;}
-.day-off-label{grid-column:2 / span 2;text-align:center;font-size:12px;font-weight:700;color:var(--warn);}
+.day-off-label{grid-column:2 / span 2;display:flex;align-items:center;justify-content:center;}
+.day-off-label img{height:24px;width:auto;}
 .admin-progress{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .admin-progress .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;}
 .admin-progress .lbl{font-size:10.5px;color:var(--text-muted);}
@@ -222,7 +223,7 @@ function renderMeScreen() {
             <div class="day-date">${shortDate(d.dateIso)}</div>
             <div class="day-kind">${d.kind}</div>
           </div>
-          <div class="day-off-label">🏖 Выходной</div>
+          <div class="day-off-label"><img src="chill.png" alt="Выходной" /></div>
         </div>`;
       }
       const my = draft[d.key];
@@ -281,7 +282,7 @@ function renderTeamScreen() {
   const rowFor = (time) => {
     const cells = state.days
       .map((d) => {
-        if (state.daysOff.includes(d.key)) return `<div style="text-align:center">🏖</div>`;
+        if (state.daysOff.includes(d.key)) return `<div style="text-align:center"><img src="chill.png" alt="Выходной" style="height:14px;width:auto" /></div>`;
         return d.slots.includes(time) ? `<div>${teamCell(availableFor(d.key, time))}</div>` : `<div style="text-align:center;color:var(--text-muted)">—</div>`;
       })
       .join('');
