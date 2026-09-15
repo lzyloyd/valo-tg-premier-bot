@@ -271,7 +271,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .noset-hero{display:flex;align-items:center;justify-content:center;background:var(--surface-3);color:var(--text-muted);font-size:26px;}
 .noset-hero::before{content:'∅';}
 
-.subtabs{position:relative;display:flex;gap:2px;overflow-x:auto;overflow-y:hidden;margin-bottom:16px;border-bottom:1px solid var(--border);}
+.subtabs{position:relative;display:flex;justify-content:center;gap:2px;overflow-x:auto;overflow-y:hidden;margin-bottom:16px;border-bottom:1px solid var(--border);}
 .subtab-indicator{position:absolute;left:0;bottom:-1px;width:0;height:2px;background:var(--accent);border-radius:2px;transition:left .25s cubic-bezier(.4,0,.2,1),width .25s cubic-bezier(.4,0,.2,1);pointer-events:none;}
 .subtab,.subtab-g{flex-shrink:0;border:none;background:none;color:var(--text-muted);font-family:'Exo 2',sans-serif;font-weight:700;font-size:12px;padding:9px 11px 11px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s ease;}
 .subtab:not(.active):hover,.subtab-g:not(.active):hover{color:var(--text);}
@@ -382,7 +382,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.6</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.61</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
