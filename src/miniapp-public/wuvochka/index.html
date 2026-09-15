@@ -306,10 +306,11 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .buff-weapon{font-weight:700;}
 .synergy-block{padding:11px 0;border-top:1px solid var(--border);}
 .synergy-block:first-child{border-top:none;padding-top:0;}
-.synergy-avatars{display:flex;gap:6px;margin-bottom:7px;}
+.synergy-header{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.synergy-avatars{display:flex;gap:6px;flex-shrink:0;}
 .synergy-avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--surface-2);margin-left:-10px;}
 .synergy-avatar:first-child{margin-left:0;}
-.synergy-block h4{font-size:13px;margin:0 0 4px;color:var(--accent);}
+.synergy-block h4{font-size:13px;margin:0;color:var(--accent);}
 .dmg-bar-row{padding:8px 0;border-top:1px solid var(--border);}
 .dmg-bar-row:first-child{border-top:none;padding-top:0;}
 .dmg-bar-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;}
@@ -388,7 +389,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.62</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v2.63</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -1295,10 +1296,11 @@ function renderGameplayTab(rootEl, charId){
   }
   if (data.synergies && data.synergies.length) {
     html += '<div class="card"><h3>Синергии</h3>' + data.synergies.map((s) => {
-      return '<div class="synergy-block"><div class="synergy-avatars">' + s.charIds.map((id) => {
+      const avatarsHtml = s.charIds.map((id) => {
         const c = CHARACTERS.find((x) => x.id === id);
         return c ? '<img class="synergy-avatar" src="/wuwa-assets/characters/' + c.id + '.webp" alt="" title="' + c.name + '">' : '';
-      }).join('') + '</div><h4>' + s.title + '</h4><div class="review-text">' + s.text + '</div></div>';
+      }).join('');
+      return '<div class="synergy-block"><div class="synergy-header"><div class="synergy-avatars">' + avatarsHtml + '</div><h4>' + s.title + '</h4></div><div class="review-text">' + s.text + '</div></div>';
     }).join('') + '</div>';
   }
   if (data.teams && data.teams.length) {
