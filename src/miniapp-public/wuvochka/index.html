@@ -46,6 +46,10 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .search-btn svg{width:19px;height:19px;flex-shrink:0;}
 .search-btn span{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .search-btn:hover{background:var(--surface-3);color:var(--text);border-color:var(--accent);}
+@media (max-width:560px){
+  .search-btn{padding:10px;}
+  .search-btn span{display:none;}
+}
 .account-btn{background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;}
 .account-btn:hover .account-avatar{border-color:var(--accent);}
 .account-avatar{width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--surface-2);font-size:17px;transition:border-color .15s ease;}
@@ -410,7 +414,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.82</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.83</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
