@@ -1,0 +1,389 @@
+[
+ {
+  "id": 340000010,
+  "name": "Crownless",
+  "category": "world",
+  "element": "havoc",
+  "resistantTo": "havoc",
+  "art": "340000010.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457291"
+ },
+ {
+  "id": 330000050,
+  "name": "Feilian Beringal",
+  "category": "world",
+  "element": "aero",
+  "resistantTo": "aero",
+  "art": "330000050.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457304"
+ },
+ {
+  "id": 330000030,
+  "name": "Impermanence Heron",
+  "category": "world",
+  "element": "havoc",
+  "resistantTo": "havoc",
+  "art": "330000030.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457326"
+ },
+ {
+  "id": 330000020,
+  "name": "Inferno Rider",
+  "category": "world",
+  "element": "fusion",
+  "resistantTo": "fusion",
+  "art": "330000020.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457327"
+ },
+ {
+  "id": 330000040,
+  "name": "Lampylumen Myriad",
+  "category": "world",
+  "element": "glacio",
+  "resistantTo": "glacio",
+  "art": "330000040.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/456941"
+ },
+ {
+  "id": 340000060,
+  "name": "Mech Abomination",
+  "category": "world",
+  "element": "electro",
+  "resistantTo": "electro",
+  "art": "340000060.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457332"
+ },
+ {
+  "id": 330000060,
+  "name": "Mourning Aix",
+  "category": "world",
+  "element": "spectro",
+  "resistantTo": "spectro",
+  "art": "330000060.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457333"
+ },
+ {
+  "id": 330000010,
+  "name": "Tempest Mephis",
+  "category": "world",
+  "element": "electro",
+  "resistantTo": "electro",
+  "art": "330000010.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457334"
+ },
+ {
+  "id": 340000080,
+  "name": "Thundering Mephis",
+  "category": "world",
+  "element": "electro",
+  "resistantTo": "electro",
+  "art": "340000080.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457348"
+ },
+ {
+  "id": 330000070,
+  "name": "Fallacy of No Return",
+  "category": "world",
+  "element": "spectro",
+  "resistantTo": "spectro",
+  "art": "330000070.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/474458"
+ },
+ {
+  "id": 330000120,
+  "name": "Sentry Construct",
+  "category": "world",
+  "element": "glacio",
+  "resistantTo": "glacio",
+  "art": "330000120.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492527"
+ },
+ {
+  "id": 330000130,
+  "name": "Dragon of Dirge",
+  "category": "world",
+  "element": "fusion",
+  "resistantTo": "fusion",
+  "art": "330000130.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492532"
+ },
+ {
+  "id": 330000110,
+  "name": "Lorelei",
+  "category": "world",
+  "element": "havoc",
+  "resistantTo": "havoc",
+  "art": "330000110.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492536"
+ },
+ {
+  "id": 340000140,
+  "name": "Lioness of Glory",
+  "category": "world",
+  "element": "fusion",
+  "resistantTo": "fusion",
+  "art": "340000140.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/526725"
+ },
+ {
+  "id": 340000150,
+  "name": "Fenrico",
+  "category": "world",
+  "element": "aero",
+  "resistantTo": "aero",
+  "art": "340000150.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/538758"
+ },
+ {
+  "id": 340000170,
+  "name": "The False Sovereign",
+  "category": "world",
+  "element": "electro",
+  "resistantTo": "electro",
+  "art": "340000170.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/546378"
+ },
+ {
+  "id": 340000180,
+  "name": "Lady of the Sea",
+  "category": "world",
+  "element": "aero",
+  "resistantTo": "aero",
+  "art": "340000180.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/546549"
+ },
+ {
+  "id": 340000210,
+  "name": "Hyvatia",
+  "category": "world",
+  "element": "spectro",
+  "resistantTo": "spectro",
+  "art": "340000210.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/571402"
+ },
+ {
+  "id": 340000220,
+  "name": "Reactor Husk",
+  "category": "world",
+  "element": "fusion",
+  "resistantTo": "fusion",
+  "art": "340000220.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/571427"
+ },
+ {
+  "id": 340000260,
+  "name": "Nameless Explorer",
+  "category": "world",
+  "element": "aero",
+  "resistantTo": "aero",
+  "art": "340000260.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/579149"
+ },
+ {
+  "id": 340000290,
+  "name": "Nightmare: Adam Smasher",
+  "category": "world",
+  "element": "physical",
+  "resistantTo": null,
+  "art": "340000290.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/604231"
+ },
+ {
+  "id": 340000300,
+  "name": "Myriad Snare: Rustfire Chassis",
+  "category": "world",
+  "element": "fusion",
+  "resistantTo": "fusion",
+  "art": "340000300.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/607318"
+ },
+ {
+  "id": 340000320,
+  "name": "Calamity Effigy",
+  "category": "world",
+  "element": "aero",
+  "resistantTo": null,
+  "art": "340000320.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/616369"
+ },
+ {
+  "id": 330000140,
+  "name": "Nightmare: Feilian Beringal",
+  "category": "nightmare",
+  "element": "electro",
+  "resistantTo": "aero",
+  "art": "330000140.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492492"
+ },
+ {
+  "id": 330000150,
+  "name": "Nightmare: Impermanence Heron",
+  "category": "nightmare",
+  "element": "havoc",
+  "resistantTo": "havoc",
+  "art": "330000150.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492493"
+ },
+ {
+  "id": 330000160,
+  "name": "Nightmare: Thundering Mephis",
+  "category": "nightmare",
+  "element": "electro",
+  "resistantTo": "electro",
+  "art": "330000160.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492494"
+ },
+ {
+  "id": 330000170,
+  "name": "Nightmare: Tempest Mephis",
+  "category": "nightmare",
+  "element": "electro",
+  "resistantTo": "electro",
+  "art": "330000170.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492495"
+ },
+ {
+  "id": 330000180,
+  "name": "Nightmare: Crownless",
+  "category": "nightmare",
+  "element": "havoc",
+  "resistantTo": "havoc",
+  "art": "330000180.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492496"
+ },
+ {
+  "id": 330000190,
+  "name": "Nightmare: Inferno Rider",
+  "category": "nightmare",
+  "element": "fusion",
+  "resistantTo": "fusion",
+  "art": "330000190.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492497"
+ },
+ {
+  "id": 330000200,
+  "name": "Nightmare: Mourning Aix",
+  "category": "nightmare",
+  "element": "spectro",
+  "resistantTo": "spectro",
+  "art": "330000200.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492498"
+ },
+ {
+  "id": 340000130,
+  "name": "Nightmare: Lampylumen Myriad",
+  "category": "nightmare",
+  "element": "glacio",
+  "resistantTo": "glacio",
+  "art": "340000130.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/506683"
+ },
+ {
+  "id": 340000110,
+  "name": "Nightmare: Kelpie",
+  "category": "nightmare",
+  "element": "glacio",
+  "resistantTo": "glacio",
+  "art": "340000110.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/526510"
+ },
+ {
+  "id": 340000160,
+  "name": "Nightmare: Hecate",
+  "category": "nightmare",
+  "element": "havoc",
+  "resistantTo": "havoc",
+  "art": "340000160.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/538754"
+ },
+ {
+  "id": 340000050,
+  "name": "Scar",
+  "category": "weekly",
+  "element": "spectro",
+  "resistantTo": "fusion",
+  "art": "340000050.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/456244"
+ },
+ {
+  "id": 340000020,
+  "name": "Bell-Borne Geochelone",
+  "category": "weekly",
+  "element": "glacio",
+  "resistantTo": "glacio",
+  "art": "340000020.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457285"
+ },
+ {
+  "id": 340000070,
+  "name": "Dreamless",
+  "category": "weekly",
+  "element": "havoc",
+  "resistantTo": "havoc",
+  "art": "340000070.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457287"
+ },
+ {
+  "id": 340000090,
+  "name": "Jué",
+  "category": "weekly",
+  "element": "spectro",
+  "resistantTo": "electro",
+  "art": "340000090.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/459813"
+ },
+ {
+  "id": 340000100,
+  "name": "Hecate",
+  "category": "weekly",
+  "element": "havoc",
+  "resistantTo": "fusion",
+  "art": "340000100.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492554"
+ },
+ {
+  "id": 340000120,
+  "name": "Fleurdelys",
+  "category": "weekly",
+  "element": "aero",
+  "resistantTo": "aero",
+  "art": "340000120.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/507272"
+ },
+ {
+  "id": 340000200,
+  "name": "Threnodian: Leviathan",
+  "category": "weekly",
+  "element": "aero",
+  "resistantTo": "aero",
+  "art": "340000200.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/556641"
+ },
+ {
+  "id": 340000250,
+  "name": "Sigillum",
+  "category": "weekly",
+  "element": "spectro",
+  "resistantTo": "spectro",
+  "art": "340000250.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/578147"
+ },
+ {
+  "id": 340000280,
+  "name": "Denia",
+  "category": "weekly",
+  "element": "fusion",
+  "resistantTo": "fusion",
+  "art": "340000280.webp",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/597670"
+ },
+ {
+  "id": 340000310,
+  "name": "Thousand-Puppet Pavilion",
+  "category": "weekly",
+  "element": "havoc",
+  "resistantTo": "electro",
+  "art": "340000310.png",
+  "game8Url": "https://game8.co/games/Wuthering-Waves/archives/607319"
+ }
+]

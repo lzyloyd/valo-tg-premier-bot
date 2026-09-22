@@ -379,6 +379,22 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .search-name{font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .search-meta{font-size:11px;color:var(--text-muted);margin-top:1px;}
 .search-hint,.search-empty{color:var(--text-muted);font-size:13px;text-align:center;padding:40px 16px;}
+
+/* bosses */
+.section-title{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;}
+.boss-mode-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 14px;margin-bottom:9px;}
+.boss-mode-card h3{margin:0 0 3px;font-size:13px;font-family:'Exo 2',sans-serif;font-weight:800;}
+.boss-mode-card .boss-mode-label{font-size:11px;color:var(--text-muted);margin-bottom:9px;}
+.boss-mode-empty{color:var(--text-muted);font-size:12.5px;}
+.boss-mode-row{display:flex;flex-wrap:wrap;gap:8px;}
+.boss-mode-chip{display:flex;align-items:center;gap:7px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:5px 11px 5px 5px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease;}
+.boss-mode-chip:hover{background:var(--surface-3);border-color:var(--accent);}
+.boss-mode-chip img{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.boss-mode-chip span{font-size:12px;font-weight:600;}
+.boss-modes-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.boss-guide-section{padding:9px 0;border-top:1px solid var(--border);}
+.boss-guide-section:first-child{border-top:none;padding-top:0;}
+.boss-guide-section h4{margin:0 0 4px;font-size:12.5px;color:var(--accent);}
 .item-card{display:flex;gap:11px;align-items:center;padding:10px 0;border-top:1px solid var(--border);}
 .item-card:first-child{border-top:none;padding-top:0;}
 .item-icon{width:42px;height:42px;border-radius:10px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--border);}
@@ -425,7 +441,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.9</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.0</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -449,6 +465,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
     <button class="tab" data-view="characters"><span class="nav-icon">⭐</span>Персонажи</button>
     <button class="tab" data-view="weapons"><span class="nav-icon">⚔️</span>Оружие</button>
     <button class="tab" data-view="echoes"><span class="nav-icon">🔮</span>Эхо</button>
+    <button class="tab" data-view="bosses"><span class="nav-icon">💀</span>Боссы</button>
     <div class="sidebar-group-label">Прочее</div>
     <button class="tab" data-view="profile"><span class="nav-icon">👤</span>Профиль</button>
     <button class="tab" data-view="matrix"><span class="nav-icon">🧩</span>Матрица</button>
@@ -584,6 +601,33 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <div class="echo-count" id="echo-count"></div>
       </div>
       <div class="char-grid echo-item-list" id="echoes-grid"></div>
+    </div>
+  </div>
+
+  <!-- BOSSES -->
+  <div class="view" id="view-bosses">
+    <div class="screen">
+      <div id="boss-mode-blocks"></div>
+      <h3 class="section-title">Все боссы</h3>
+      <div class="char-grid" id="bosses-grid"></div>
+    </div>
+  </div>
+
+  <!-- BOSS DETAIL -->
+  <div class="view" id="view-boss">
+    <div class="screen">
+      <div class="back-row" onclick="closeBoss()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        Назад
+      </div>
+      <div class="char-hero">
+        <div class="portrait hero"><img class="portrait-img" id="boss-portrait-img" src="" alt=""><span class="ring"></span></div>
+        <div><h2 id="boss-name"></h2><div class="hero-tags" id="boss-tags"></div></div>
+      </div>
+      <div class="card"><h3>Где сейчас участвует</h3><div id="boss-modes"></div></div>
+      <div class="card"><h3>Как победить коротко</h3><div class="review-text" id="boss-summary"></div></div>
+      <div class="card"><h3>Лучшие команды</h3><div id="boss-counter-teams"></div></div>
+      <div class="card"><h3>Подробный гайд</h3><div id="boss-guide"></div></div>
     </div>
   </div>
 
@@ -928,8 +972,10 @@ let REVIEWS = {};
 let KIT = {};
 let TEAMS = { tiers: [] };
 let TIERLIST = { modes: [], toa: { tiers: [] }, ww: { tiers: [] } };
+let BOSSES = {};
+let BOSS_MODES = { tower: { bossIds: [] }, wastes: { bossIds: [] }, dpm: { bossIds: [] } };
 async function loadGameData(){
-  const [characters, weapons, echoData, builds, gameplay, reviews, kit, weaponFacts, echoSkills, teams, tierlist] = await Promise.all([
+  const [characters, weapons, echoData, builds, gameplay, reviews, kit, weaponFacts, echoSkills, teams, tierlist, bosses, bossModes] = await Promise.all([
     fetch('/wuwa-assets/characters/index.json').then((r) => r.json()),
     fetch('/wuwa-assets/weapons/index.json').then((r) => r.json()),
     fetch('/wuvochka/echo-data.json').then((r) => r.json()),
@@ -941,6 +987,8 @@ async function loadGameData(){
     fetch('/wuvochka/echo-skill-facts.json').then((r) => r.json()),
     fetch('/wuvochka/teams.json').then((r) => r.json()),
     fetch('/wuvochka/tierlist.json').then((r) => r.json()),
+    fetch('/wuvochka/bosses.json').then((r) => r.json()),
+    fetch('/wuvochka/boss-modes.json').then((r) => r.json()),
   ]);
   CHARACTERS = characters;
   WEAPONS = weapons;
@@ -954,6 +1002,8 @@ async function loadGameData(){
   ECHO_SKILLS = echoSkills;
   TEAMS = teams;
   TIERLIST = tierlist;
+  BOSSES = bosses;
+  BOSS_MODES = bossModes;
 }
 const ROLE_LABEL_RU = { dps: 'DPS', hybrid: 'Hybrid', support: 'Support' };
 let tierlistMode = 'toa';
@@ -1594,6 +1644,69 @@ function renderWeaponsGrid(){
   }).join('');
   applyStagger(grid);
 }
+const BOSS_CATEGORY_RU = { world: 'Мировой босс', weekly: 'Еженедельный босс', nightmare: 'Кошмар' };
+const BOSS_MODE_LABELS = [
+  { key: 'tower', title: 'Башня', icon: '📊' },
+  { key: 'wastes', title: 'Корабли', icon: '🌊' },
+  { key: 'dpm', title: 'Матрица', icon: '🧩' },
+];
+function bossIconSrc(b){
+  return '/wuwa-assets/bosses/' + (b.icon || '');
+}
+function renderBossesGrid(){
+  const grid = document.getElementById('bosses-grid');
+  const ids = Object.keys(BOSSES);
+  grid.innerHTML = ids.map((id) => {
+    const b = BOSSES[id];
+    return '<div class="portrait lg" onclick="openBoss(\'' + id + '\')"><img class="portrait-img" src="' + bossIconSrc(b) + '" alt=""><span class="ring"></span><span class="p-name">' + b.name + '</span></div>';
+  }).join('');
+  applyStagger(grid);
+}
+function renderBossModeBlocks(){
+  const root = document.getElementById('boss-mode-blocks');
+  root.innerHTML = BOSS_MODE_LABELS.map((mode) => {
+    const data = BOSS_MODES[mode.key] || { bossIds: [] };
+    const ids = data.bossIds || [];
+    const rows = ids.map((id) => {
+      const b = BOSSES[id];
+      if (!b) return '';
+      return '<div class="boss-mode-chip" onclick="openBoss(\'' + id + '\')"><img src="' + bossIconSrc(b) + '" alt="">' + '<span>' + b.name + '</span></div>';
+    }).join('');
+    return '<div class="boss-mode-card"><h3>' + mode.icon + ' ' + mode.title + '</h3>' +
+      (data.label ? '<div class="boss-mode-label">' + data.label + '</div>' : '') +
+      (rows ? '<div class="boss-mode-row">' + rows + '</div>' : '<div class="boss-mode-empty">Сейчас боссов нет</div>') +
+      '</div>';
+  }).join('');
+}
+function openBoss(id){
+  const b = BOSSES[id];
+  if (!b) return;
+  pushViewHistory();
+  document.querySelectorAll('.view').forEach((x) => x.classList.remove('active'));
+  document.getElementById('boss-portrait-img').src = bossIconSrc(b);
+  document.getElementById('boss-name').textContent = b.name;
+  const elLabel = b.element ? b.element[0].toUpperCase() + b.element.slice(1) : '';
+  document.getElementById('boss-tags').innerHTML =
+    '<div class="hero-tag">' + elLabel + '</div>' +
+    '<div class="hero-tag">' + (BOSS_CATEGORY_RU[b.category] || b.category) + '</div>' +
+    (b.resistantTo ? '<div class="hero-tag">Резист: ' + (b.resistantTo[0].toUpperCase() + b.resistantTo.slice(1)) + '</div>' : '');
+  const activeModes = BOSS_MODE_LABELS.filter((mode) => ((BOSS_MODES[mode.key] || {}).bossIds || []).includes(Number(id)));
+  document.getElementById('boss-modes').innerHTML = activeModes.length
+    ? '<div class="boss-modes-chips">' + activeModes.map((m) => '<div class="hero-tag">' + m.icon + ' ' + m.title + '</div>').join('') + '</div>'
+    : '<div class="boss-mode-empty">Сейчас не участвует в эндгейм-режимах</div>';
+  document.getElementById('boss-summary').innerHTML = '<p>' + (b.location ? b.location + ' ' : '') + (b.summary || 'Появится здесь позже.') + '</p>';
+  document.getElementById('boss-counter-teams').innerHTML = (b.counterTeams && b.counterTeams.length)
+    ? '<ul style="margin:0;padding-left:16px;font-size:12.5px;line-height:1.6;">' + b.counterTeams.map((t) => '<li>' + t + '</li>').join('') + '</ul>'
+    : '<div class="boss-mode-empty">Появится здесь позже.</div>';
+  document.getElementById('boss-guide').innerHTML = (b.guide && b.guide.length)
+    ? b.guide.map((s) => '<div class="boss-guide-section"><h4>' + s.title + '</h4><div class="review-text">' + s.text + '</div></div>').join('')
+    : '<div class="boss-mode-empty">Появится здесь позже.</div>';
+  document.getElementById('view-boss').classList.add('active');
+  window.scrollTo(0,0);
+}
+function closeBoss(){
+  popViewHistory('view-bosses');
+}
 function renderEchoSetsGrid(){
   const grid = document.getElementById('echo-sets-grid');
   grid.innerHTML = ECHOES.map((e) => {
@@ -1782,6 +1895,8 @@ Promise.all([loadGameData(), loadProfile()]).then(() => {
   renderWeaponsGrid();
   renderEchoItemsGrid();
   renderEchoSetsGrid();
+  renderBossesGrid();
+  renderBossModeBlocks();
   buildSearchIndex();
   updateAccountAvatar();
   document.querySelectorAll('.review-dynamic[data-char-id]').forEach((el) => renderReviewTab(el, Number(el.dataset.charId)));
