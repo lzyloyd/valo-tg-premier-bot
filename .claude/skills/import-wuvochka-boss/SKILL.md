@@ -86,7 +86,7 @@ Add/update `bosses.json[monsterId]` (create the file with `{}` if it doesn't exi
 }
 ```
 
-`icon` is copied verbatim from the roster entry's `art` field (just the filename, e.g. `330000010.webp` — the app resolves it under `/wuwa-assets/bosses/`). Never re-derive it.
+`icon` is copied verbatim from the roster entry's `art` field (just the filename, e.g. `330000010.webp` — the app resolves it under `/wuwa-assets/bosses/`). Never re-derive it. This art is the boss's own Overlord/Calamity Echo splash art from Encore's `/api/en/echo` catalog (clean square image, no Game8 screenshot captions) — already downloaded for 42/43 bosses as of 2026-09-24; only "Scar" (340000050) has no matching Echo entry and keeps a Game8 location-screenshot fallback.
 
 Do **not** touch `boss-modes.json` — that's the separate current-season Tower/Wastes/DPM
 roster, refreshed independently (see project memory `project_wuvochka_boss_modes` for how).

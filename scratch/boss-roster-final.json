@@ -41,7 +41,7 @@
   "category": "world",
   "element": "glacio",
   "resistantTo": "glacio",
-  "art": "330000040.png",
+  "art": "330000040.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/456941"
  },
  {
@@ -50,7 +50,7 @@
   "category": "world",
   "element": "electro",
   "resistantTo": "electro",
-  "art": "340000060.png",
+  "art": "340000060.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457332"
  },
  {
@@ -77,7 +77,7 @@
   "category": "world",
   "element": "electro",
   "resistantTo": "electro",
-  "art": "340000080.png",
+  "art": "340000080.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457348"
  },
  {
@@ -104,7 +104,7 @@
   "category": "world",
   "element": "fusion",
   "resistantTo": "fusion",
-  "art": "330000130.png",
+  "art": "330000130.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492532"
  },
  {
@@ -113,7 +113,7 @@
   "category": "world",
   "element": "havoc",
   "resistantTo": "havoc",
-  "art": "330000110.png",
+  "art": "330000110.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492536"
  },
  {
@@ -122,7 +122,7 @@
   "category": "world",
   "element": "fusion",
   "resistantTo": "fusion",
-  "art": "340000140.png",
+  "art": "340000140.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/526725"
  },
  {
@@ -131,7 +131,7 @@
   "category": "world",
   "element": "aero",
   "resistantTo": "aero",
-  "art": "340000150.png",
+  "art": "340000150.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/538758"
  },
  {
@@ -140,7 +140,7 @@
   "category": "world",
   "element": "electro",
   "resistantTo": "electro",
-  "art": "340000170.png",
+  "art": "340000170.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/546378"
  },
  {
@@ -149,7 +149,7 @@
   "category": "world",
   "element": "aero",
   "resistantTo": "aero",
-  "art": "340000180.png",
+  "art": "340000180.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/546549"
  },
  {
@@ -185,7 +185,7 @@
   "category": "world",
   "element": "physical",
   "resistantTo": null,
-  "art": "340000290.png",
+  "art": "340000290.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/604231"
  },
  {
@@ -203,7 +203,7 @@
   "category": "world",
   "element": "aero",
   "resistantTo": null,
-  "art": "340000320.png",
+  "art": "340000320.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/616369"
  },
  {
@@ -212,7 +212,7 @@
   "category": "nightmare",
   "element": "electro",
   "resistantTo": "aero",
-  "art": "330000140.png",
+  "art": "330000140.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492492"
  },
  {
@@ -221,7 +221,7 @@
   "category": "nightmare",
   "element": "havoc",
   "resistantTo": "havoc",
-  "art": "330000150.png",
+  "art": "330000150.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492493"
  },
  {
@@ -230,7 +230,7 @@
   "category": "nightmare",
   "element": "electro",
   "resistantTo": "electro",
-  "art": "330000160.png",
+  "art": "330000160.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492494"
  },
  {
@@ -239,7 +239,7 @@
   "category": "nightmare",
   "element": "electro",
   "resistantTo": "electro",
-  "art": "330000170.png",
+  "art": "330000170.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492495"
  },
  {
@@ -248,7 +248,7 @@
   "category": "nightmare",
   "element": "havoc",
   "resistantTo": "havoc",
-  "art": "330000180.png",
+  "art": "330000180.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492496"
  },
  {
@@ -257,7 +257,7 @@
   "category": "nightmare",
   "element": "fusion",
   "resistantTo": "fusion",
-  "art": "330000190.png",
+  "art": "330000190.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492497"
  },
  {
@@ -266,7 +266,7 @@
   "category": "nightmare",
   "element": "spectro",
   "resistantTo": "spectro",
-  "art": "330000200.png",
+  "art": "330000200.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492498"
  },
  {
@@ -275,7 +275,7 @@
   "category": "nightmare",
   "element": "glacio",
   "resistantTo": "glacio",
-  "art": "340000130.png",
+  "art": "340000130.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/506683"
  },
  {
@@ -284,7 +284,7 @@
   "category": "nightmare",
   "element": "glacio",
   "resistantTo": "glacio",
-  "art": "340000110.png",
+  "art": "340000110.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/526510"
  },
  {
@@ -293,7 +293,7 @@
   "category": "nightmare",
   "element": "havoc",
   "resistantTo": "havoc",
-  "art": "340000160.png",
+  "art": "340000160.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/538754"
  },
  {
@@ -311,7 +311,7 @@
   "category": "weekly",
   "element": "glacio",
   "resistantTo": "glacio",
-  "art": "340000020.png",
+  "art": "340000020.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/457285"
  },
  {
@@ -329,7 +329,7 @@
   "category": "weekly",
   "element": "spectro",
   "resistantTo": "electro",
-  "art": "340000090.png",
+  "art": "340000090.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/459813"
  },
  {
@@ -338,7 +338,7 @@
   "category": "weekly",
   "element": "havoc",
   "resistantTo": "fusion",
-  "art": "340000100.png",
+  "art": "340000100.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/492554"
  },
  {
@@ -347,7 +347,7 @@
   "category": "weekly",
   "element": "aero",
   "resistantTo": "aero",
-  "art": "340000120.png",
+  "art": "340000120.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/507272"
  },
  {
@@ -356,7 +356,7 @@
   "category": "weekly",
   "element": "aero",
   "resistantTo": "aero",
-  "art": "340000200.png",
+  "art": "340000200.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/556641"
  },
  {
@@ -383,7 +383,7 @@
   "category": "weekly",
   "element": "havoc",
   "resistantTo": "electro",
-  "art": "340000310.png",
+  "art": "340000310.webp",
   "game8Url": "https://game8.co/games/Wuthering-Waves/archives/607319"
  }
 ]
