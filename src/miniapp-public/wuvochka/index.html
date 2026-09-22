@@ -354,14 +354,25 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .review-text + .review-subhead{margin-top:14px;}
 .review-subhead{font-family:'Exo 2',sans-serif;font-weight:800;font-size:13px;color:var(--accent);margin:0 0 6px;}
 
-.search-input-wrap{position:relative;margin-bottom:16px;}
-.search-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 14px;font-size:14px;color:var(--text);font-family:'PT Sans',sans-serif;outline:none;transition:border-color .15s ease;}
+/* search modal */
+.search-overlay{position:fixed;inset:0;background:rgba(4,6,10,.6);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s ease;display:flex;justify-content:center;align-items:flex-start;padding:min(9vh,72px) 16px 16px;}
+.search-overlay.open{opacity:1;pointer-events:auto;}
+.search-modal{width:100%;max-width:560px;max-height:calc(100vh - min(9vh,72px) - 32px);background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden;transform:translateY(-10px) scale(.98);opacity:0;transition:transform .2s cubic-bezier(.16,1,.3,1),opacity .2s ease;}
+.search-overlay.open .search-modal{transform:none;opacity:1;}
+.search-modal-head{display:flex;align-items:center;gap:8px;padding:12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.search-input-wrap{position:relative;flex:1;min-width:0;}
+.search-input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--text-muted);pointer-events:none;}
+.search-input{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:12px 14px 12px 38px;font-size:14px;color:var(--text);font-family:'PT Sans',sans-serif;outline:none;transition:border-color .15s ease;}
 .search-input:focus{border-color:var(--accent);}
 .search-input::placeholder{color:var(--text-muted);}
-.search-group-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:16px 0 6px;}
-.search-group-label:first-child{margin-top:0;}
-.search-row{display:flex;gap:11px;align-items:center;padding:9px 0;border-top:1px solid var(--border);cursor:pointer;}
-.search-row:first-child{border-top:none;}
+.search-close-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:8px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background-color .15s ease,color .15s ease;}
+.search-close-btn svg{width:19px;height:19px;}
+.search-close-btn:hover{background:var(--surface-2);color:var(--text);}
+.search-results{overflow-y:auto;padding:8px 12px 12px;}
+.search-group-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:14px 4px 4px;}
+.search-group-label:first-child{margin-top:4px;}
+.search-row{display:flex;gap:11px;align-items:center;padding:8px;border-radius:10px;cursor:pointer;transition:background-color .12s ease;}
+.search-row:hover{background:var(--surface-2);}
 .search-icon{width:40px;height:40px;border-radius:10px;background:var(--surface-3);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);}
 .search-icon img{width:100%;height:100%;object-fit:cover;}
 .search-info{flex:1;min-width:0;}
@@ -414,7 +425,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.83</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.9</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -885,16 +896,18 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
   </div>
 
   <!-- SEARCH -->
-  <div class="view" id="view-search">
-    <div class="screen">
-      <div class="back-row" onclick="closeSearch()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-        Назад
+  <div class="search-overlay" id="search-overlay" onclick="if(event.target===this)closeSearch()">
+    <div class="search-modal">
+      <div class="search-modal-head">
+        <div class="search-input-wrap">
+          <svg class="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input class="search-input" id="search-input" type="text" placeholder="Персонажи, оружие, эхо..." oninput="renderSearchResults(this.value)">
+        </div>
+        <button class="search-close-btn" onclick="closeSearch()" aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
       </div>
-      <div class="search-input-wrap">
-        <input class="search-input" id="search-input" type="text" placeholder="Персонажи, оружие, эхо..." oninput="renderSearchResults(this.value)">
-      </div>
-      <div id="search-results"></div>
+      <div id="search-results" class="search-results"></div>
     </div>
   </div>
 
@@ -1670,25 +1683,25 @@ function renderSearchResults(query){
     if (!items.length) return;
     html += '<div class="search-group-label">' + group + ' (' + items.length + ')</div>';
     html += items.map((item) => {
-      return '<div class="search-row" onclick="' + item.onclick + '"><div class="search-icon">' + item.iconHtml + '</div><div class="search-info"><div class="search-name">' + item.name + '</div><div class="search-meta">' + item.meta + '</div></div></div>';
+      return '<div class="search-row" onclick="closeSearch();' + item.onclick + '"><div class="search-icon">' + item.iconHtml + '</div><div class="search-info"><div class="search-name">' + item.name + '</div><div class="search-meta">' + item.meta + '</div></div></div>';
     }).join('');
   });
   root.innerHTML = html;
 }
 function openSearch(){
-  pushViewHistory();
-  document.querySelectorAll('.view').forEach((x) => x.classList.remove('active'));
-  document.getElementById('view-search').classList.add('active');
+  document.getElementById('search-overlay').classList.add('open');
   const input = document.getElementById('search-input');
   input.value = '';
   renderSearchResults('');
   closeSidebar();
-  window.scrollTo(0,0);
   setTimeout(() => input.focus(), 50);
 }
 function closeSearch(){
-  popViewHistory('view-tierlist');
+  document.getElementById('search-overlay').classList.remove('open');
 }
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('search-overlay').classList.contains('open')) closeSearch();
+});
 function setPillHtml(setName, stopProp){
   const set = ECHOES.find((x) => x.name === setName);
   const nameAttr = setName.replace(/'/g, "\\'");
