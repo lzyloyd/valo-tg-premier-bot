@@ -42,6 +42,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .app-title h1{margin:0;font-size:21px;font-weight:800;letter-spacing:.01em;}
 .app-version{font-size:11px;font-weight:700;color:var(--text-muted);font-family:'JetBrains Mono',monospace;vertical-align:middle;margin-left:2px;}
 
+.search-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:6px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background-color .15s ease,color .15s ease;}
+.search-btn:hover{background:var(--surface-2);color:var(--text);}
 .account-btn{background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;}
 .account-btn:hover .account-avatar{border-color:var(--accent);}
 .account-avatar{width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--surface-2);font-size:17px;transition:border-color .15s ease;}
@@ -346,6 +348,20 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .review-text + .review-subhead{margin-top:14px;}
 .review-subhead{font-family:'Exo 2',sans-serif;font-weight:800;font-size:13px;color:var(--accent);margin:0 0 6px;}
 
+.search-input-wrap{position:relative;margin-bottom:16px;}
+.search-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 14px;font-size:14px;color:var(--text);font-family:'PT Sans',sans-serif;outline:none;transition:border-color .15s ease;}
+.search-input:focus{border-color:var(--accent);}
+.search-input::placeholder{color:var(--text-muted);}
+.search-group-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:16px 0 6px;}
+.search-group-label:first-child{margin-top:0;}
+.search-row{display:flex;gap:11px;align-items:center;padding:9px 0;border-top:1px solid var(--border);cursor:pointer;}
+.search-row:first-child{border-top:none;}
+.search-icon{width:40px;height:40px;border-radius:10px;background:var(--surface-3);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);}
+.search-icon img{width:100%;height:100%;object-fit:cover;}
+.search-info{flex:1;min-width:0;}
+.search-name{font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.search-meta{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.search-hint,.search-empty{color:var(--text-muted);font-size:13px;text-align:center;padding:40px 16px;}
 .item-card{display:flex;gap:11px;align-items:center;padding:10px 0;border-top:1px solid var(--border);}
 .item-card:first-child{border-top:none;padding-top:0;}
 .item-icon{width:42px;height:42px;border-radius:10px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--border);}
@@ -392,7 +408,10 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.71</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.8</span></h1></div>
+      <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -855,6 +874,20 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
         <h3>Способность эхо</h3>
         <div class="review-text" id="ei-skill-desc">Описание навыка этого эхо появится здесь позже.</div>
       </div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="view" id="view-search">
+    <div class="screen">
+      <div class="back-row" onclick="closeSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        Назад
+      </div>
+      <div class="search-input-wrap">
+        <input class="search-input" id="search-input" type="text" placeholder="Персонажи, оружие, эхо..." oninput="renderSearchResults(this.value)">
+      </div>
+      <div id="search-results"></div>
     </div>
   </div>
 
@@ -1569,6 +1602,86 @@ function echoArtHtml(item){
   if (firstSet) return '<img class="echo-icon-solo" src="' + firstSet.badge + '" alt="">';
   return '∅';
 }
+// Rover exists 8 times in the raw asset data (4 elements x 2 genders), but
+// only one id per element is actually reachable (openChar-able) in the app -
+// exclude the other 4 here too, same as the static char-grid markup does.
+const ROVER_DUPLICATE_IDS = new Set([1502, 1605, 1408, 1310]);
+const SEARCH_GROUP_ORDER = ['Персонажи', 'Оружие', 'Сеты эхо', 'Эхо'];
+let SEARCH_INDEX = [];
+function buildSearchIndex(){
+  const chars = CHARACTERS.filter((c) => !ROVER_DUPLICATE_IDS.has(c.id)).map((c) => ({
+    group: 'Персонажи',
+    name: c.name,
+    iconHtml: '<img src="/wuwa-assets/characters/' + c.id + '.webp" alt="">',
+    meta: c.element + ' · ' + c.rarity + '★',
+    onclick: 'openChar(' + c.id + ')',
+  }));
+  const weapons = WEAPONS.map((w) => ({
+    group: 'Оружие',
+    name: w.name,
+    iconHtml: '<img src="/wuwa-assets/weapons/' + w.id + '.webp" alt="">',
+    meta: (WEAPON_TYPE_RU[w.weaponType] || w.weaponType) + ' · ' + w.rarity + '★',
+    onclick: 'openWeapon(' + w.id + ')',
+  }));
+  const echoSets = ECHOES.map((e) => {
+    const nameAttr = e.name.replace(/'/g, "\\'");
+    return {
+      group: 'Сеты эхо',
+      name: e.name,
+      iconHtml: '<img src="' + e.badge + '" alt="">',
+      meta: 'Сет эхо',
+      onclick: "openEcho('" + nameAttr + "')",
+    };
+  });
+  const echoItems = ECHO_ITEMS.map((it) => {
+    const nameAttr = it.name.replace(/'/g, "\\'");
+    return {
+      group: 'Эхо',
+      name: it.name,
+      iconHtml: echoArtHtml(it),
+      meta: it.classRu || 'Эхо',
+      onclick: "openEchoItem('" + nameAttr + "')",
+    };
+  });
+  SEARCH_INDEX = [...chars, ...weapons, ...echoSets, ...echoItems];
+}
+function renderSearchResults(query){
+  const root = document.getElementById('search-results');
+  const q = query.trim().toLowerCase();
+  if (!q) {
+    root.innerHTML = '<div class="search-hint">Начните вводить имя персонажа, оружия или эхо</div>';
+    return;
+  }
+  const matches = SEARCH_INDEX.filter((item) => item.name.toLowerCase().includes(q));
+  if (!matches.length) {
+    root.innerHTML = '<div class="search-empty">Ничего не найдено</div>';
+    return;
+  }
+  let html = '';
+  SEARCH_GROUP_ORDER.forEach((group) => {
+    const items = matches.filter((item) => item.group === group);
+    if (!items.length) return;
+    html += '<div class="search-group-label">' + group + ' (' + items.length + ')</div>';
+    html += items.map((item) => {
+      return '<div class="search-row" onclick="' + item.onclick + '"><div class="search-icon">' + item.iconHtml + '</div><div class="search-info"><div class="search-name">' + item.name + '</div><div class="search-meta">' + item.meta + '</div></div></div>';
+    }).join('');
+  });
+  root.innerHTML = html;
+}
+function openSearch(){
+  pushViewHistory();
+  document.querySelectorAll('.view').forEach((x) => x.classList.remove('active'));
+  document.getElementById('view-search').classList.add('active');
+  const input = document.getElementById('search-input');
+  input.value = '';
+  renderSearchResults('');
+  closeSidebar();
+  window.scrollTo(0,0);
+  setTimeout(() => input.focus(), 50);
+}
+function closeSearch(){
+  popViewHistory('view-tierlist');
+}
 function setPillHtml(setName, stopProp){
   const set = ECHOES.find((x) => x.name === setName);
   const nameAttr = setName.replace(/'/g, "\\'");
@@ -1649,6 +1762,7 @@ Promise.all([loadGameData(), loadProfile()]).then(() => {
   renderWeaponsGrid();
   renderEchoItemsGrid();
   renderEchoSetsGrid();
+  buildSearchIndex();
   updateAccountAvatar();
   document.querySelectorAll('.review-dynamic[data-char-id]').forEach((el) => renderReviewTab(el, Number(el.dataset.charId)));
   document.querySelectorAll('.build-dynamic[data-char-id]').forEach((el) => renderBuildTab(el, Number(el.dataset.charId)));
