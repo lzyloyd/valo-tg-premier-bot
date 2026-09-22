@@ -157,6 +157,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-role-section{padding:14px 16px;border-top:1px solid var(--border);}
 .tier-role-section:first-of-type{border-top:none;}
 .tier-role-heading{display:flex;align-items:center;gap:6px;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:11px;}
+.tier-role-heading svg{width:15px;height:15px;flex-shrink:0;}
+.boss-mode-card h3 svg{width:15px;height:15px;vertical-align:-3px;margin-right:5px;}
 .tier-role-heading.dps{color:var(--bad);}
 .tier-role-heading.hybrid{color:var(--el-electro);}
 .tier-role-heading.support{color:var(--tier-0);}
@@ -224,6 +226,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .matrix-link-btn:hover{filter:brightness(1.1);}
 .matrix-link-btn:active{transform:scale(.97);}
 .hero-tag{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:4px 8px;border-radius:6px;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;gap:4px;}
+.hero-tag svg{width:12px;height:12px;flex-shrink:0;}
 .hero-tag.tier{background:var(--accent-soft);color:var(--accent);}
 
 .echo-toolbar{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
@@ -441,7 +444,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.0</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.1</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -1006,6 +1009,11 @@ async function loadGameData(){
   BOSS_MODES = bossModes;
 }
 const ROLE_LABEL_RU = { dps: 'DPS', hybrid: 'Hybrid', support: 'Support' };
+const ROLE_ICON_SVG = {
+  dps: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>',
+  hybrid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9.5" cy="12" r="6.5"/><circle cx="14.5" cy="12" r="6.5"/></svg>',
+  support: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>',
+};
 let tierlistMode = 'toa';
 function tierPortraitHtml(id, role){
   const c = CHARACTERS.find((x) => x.id === id);
@@ -1021,7 +1029,7 @@ function renderTierListView(){
     return '<div class="chip' + (m.id === tierlistMode ? ' active' : '') + '" onclick="setTierlistMode(\'' + m.id + '\')">' + m.name + '</div>';
   }).join('');
   const data = TIERLIST[tierlistMode];
-  const roleIcon = { dps: '🥊', hybrid: '✳️', support: '🧪' };
+  const roleIcon = ROLE_ICON_SVG;
   rootEl.innerHTML = data.tiers.map((tierGroup) => {
     const rolesHtml = ['dps', 'hybrid', 'support'].map((role) => {
       const ids = tierGroup.roles[role] || [];
@@ -1646,9 +1654,9 @@ function renderWeaponsGrid(){
 }
 const BOSS_CATEGORY_RU = { world: 'Мировой босс', weekly: 'Еженедельный босс', nightmare: 'Кошмар' };
 const BOSS_MODE_LABELS = [
-  { key: 'tower', title: 'Башня', icon: '📊' },
-  { key: 'wastes', title: 'Корабли', icon: '🌊' },
-  { key: 'dpm', title: 'Матрица', icon: '🧩' },
+  { key: 'tower', title: 'Башня', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21h12"/><path d="M7 21V11h10v10"/><path d="M6 11l1-6h2v3h2v-3h2v3h2v-3h2l1 6"/></svg>' },
+  { key: 'wastes', title: 'Корабли', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/><path d="M2 13.5c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/><path d="M2 19c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/></svg>' },
+  { key: 'dpm', title: 'Матрица', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>' },
 ];
 function bossIconSrc(b){
   return '/wuwa-assets/bosses/' + (b.icon || '');
