@@ -392,7 +392,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.5</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v3.51</span></h1></div>
       <button class="account-btn" onclick="goToProfile()" aria-label="Профиль">
         <span class="account-avatar" id="account-avatar">👤</span>
       </button>
@@ -1554,7 +1554,12 @@ function renderEchoSetsGrid(){
     // option collides with another set's. The 4 newest sets have no
     // carrying echo in prydwen's data at all yet, so no photo either.
     const bgHtml = e.bg ? '<img class="portrait-img" src="' + e.bg + '" alt="">' : '';
-    return '<div class="portrait lg ' + el + '" data-el="' + el + '" onclick="openEcho(\'' + nameAttr + '\')">' + bgHtml + '<span class="ring"></span><img class="el-dot el-' + el + ' p-el" src="/wuwa-assets/elements/' + el + '.webp" alt=""><span class="set-badge-bottom"><img src="' + e.badge + '" alt=""></span><span class="p-name">' + e.name + '</span></div>';
+    // "Physical" isn't a real WuWa element (Encore only ships icons for the 6
+    // actual elements) - it's how these curated sets mark "not tied to one
+    // element", so there's no /wuwa-assets/elements/physical.webp to show and
+    // the el-dot badge is skipped entirely rather than rendering a broken img.
+    const elDotHtml = el === 'physical' ? '' : '<img class="el-dot el-' + el + ' p-el" src="/wuwa-assets/elements/' + el + '.webp" alt="">';
+    return '<div class="portrait lg ' + el + '" data-el="' + el + '" onclick="openEcho(\'' + nameAttr + '\')">' + bgHtml + '<span class="ring"></span>' + elDotHtml + '<span class="set-badge-bottom"><img src="' + e.badge + '" alt=""></span><span class="p-name">' + e.name + '</span></div>';
   }).join('');
 }
 function echoArtHtml(item){
