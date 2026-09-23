@@ -130,6 +130,19 @@ export function startMiniAppServer() {
     }
   });
 
+  // Full current-rotation rules for Tower/Wastes/DPM (buffs, target scores,
+  // floor-by-floor enemies) — same daily-scrape setup as boss-modes.json
+  // above, just the heavier detail scrape (see scripts/fetch-mode-details.mjs).
+  const modeDetailsPath = path.join(__dirname, '..', 'data', 'wuvochka-mode-details.json');
+  app.get('/wuvochka/mode-details.json', async (req, res) => {
+    try {
+      res.type('application/json').send(await fs.readFile(modeDetailsPath, 'utf8'));
+    } catch (err) {
+      if (err.code !== 'ENOENT') console.error('[miniapp] failed to read mode-details.json:', err);
+      res.json({ updated: null, tower: null, wastes: null, dpm: null });
+    }
+  });
+
   app.use(express.static(path.join(__dirname, 'miniapp-public'), { etag: false, lastModified: false, cacheControl: false }));
 
   app.post('/api/state', async (req, res) => {

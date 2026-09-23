@@ -19,6 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { scrapeModeDetails, writeModeDetails } from './fetch-mode-details.mjs';
 
 puppeteer.use(StealthPlugin());
 
@@ -71,6 +72,10 @@ async function main() {
   const bosses = Object.entries(bossesRaw)
     .map(([id, b]) => ({ id: Number(id), name: b.name }))
     .sort((a, b) => b.name.length - a.name.length);
+  const previous = await fs
+    .readFile(OUT_PATH, 'utf8')
+    .then(JSON.parse)
+    .catch(() => null);
 
   const browser = await puppeteer.launch({
     headless: 'new',
@@ -113,6 +118,29 @@ async function main() {
     await fs.writeFile(OUT_PATH, JSON.stringify(result, null, 1));
     console.log('[fetch-boss-modes] wrote', OUT_PATH);
     console.log(JSON.stringify(result, null, 1));
+
+    // The full mode-details scrape (buffs/targets/floor-by-floor enemies for
+    // all three modes) is much heavier than this boss-presence check — dozens
+    // of extra tab switches — so only pay for it on days the season/phase
+    // actually rotated (or there's no mode-details file yet at all).
+    const rotated =
+      !previous ||
+      previous.tower?.label !== result.tower.label ||
+      previous.wastes?.label !== result.wastes.label ||
+      previous.dpm?.label !== result.dpm.label;
+    if (rotated) {
+      console.log('[fetch-boss-modes] season/phase changed — refreshing mode-details.json too');
+      try {
+        const details = await scrapeModeDetails(page, { towerSeason, wastesSeason, dpmId });
+        await writeModeDetails(details);
+      } catch (err) {
+        // boss-modes.json above already wrote successfully — don't let a
+        // mode-details hiccup mask that or exit non-zero over it.
+        console.error('[fetch-boss-modes] mode-details refresh failed, leaving previous mode-details.json untouched:', err);
+      }
+    } else {
+      console.log('[fetch-boss-modes] no season/phase change — mode-details.json left as-is');
+    }
   } finally {
     await browser.close();
   }

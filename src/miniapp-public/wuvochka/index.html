@@ -394,6 +394,49 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .boss-mode-chip:hover{background:var(--surface-3);border-color:var(--accent);}
 .boss-mode-chip img{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;}
 .boss-mode-chip span{font-size:12px;font-weight:600;}
+
+#modes-switch{margin-bottom:6px;}
+#modes-switch.filters{flex-wrap:nowrap;}
+#modes-switch .chip{flex-direction:column;flex:1;gap:8px;padding:14px 8px;border-radius:14px;}
+#modes-switch .chip img{width:34px;height:34px;object-fit:contain;}
+#modes-switch .chip.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
+.modes-updated{font-size:11px;color:var(--text-muted);margin:0 0 14px;}
+.mode-subtabs{margin-bottom:14px;}
+.mode-section-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;margin:0 0 8px;}
+.mode-group{margin-bottom:14px;}
+.mode-group:last-child{margin-bottom:0;}
+.mode-group-heading{font-size:11px;color:var(--accent);font-weight:700;margin:0 0 6px;}
+.mode-lines p{font-size:13px;line-height:1.6;color:var(--text);margin:0 0 6px;}
+.mode-lines p:last-child{margin-bottom:0;}
+.mode-floor-block{border-top:1px solid var(--border);padding:11px 0;}
+.mode-floor-block:first-child{border-top:none;padding-top:0;}
+.mode-floor-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.mode-floor-head b{font-size:13px;}
+.mode-cost-badge{font-size:10.5px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:2px 7px;}
+.mode-enemy-row{display:flex;flex-wrap:wrap;gap:7px;}
+.mode-enemy-chip{font-size:11.5px;font-weight:600;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:5px 11px;color:var(--text-muted);}
+.mode-enemy-chip.linked{color:var(--accent);cursor:pointer;transition:background-color .15s ease;}
+.mode-enemy-chip.linked:hover{background:var(--surface-3);}
+.mode-weakness-tag{font-size:10.5px;font-weight:700;color:var(--text-muted);margin-bottom:7px;}
+.mode-stage-note{font-size:11.5px;color:var(--text-muted);margin-bottom:8px;}
+.mode-score-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:2px;}
+.mode-score-chip{font-size:11.5px;font-weight:700;font-family:'JetBrains Mono',monospace;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);}
+.mode-tokens-row{display:flex;flex-wrap:wrap;gap:7px;}
+.mode-boss-card{border-top:1px solid var(--border);padding:12px 0;}
+.mode-boss-card:first-child{border-top:none;padding-top:0;}
+.mode-boss-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px;flex-wrap:wrap;}
+.mode-boss-head b{font-size:13.5px;}
+.mode-resist-tag{font-size:10.5px;font-weight:700;color:var(--accent);}
+.mode-tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:7px;}
+.mode-tag-chip{font-size:10.5px;font-weight:600;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text-muted);}
+.mode-boss-notes p{font-size:12px;line-height:1.55;color:var(--text-muted);margin:0 0 4px;}
+.mode-boss-notes p:first-child{font-weight:700;color:var(--text);}
+.mode-char-buff-row{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--border);padding:9px 0;}
+.mode-char-buff-row:first-child{border-top:none;padding-top:0;}
+.mode-char-buff-row b{font-size:12.5px;}
+.mode-char-buff-row span{font-size:12px;color:var(--text-muted);line-height:1.5;}
+.mode-boss-name{font-size:13.5px;font-weight:800;}
+.mode-boss-name.linked{color:var(--accent);cursor:pointer;}
 .boss-modes-chips{display:flex;flex-wrap:wrap;gap:8px;}
 .boss-guide-section{padding:9px 0;border-top:1px solid var(--border);}
 .boss-guide-section:first-child{border-top:none;padding-top:0;}
@@ -444,7 +487,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.21</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.3</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -469,6 +512,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
     <button class="tab" data-view="weapons"><span class="nav-icon">⚔️</span>Оружие</button>
     <button class="tab" data-view="echoes"><span class="nav-icon">🔮</span>Эхо</button>
     <button class="tab" data-view="bosses"><span class="nav-icon">💀</span>Боссы</button>
+    <button class="tab" data-view="modes"><span class="nav-icon">🧭</span>Режимы</button>
     <div class="sidebar-group-label">Прочее</div>
     <button class="tab" data-view="profile"><span class="nav-icon">👤</span>Профиль</button>
     <button class="tab" data-view="matrix"><span class="nav-icon">🧩</span>Матрица</button>
@@ -631,6 +675,15 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <div class="card"><h3>Как победить коротко</h3><div class="review-text" id="boss-summary"></div></div>
       <div class="card"><h3>Лучшие команды</h3><div id="boss-counter-teams"></div></div>
       <div class="card"><h3>Подробный гайд</h3><div id="boss-guide"></div></div>
+    </div>
+  </div>
+
+  <!-- MODES (current Tower/Wastes/DPM rotation, parsed from encore.moe) -->
+  <div class="view" id="view-modes">
+    <div class="screen">
+      <div class="filters" id="modes-switch"></div>
+      <div class="modes-updated" id="modes-updated"></div>
+      <div id="modes-content"></div>
     </div>
   </div>
 
@@ -977,8 +1030,9 @@ let TEAMS = { tiers: [] };
 let TIERLIST = { modes: [], toa: { tiers: [] }, ww: { tiers: [] } };
 let BOSSES = {};
 let BOSS_MODES = { tower: { bossIds: [] }, wastes: { bossIds: [] }, dpm: { bossIds: [] } };
+let MODE_DETAILS = { updated: null, tower: null, wastes: null, dpm: null };
 async function loadGameData(){
-  const [characters, weapons, echoData, builds, gameplay, reviews, kit, weaponFacts, echoSkills, teams, tierlist, bosses, bossModes] = await Promise.all([
+  const [characters, weapons, echoData, builds, gameplay, reviews, kit, weaponFacts, echoSkills, teams, tierlist, bosses, bossModes, modeDetails] = await Promise.all([
     fetch('/wuwa-assets/characters/index.json').then((r) => r.json()),
     fetch('/wuwa-assets/weapons/index.json').then((r) => r.json()),
     fetch('/wuvochka/echo-data.json').then((r) => r.json()),
@@ -992,6 +1046,7 @@ async function loadGameData(){
     fetch('/wuvochka/tierlist.json').then((r) => r.json()),
     fetch('/wuvochka/bosses.json').then((r) => r.json()),
     fetch('/wuvochka/boss-modes.json').then((r) => r.json()),
+    fetch('/wuvochka/mode-details.json').then((r) => r.json()),
   ]);
   CHARACTERS = characters;
   WEAPONS = weapons;
@@ -1007,6 +1062,7 @@ async function loadGameData(){
   TIERLIST = tierlist;
   BOSSES = bosses;
   BOSS_MODES = bossModes;
+  MODE_DETAILS = modeDetails;
 }
 const ROLE_LABEL_RU = { dps: 'DPS', hybrid: 'Hybrid', support: 'Support' };
 const ROLE_ICON_SVG = {
@@ -1715,6 +1771,156 @@ function openBoss(id){
 function closeBoss(){
   popViewHistory('view-bosses');
 }
+
+// ---------- MODES (Tower / Wastes / DPM current rotation, from encore.moe) ----------
+let modesMode = 'tower';
+let modesTowerAreaIdx = 0;
+let modesWastesAreaIdx = 0;
+let modesWastesLevelIdx = 0;
+let modesDpmVariantIdx = 0;
+function modesFormatDate(iso){
+  const p = iso.split('-');
+  return p[2] + '.' + p[1] + '.' + p[0];
+}
+function modeEnemyChipHtml(name){
+  const entry = Object.entries(BOSSES).find(([, b]) => b.name === name);
+  if (entry) return '<span class="mode-enemy-chip linked" onclick="openBoss(\'' + entry[0] + '\')">' + name + '</span>';
+  return '<span class="mode-enemy-chip">' + name + '</span>';
+}
+function modeBossNameHtml(name){
+  const entry = Object.entries(BOSSES).find(([, b]) => b.name === name);
+  if (entry) return '<b class="mode-boss-name linked" onclick="openBoss(\'' + entry[0] + '\')">' + name + '</b>';
+  return '<b class="mode-boss-name">' + name + '</b>';
+}
+function modeLinesHtml(lines){
+  return '<div class="mode-lines">' + (lines || []).map((l) => '<p>' + l + '</p>').join('') + '</div>';
+}
+function modeScoresHtml(scores){
+  if (!scores || !scores.length) return '<div class="boss-mode-empty">Нет данных.</div>';
+  return '<div class="mode-score-row">' + scores.map((s) => '<span class="mode-score-chip">' + s.toLocaleString('ru-RU') + '</span>').join('') + '</div>';
+}
+
+function towerModeHtml(){
+  const data = MODE_DETAILS.tower;
+  if (!data) return '<div class="boss-mode-empty">Данные скоро появятся — первый парсинг ещё не прошёл.</div>';
+  const tabs = '<div class="subtabs mode-subtabs">' + data.areas.map((a, idx) =>
+    '<button class="subtab' + (idx === modesTowerAreaIdx ? ' active' : '') + '" onclick="setModesTowerArea(' + idx + ')">' + a.title + '</button>'
+  ).join('') + '</div>';
+  const area = data.areas[modesTowerAreaIdx] || data.areas[0];
+  const buffsHtml = area.buffs.map((g) =>
+    '<div class="mode-group"><div class="mode-group-heading">Этажи ' + g.floors + '</div>' + modeLinesHtml(g.lines) + '</div>'
+  ).join('') || '<div class="boss-mode-empty">Нет данных.</div>';
+  const targetsHtml = area.targets.map((g) =>
+    '<div class="mode-group"><div class="mode-group-heading">Этажи ' + g.floors + '</div>' + modeLinesHtml(g.lines) + '</div>'
+  ).join('') || '<div class="boss-mode-empty">Нет данных.</div>';
+  const floorsHtml = area.floors.map((f) =>
+    '<div class="mode-floor-block"><div class="mode-floor-head"><b>Этаж ' + (f.floor ?? '?') + '</b><span class="mode-cost-badge">Стоимость ' + f.cost + '</span></div>' +
+    '<div class="mode-enemy-row">' + f.enemies.map(modeEnemyChipHtml).join('') + '</div></div>'
+  ).join('') || '<div class="boss-mode-empty">Нет данных.</div>';
+  return tabs +
+    '<div class="card"><h3>Баффы башни · ' + data.label + '</h3>' + buffsHtml + '</div>' +
+    '<div class="card"><h3>Цели</h3>' + targetsHtml + '</div>' +
+    '<div class="card"><h3>Этажи и враги</h3>' + floorsHtml + '</div>';
+}
+function setModesTowerArea(idx){
+  modesTowerAreaIdx = idx;
+  renderModesContent();
+}
+
+function wastesModeHtml(){
+  const data = MODE_DETAILS.wastes;
+  if (!data) return '<div class="boss-mode-empty">Данные скоро появятся — первый парсинг ещё не прошёл.</div>';
+  const areaTabs = '<div class="subtabs mode-subtabs">' + data.areas.map((a, idx) =>
+    '<button class="subtab' + (idx === modesWastesAreaIdx ? ' active' : '') + '" onclick="setModesWastesArea(' + idx + ')">' + (a.title || 'Зона ' + (idx + 1)) + '</button>'
+  ).join('') + '</div>';
+  const area = data.areas[modesWastesAreaIdx] || data.areas[0];
+  const levelTabs = '<div class="filters">' + area.levels.map((lv, idx) =>
+    '<div class="chip' + (idx === modesWastesLevelIdx ? ' active' : '') + '" onclick="setModesWastesLevel(' + idx + ')">' + (lv.level ?? (idx + 1)) + '</div>'
+  ).join('') + '</div>';
+  const level = area.levels[modesWastesLevelIdx] || area.levels[0];
+  const mechanicHtml = '<div class="card"><h3>' + (level.mechanicName || 'Механика') + '</h3>' + modeLinesHtml(level.mechanicLines) + '</div>';
+  const tokensHtml = level.tokens && level.tokens.length
+    ? '<div class="card"><h3>Токены</h3><div class="mode-tokens-row">' + level.tokens.map((t) => '<span class="mode-enemy-chip">' + t + '</span>').join('') + '</div></div>'
+    : '';
+  const scoresHtml = '<div class="card"><h3>Целевые очки</h3>' + modeScoresHtml(level.targetScores) + '</div>';
+  const stagesHtml = '<div class="card"><h3>Волны</h3>' + level.stages.map((s) =>
+    '<div class="mode-floor-block"><div class="mode-floor-head"><b>Волна ' + s.stage + '</b></div>' +
+    (s.note ? '<div class="mode-stage-note">' + s.note + '</div>' : '') +
+    (s.weakness ? '<div class="mode-weakness-tag">Слабость: ' + s.weakness.replace(' RES', '') + '</div>' : '') +
+    '<div class="mode-enemy-row">' + s.enemies.map(modeEnemyChipHtml).join('') + '</div></div>'
+  ).join('') + '</div>';
+  return areaTabs + levelTabs + mechanicHtml + tokensHtml + scoresHtml + stagesHtml;
+}
+function setModesWastesArea(idx){
+  modesWastesAreaIdx = idx;
+  modesWastesLevelIdx = 0;
+  renderModesContent();
+}
+function setModesWastesLevel(idx){
+  modesWastesLevelIdx = idx;
+  renderModesContent();
+}
+
+function dpmModeHtml(){
+  const data = MODE_DETAILS.dpm;
+  if (!data) return '<div class="boss-mode-empty">Данные скоро появятся — первый парсинг ещё не прошёл.</div>';
+  const tabs = data.variants.length > 1
+    ? '<div class="subtabs mode-subtabs">' + data.variants.map((v, idx) =>
+        '<button class="subtab' + (idx === modesDpmVariantIdx ? ' active' : '') + '" onclick="setModesDpmVariant(' + idx + ')">' + (v.title || 'Вариант ' + (idx + 1)) + '</button>'
+      ).join('') + '</div>'
+    : '';
+  const variant = data.variants[modesDpmVariantIdx] || data.variants[0];
+  const buffsHtml = variant.buffs.map((b) =>
+    '<div class="mode-group"><div class="mode-group-heading">' + b.title + '</div>' + modeLinesHtml(b.lines) + '</div>'
+  ).join('');
+  const bossesHtml = variant.bosses.map((b) => {
+    const tagsHtml = b.tags.length ? '<div class="mode-tag-row">' + b.tags.map((t) => '<span class="mode-tag-chip">' + t + '</span>').join('') + '</div>' : '';
+    const notesHtml = b.notes.length
+      ? '<div class="mode-boss-notes">' + b.notes.map((n) => '<p>' + n + '</p>').join('') + '</div>'
+      : (b.suggestedBuff ? '<div class="mode-boss-notes"><p>Рекомендуемый бафф: ' + b.suggestedBuff + '</p></div>' : '');
+    return '<div class="mode-boss-card"><div class="mode-boss-head">' + modeBossNameHtml(b.name) +
+      (b.resistantTo ? '<span class="mode-resist-tag">' + b.resistantTo.replace(' RES', ' резист') + '</span>' : '') +
+      '</div>' + tagsHtml + notesHtml + '</div>';
+  }).join('');
+  const charBuffsHtml = variant.characterBuffs.map((c) =>
+    '<div class="mode-char-buff-row"><b>' + c.name + '</b><span>' + c.text + '</span></div>'
+  ).join('');
+  return tabs +
+    (variant.ends ? '<div class="modes-updated">Заканчивается в версии ' + variant.ends + '</div>' : '') +
+    '<div class="card"><h3>Баффы</h3>' + buffsHtml + '</div>' +
+    '<div class="card"><h3>Целевые очки</h3>' + modeScoresHtml(variant.targetScores) + '</div>' +
+    '<div class="card"><h3>Боссы</h3>' + (bossesHtml || '<div class="boss-mode-empty">Нет данных.</div>') + '</div>' +
+    (charBuffsHtml ? '<div class="card"><h3>Бонусы персонажам</h3>' + charBuffsHtml + '</div>' : '');
+}
+function setModesDpmVariant(idx){
+  modesDpmVariantIdx = idx;
+  renderModesContent();
+}
+
+function renderModesContent(){
+  const root = document.getElementById('modes-content');
+  if (!root) return;
+  if (modesMode === 'wastes') root.innerHTML = wastesModeHtml();
+  else if (modesMode === 'dpm') root.innerHTML = dpmModeHtml();
+  else root.innerHTML = towerModeHtml();
+}
+function renderModesView(){
+  const switchEl = document.getElementById('modes-switch');
+  if (!switchEl) return;
+  switchEl.innerHTML = BOSS_MODE_LABELS.map((m) =>
+    '<div class="chip' + (m.key === modesMode ? ' active' : '') + '" onclick="setModesMode(\'' + m.key + '\')">' + m.icon + ' ' + m.title + '</div>'
+  ).join('');
+  document.getElementById('modes-updated').textContent = MODE_DETAILS.updated ? 'Обновлено: ' + modesFormatDate(MODE_DETAILS.updated) : '';
+  renderModesContent();
+}
+function setModesMode(key){
+  modesMode = key;
+  modesTowerAreaIdx = 0;
+  modesWastesAreaIdx = 0;
+  modesWastesLevelIdx = 0;
+  modesDpmVariantIdx = 0;
+  renderModesView();
+}
 function renderEchoSetsGrid(){
   const grid = document.getElementById('echo-sets-grid');
   grid.innerHTML = ECHOES.map((e) => {
@@ -1915,6 +2121,7 @@ Promise.all([loadGameData(), loadProfile()]).then(() => {
   renderEchoSetsGrid();
   renderBossesGrid();
   renderBossModeBlocks();
+  renderModesView();
   buildSearchIndex();
   updateAccountAvatar();
   document.querySelectorAll('.review-dynamic[data-char-id]').forEach((el) => renderReviewTab(el, Number(el.dataset.charId)));

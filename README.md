@@ -235,6 +235,17 @@ journalctl -u tg-results-bot -f
 (`/wuvochka/boss-modes.json` в `miniappServer.js`), не напрямую с encore.moe
 (их сайт блокирует кросс-доменные запросы с клиента).
 
+Тот же запуск, если видит, что сезон/фаза одного из режимов сменились (или
+`data/wuvochka-mode-details.json` ещё ни разу не создавался), заодно гоняет
+`scripts/fetch-mode-details.mjs` — это уже полный парсинг правил режима
+(баффы, целевые очки, этажи/волны и враги на них, боссы DPM с тегами и
+бонусами персонажам) для раздела «Режимы» в миниаппе
+(`/wuvochka/mode-details.json`). Он тяжелее (десятки переключений вкладок на
+encore.moe), поэтому не гоняется каждый день, а только когда действительно
+есть что обновлять. Отдельного systemd-таймера ему не нужно — он всегда
+запускается изнутри `fetch-boss-modes.mjs`; вручную его можно прогнать и
+отдельно: `node scripts/fetch-mode-details.mjs`.
+
 ```bash
 sudo cp deploy/wuvochka-boss-modes.service deploy/wuvochka-boss-modes.timer /etc/systemd/system/
 sudo systemctl daemon-reload
