@@ -158,7 +158,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .tier-role-section:first-of-type{border-top:none;}
 .tier-role-heading{display:flex;align-items:center;gap:6px;font-family:'Exo 2',sans-serif;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:11px;}
 .tier-role-heading svg{width:15px;height:15px;flex-shrink:0;}
-.boss-mode-card h3 svg{width:15px;height:15px;vertical-align:-3px;margin-right:5px;}
+.boss-mode-card h3 svg,.boss-mode-card h3 img{width:15px;height:15px;vertical-align:-3px;margin-right:5px;object-fit:contain;}
 .tier-role-heading.dps{color:var(--bad);}
 .tier-role-heading.hybrid{color:var(--el-electro);}
 .tier-role-heading.support{color:var(--tier-0);}
@@ -226,7 +226,7 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .matrix-link-btn:hover{filter:brightness(1.1);}
 .matrix-link-btn:active{transform:scale(.97);}
 .hero-tag{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:4px 8px;border-radius:6px;background:var(--surface-3);color:var(--text-muted);display:flex;align-items:center;gap:4px;}
-.hero-tag svg{width:12px;height:12px;flex-shrink:0;}
+.hero-tag svg,.hero-tag img{width:12px;height:12px;flex-shrink:0;object-fit:contain;}
 .hero-tag.tier{background:var(--accent-soft);color:var(--accent);}
 
 .echo-toolbar{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
@@ -444,7 +444,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.12</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.13</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -1654,9 +1654,9 @@ function renderWeaponsGrid(){
 }
 const BOSS_CATEGORY_RU = { world: 'Мировой босс', weekly: 'Еженедельный босс', nightmare: 'Кошмар' };
 const BOSS_MODE_LABELS = [
-  { key: 'tower', title: 'Башня', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21h12"/><path d="M7 21V11h10v10"/><path d="M6 11l1-6h2v3h2v-3h2v3h2v-3h2l1 6"/></svg>' },
-  { key: 'wastes', title: 'Корабли', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/><path d="M2 13.5c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/><path d="M2 19c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/></svg>' },
-  { key: 'dpm', title: 'Матрица', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>' },
+  { key: 'tower', title: 'Башня', icon: '<img src="/wuwa-assets/app/mode-tower.webp" alt="">' },
+  { key: 'wastes', title: 'Корабли', icon: '<img src="/wuwa-assets/app/mode-wastes.webp" alt="">' },
+  { key: 'dpm', title: 'Матрица', icon: '<img src="/wuwa-assets/app/mode-matrix.webp" alt="">' },
 ];
 function bossIconSrc(b){
   return '/wuwa-assets/bosses/' + (b.icon || '');
