@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh Вувочка boss-mode rosters (Tower/Wastes/DPM) from encore.moe
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=tgbot
+WorkingDirectory=/opt/tg-results-bot
+ExecStart=/usr/bin/node scripts/fetch-boss-modes.mjs

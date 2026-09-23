@@ -1,0 +1,9 @@
+[Unit]
+Description=Run wuvochka-boss-modes.service daily at 00:00 UTC
+
+[Timer]
+OnCalendar=*-*-* 00:00:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -227,6 +227,22 @@ sudo systemctl status tg-results-bot
 journalctl -u tg-results-bot -f
 ```
 
+## Вувочка: обновление текущих боссов режимов (раз в сутки)
+
+`scripts/fetch-boss-modes.mjs` тянет через Puppeteer с encore.moe, какие боссы
+сейчас в Башне / Тщетных Пустошах / Матрице, и пишет
+`data/wuvochka-boss-modes.json` — миниапп раздаёт его через свой бэкенд
+(`/wuvochka/boss-modes.json` в `miniappServer.js`), не напрямую с encore.moe
+(их сайт блокирует кросс-доменные запросы с клиента).
+
+```bash
+sudo cp deploy/wuvochka-boss-modes.service deploy/wuvochka-boss-modes.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now wuvochka-boss-modes.timer
+sudo systemctl status wuvochka-boss-modes.timer
+node scripts/fetch-boss-modes.mjs  # прогнать вручную сразу после установки
+```
+
 ## В разработке
 
 - **«Вувочка»** — мини-апп со справочником по Wuthering Waves (тир-лист,

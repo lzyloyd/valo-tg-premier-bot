@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import fs from 'node:fs/promises';
 import express from 'express';
 import { config } from './config.js';
 import { verifyInitData } from './telegramAuth.js';
@@ -107,6 +108,28 @@ export function startMiniAppServer() {
     res.set('Cache-Control', 'no-store');
     next();
   });
+
+  // Which bosses are currently in Tower of Adversity / Whimpering Wastes / DPM —
+  // refreshed daily by scripts/fetch-boss-modes.mjs (see wuvochka-boss-modes.timer
+  // on the VPS) into data/wuvochka-boss-modes.json, since encore.moe's own pages
+  // block cross-origin fetch and can't be read straight from the client. Falls
+  // back to an empty-but-valid shape before the first scrape has ever run.
+  const bossModesPath = path.join(__dirname, '..', 'data', 'wuvochka-boss-modes.json');
+  const emptyBossModes = {
+    updated: null,
+    tower: { label: null, bossIds: [] },
+    wastes: { label: null, bossIds: [] },
+    dpm: { label: null, bossIds: [] },
+  };
+  app.get('/wuvochka/boss-modes.json', async (req, res) => {
+    try {
+      res.type('application/json').send(await fs.readFile(bossModesPath, 'utf8'));
+    } catch (err) {
+      if (err.code !== 'ENOENT') console.error('[miniapp] failed to read boss-modes.json:', err);
+      res.json(emptyBossModes);
+    }
+  });
+
   app.use(express.static(path.join(__dirname, 'miniapp-public'), { etag: false, lastModified: false, cacheControl: false }));
 
   app.post('/api/state', async (req, res) => {
