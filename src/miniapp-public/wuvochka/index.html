@@ -444,7 +444,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.2</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.21</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -1747,7 +1747,7 @@ function echoArtHtml(item){
 // only one id per element is actually reachable (openChar-able) in the app -
 // exclude the other 4 here too, same as the static char-grid markup does.
 const ROVER_DUPLICATE_IDS = new Set([1502, 1605, 1408, 1310]);
-const SEARCH_GROUP_ORDER = ['Персонажи', 'Оружие', 'Сеты эхо', 'Эхо'];
+const SEARCH_GROUP_ORDER = ['Персонажи', 'Оружие', 'Сеты эхо', 'Эхо', 'Боссы'];
 let SEARCH_INDEX = [];
 function buildSearchIndex(){
   const chars = CHARACTERS.filter((c) => !ROVER_DUPLICATE_IDS.has(c.id)).map((c) => ({
@@ -1784,7 +1784,17 @@ function buildSearchIndex(){
       onclick: "openEchoItem('" + nameAttr + "')",
     };
   });
-  SEARCH_INDEX = [...chars, ...weapons, ...echoSets, ...echoItems];
+  const bosses = Object.keys(BOSSES).map((id) => {
+    const b = BOSSES[id];
+    return {
+      group: 'Боссы',
+      name: b.name,
+      iconHtml: '<img src="' + bossIconSrc(b) + '" alt="">',
+      meta: BOSS_CATEGORY_RU[b.category] || 'Босс',
+      onclick: "openBoss('" + id + "')",
+    };
+  });
+  SEARCH_INDEX = [...chars, ...weapons, ...echoSets, ...echoItems, ...bosses];
 }
 function renderSearchResults(query){
   const root = document.getElementById('search-results');
