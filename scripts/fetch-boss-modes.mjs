@@ -26,6 +26,7 @@ puppeteer.use(StealthPlugin());
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BOSSES_PATH = path.join(__dirname, '..', 'src', 'miniapp-public', 'wuvochka', 'bosses.json');
 const OUT_PATH = path.join(__dirname, '..', 'data', 'wuvochka-boss-modes.json');
+const MODE_DETAILS_PATH = path.join(__dirname, '..', 'data', 'wuvochka-mode-details.json');
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
 const MIN_TEXT_LENGTH = 300;
 
@@ -122,9 +123,17 @@ async function main() {
     // The full mode-details scrape (buffs/targets/floor-by-floor enemies for
     // all three modes) is much heavier than this boss-presence check — dozens
     // of extra tab switches — so only pay for it on days the season/phase
-    // actually rotated (or there's no mode-details file yet at all).
+    // actually rotated (or there's no mode-details file yet at all — checked
+    // separately from `previous` since that's this script's OWN output file,
+    // which can already exist and match even on a fresh deploy that's never
+    // run the mode-details scrape before).
+    const modeDetailsExist = await fs
+      .access(MODE_DETAILS_PATH)
+      .then(() => true)
+      .catch(() => false);
     const rotated =
       !previous ||
+      !modeDetailsExist ||
       previous.tower?.label !== result.tower.label ||
       previous.wastes?.label !== result.wastes.label ||
       previous.dpm?.label !== result.dpm.label;
