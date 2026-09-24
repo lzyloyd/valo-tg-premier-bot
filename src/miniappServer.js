@@ -143,6 +143,20 @@ export function startMiniAppServer() {
     }
   });
 
+  // Monster head icons for the enemy/boss chips on the "Режимы" page — fetched
+  // and cached by scripts/fetch-mode-details.mjs alongside mode-details.json
+  // (same encore.moe monster-id namespace as bosses.json's `icon` field, but a
+  // different, much larger set — every enemy that's ever shown up in a floor
+  // or wave, not just the 43 full bosses).
+  app.use(
+    '/wuvochka/enemy-icons',
+    express.static(path.join(__dirname, '..', 'data', 'wuvochka-enemy-icons'), {
+      etag: false,
+      lastModified: false,
+      cacheControl: false,
+    }),
+  );
+
   app.use(express.static(path.join(__dirname, 'miniapp-public'), { etag: false, lastModified: false, cacheControl: false }));
 
   app.post('/api/state', async (req, res) => {

@@ -34,6 +34,8 @@ puppeteer.use(StealthPlugin());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = path.join(__dirname, '..', 'data', 'wuvochka-mode-details.json');
+const ICON_DIR = path.join(__dirname, '..', 'data', 'wuvochka-enemy-icons');
+const MONSTER_API = 'https://api-v2.encore.moe/api/en/monster';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
 
 function lines(text) {
@@ -318,13 +320,90 @@ async function scrapeDpm(page, dpmId) {
   return { label, variants };
 }
 
+// ---------- Enemy/boss head icons ----------
+//
+// api-v2.encore.moe/api/en/monster's own `Icon` field points at a dead host
+// (`api.encore.moe`, .png) — the site's own rendered <img> tags resolve to
+// `api-v2.encore.moe`, .webp instead (found by inspecting encore.moe/monster
+// live rather than trusting the API field literally). Same monster id, just
+// a different host+extension, confirmed working for several samples.
+function toIconUrl(rawIcon) {
+  return rawIcon.replace('api.encore.moe', 'api-v2.encore.moe').replace(/\.png$/, '.webp');
+}
+
+async function fetchMonsterIndex() {
+  const res = await fetch(MONSTER_API);
+  const data = await res.json();
+  const index = new Map();
+  for (const m of data.monsterList || []) {
+    index.set(m.Name, { id: m.Id, iconUrl: toIconUrl(m.Icon) });
+  }
+  return index;
+}
+
+async function downloadIcon(id, iconUrl) {
+  const dest = path.join(ICON_DIR, `${id}.webp`);
+  const exists = await fs.access(dest).then(() => true).catch(() => false);
+  if (exists) return;
+  const res = await fetch(iconUrl);
+  if (!res.ok) return;
+  await fs.mkdir(ICON_DIR, { recursive: true });
+  await fs.writeFile(dest, Buffer.from(await res.arrayBuffer()));
+}
+
+// Replaces bare enemy-name strings with `{name, id}` (id: null when the name
+// isn't a known monster) throughout the tower/wastes trees, and adds an `id`
+// field onto each DPM boss — then downloads any not-yet-cached icon for every
+// id referenced, so the frontend can just point an <img> at
+// /wuvochka/enemy-icons/<id>.webp.
+async function attachEnemyIcons(result, monsterIndex) {
+  const withId = (name) => ({ name, id: monsterIndex.get(name)?.id ?? null });
+
+  for (const area of result.tower.areas) {
+    for (const floor of area.floors) floor.enemies = floor.enemies.map(withId);
+  }
+  for (const area of result.wastes.areas) {
+    for (const level of area.levels) {
+      for (const stage of level.stages) stage.enemies = stage.enemies.map(withId);
+    }
+  }
+  for (const variant of result.dpm.variants) {
+    for (const boss of variant.bosses) boss.id = monsterIndex.get(boss.name)?.id ?? null;
+  }
+
+  const ids = new Map();
+  for (const [name, info] of monsterIndex) ids.set(info.id, info.iconUrl);
+  const referenced = new Set();
+  const collect = (obj) => {
+    if (typeof obj.id === 'number') referenced.add(obj.id);
+  };
+  result.tower.areas.forEach((a) => a.floors.forEach((f) => f.enemies.forEach(collect)));
+  result.wastes.areas.forEach((a) => a.levels.forEach((l) => l.stages.forEach((s) => s.enemies.forEach(collect))));
+  result.dpm.variants.forEach((v) => v.bosses.forEach(collect));
+
+  for (const id of referenced) {
+    const iconUrl = ids.get(id);
+    if (iconUrl) await downloadIcon(id, iconUrl);
+  }
+}
+
 // ---------- Entry points ----------
 
 export async function scrapeModeDetails(page, { towerSeason, wastesSeason, dpmId }) {
   const tower = await scrapeTower(page, towerSeason);
   const wastes = await scrapeWastes(page, wastesSeason);
   const dpm = await scrapeDpm(page, dpmId);
-  return { updated: new Date().toISOString().slice(0, 10), tower, wastes, dpm };
+  const result = { updated: new Date().toISOString().slice(0, 10), tower, wastes, dpm };
+  try {
+    const monsterIndex = await fetchMonsterIndex();
+    await attachEnemyIcons(result, monsterIndex);
+  } catch (err) {
+    // Icons are a nice-to-have on top of the text data above, which is
+    // already complete and correct at this point — don't lose that over an
+    // icon-fetch hiccup.
+    console.error('[fetch-mode-details] enemy icon fetch failed, continuing without icons:', err);
+  }
+  return result;
 }
 
 export async function writeModeDetails(result) {

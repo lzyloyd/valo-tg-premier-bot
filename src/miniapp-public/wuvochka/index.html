@@ -414,9 +414,11 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .mode-floor-head b{font-size:13px;}
 .mode-cost-badge{font-size:10.5px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:2px 7px;}
 .mode-enemy-row{display:flex;flex-wrap:wrap;gap:7px;}
-.mode-enemy-chip{font-size:11.5px;font-weight:600;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:5px 11px;color:var(--text-muted);}
+.mode-enemy-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:4px 11px;color:var(--text-muted);}
 .mode-enemy-chip.linked{color:var(--accent);cursor:pointer;transition:background-color .15s ease;}
 .mode-enemy-chip.linked:hover{background:var(--surface-3);}
+.mode-icon-sm{width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--surface-3);}
+.mode-icon-md{width:32px;height:32px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--surface-3);}
 .mode-weakness-tag{font-size:10.5px;font-weight:700;color:var(--text-muted);margin-bottom:7px;}
 .mode-stage-note{font-size:11.5px;color:var(--text-muted);margin-bottom:8px;}
 .mode-score-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:2px;}
@@ -431,11 +433,13 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .mode-tag-chip{font-size:10.5px;font-weight:600;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text-muted);}
 .mode-boss-notes p{font-size:12px;line-height:1.55;color:var(--text-muted);margin:0 0 4px;}
 .mode-boss-notes p:first-child{font-weight:700;color:var(--text);}
-.mode-char-buff-row{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--border);padding:9px 0;}
+.mode-char-buff-row{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--border);padding:9px 0;}
 .mode-char-buff-row:first-child{border-top:none;padding-top:0;}
+.mode-char-buff-row .mode-name-row{display:flex;align-items:center;gap:8px;}
+.mode-char-buff-row .mode-name-row.linked{cursor:pointer;}
 .mode-char-buff-row b{font-size:12.5px;}
 .mode-char-buff-row span{font-size:12px;color:var(--text-muted);line-height:1.5;}
-.mode-boss-name{font-size:13.5px;font-weight:800;}
+.mode-boss-name{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:800;}
 .mode-boss-name.linked{color:var(--accent);cursor:pointer;}
 .boss-modes-chips{display:flex;flex-wrap:wrap;gap:8px;}
 .boss-guide-section{padding:9px 0;border-top:1px solid var(--border);}
@@ -487,7 +491,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.3</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.4</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -1782,15 +1786,30 @@ function modesFormatDate(iso){
   const p = iso.split('-');
   return p[2] + '.' + p[1] + '.' + p[0];
 }
-function modeEnemyChipHtml(name){
-  const entry = Object.entries(BOSSES).find(([, b]) => b.name === name);
-  if (entry) return '<span class="mode-enemy-chip linked" onclick="openBoss(\'' + entry[0] + '\')">' + name + '</span>';
-  return '<span class="mode-enemy-chip">' + name + '</span>';
+function modeBossEntry(name){
+  return Object.entries(BOSSES).find(([, b]) => b.name === name);
 }
-function modeBossNameHtml(name){
-  const entry = Object.entries(BOSSES).find(([, b]) => b.name === name);
-  if (entry) return '<b class="mode-boss-name linked" onclick="openBoss(\'' + entry[0] + '\')">' + name + '</b>';
-  return '<b class="mode-boss-name">' + name + '</b>';
+// Prefers a known boss's own splash art (already fetched for the Боссы
+// section) over the generic monster-head icon, since it looks better at chip
+// size and needs no extra request; the monster-head icon (fetched by
+// fetch-mode-details.mjs into /wuvochka/enemy-icons/<id>.webp) covers every
+// other enemy that shows up in a floor/wave but isn't a full boss.
+function modeIconHtml(cssClass, entry, obj){
+  if (entry) return '<img class="' + cssClass + '" src="' + bossIconSrc(entry[1]) + '" alt="">';
+  if (obj && obj.id) return '<img class="' + cssClass + '" src="/wuvochka/enemy-icons/' + obj.id + '.webp" alt="">';
+  return '';
+}
+function modeEnemyChipHtml(enemy){
+  const entry = modeBossEntry(enemy.name);
+  const icon = modeIconHtml('mode-icon-sm', entry, enemy);
+  if (entry) return '<span class="mode-enemy-chip linked" onclick="openBoss(\'' + entry[0] + '\')">' + icon + enemy.name + '</span>';
+  return '<span class="mode-enemy-chip">' + icon + enemy.name + '</span>';
+}
+function modeBossNameHtml(boss){
+  const entry = modeBossEntry(boss.name);
+  const icon = modeIconHtml('mode-icon-md', entry, boss);
+  if (entry) return '<span class="mode-boss-name linked" onclick="openBoss(\'' + entry[0] + '\')">' + icon + boss.name + '</span>';
+  return '<span class="mode-boss-name">' + icon + boss.name + '</span>';
 }
 function modeLinesHtml(lines){
   return '<div class="mode-lines">' + (lines || []).map((l) => '<p>' + l + '</p>').join('') + '</div>';
@@ -1878,13 +1897,17 @@ function dpmModeHtml(){
     const notesHtml = b.notes.length
       ? '<div class="mode-boss-notes">' + b.notes.map((n) => '<p>' + n + '</p>').join('') + '</div>'
       : (b.suggestedBuff ? '<div class="mode-boss-notes"><p>Рекомендуемый бафф: ' + b.suggestedBuff + '</p></div>' : '');
-    return '<div class="mode-boss-card"><div class="mode-boss-head">' + modeBossNameHtml(b.name) +
+    return '<div class="mode-boss-card"><div class="mode-boss-head">' + modeBossNameHtml(b) +
       (b.resistantTo ? '<span class="mode-resist-tag">' + b.resistantTo.replace(' RES', ' резист') + '</span>' : '') +
       '</div>' + tagsHtml + notesHtml + '</div>';
   }).join('');
-  const charBuffsHtml = variant.characterBuffs.map((c) =>
-    '<div class="mode-char-buff-row"><b>' + c.name + '</b><span>' + c.text + '</span></div>'
-  ).join('');
+  const charBuffsHtml = variant.characterBuffs.map((c) => {
+    const character = CHARACTERS.find((x) => x.name === c.name);
+    const icon = character ? '<img class="mode-icon-sm" src="/wuwa-assets/characters/' + character.id + '.webp" alt="">' : '';
+    const rowClass = 'mode-name-row' + (character ? ' linked' : '');
+    const onclick = character ? ' onclick="openChar(' + character.id + ')"' : '';
+    return '<div class="mode-char-buff-row"><div class="' + rowClass + '"' + onclick + '>' + icon + '<b>' + c.name + '</b></div><span>' + c.text + '</span></div>';
+  }).join('');
   return tabs +
     (variant.ends ? '<div class="modes-updated">Заканчивается в версии ' + variant.ends + '</div>' : '') +
     '<div class="card"><h3>Баффы</h3>' + buffsHtml + '</div>' +
