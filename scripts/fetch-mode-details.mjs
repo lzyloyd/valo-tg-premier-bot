@@ -533,13 +533,24 @@ async function fetchEscalationTooltips(page, bosses) {
       const handle = handles[ptr];
       await handle.evaluate((el) => el.scrollIntoView({ block: 'center' }));
       await new Promise((resolve) => setTimeout(resolve, 150));
-      // Occasionally the first hover after a scroll doesn't register a
-      // mouseenter (the tooltip is a JS hover-state component, not a native
-      // title attribute) — one retry with a longer wait clears that up.
+      // ElementHandle.hover() teleports the pointer straight to the target,
+      // which some Vue hover-state components don't register as a real
+      // mouseenter (observed to work reliably in one headless Chrome build
+      // but not another) — moving the mouse to a neutral spot first, then
+      // stepping onto the element, is a closer approximation of a real
+      // hover and proved reliable across environments. One retry with a
+      // longer wait covers whatever's still left after that.
       let tooltipText = null;
       for (let attempt = 0; attempt < 2 && !tooltipText; attempt++) {
-        await handle.hover();
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        const box = await handle.boundingBox();
+        if (box) {
+          await page.mouse.move(0, 0);
+          await new Promise((resolve) => setTimeout(resolve, 80));
+          await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 10 });
+        } else {
+          await handle.hover();
+        }
+        await new Promise((resolve) => setTimeout(resolve, 350));
         tooltipText = await page.evaluate(() => {
           const el = document.querySelector('div.fixed.pointer-events-none');
           if (!el) return null;
