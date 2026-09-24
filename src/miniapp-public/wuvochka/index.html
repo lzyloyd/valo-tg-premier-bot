@@ -434,11 +434,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .mode-tag-chip{font-size:10.5px;font-weight:600;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text-muted);}
 .mode-tag-section{margin-bottom:7px;}
 .mode-tag-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);font-weight:700;margin:0 0 5px;}
-.mode-esc-list{display:flex;flex-direction:column;gap:6px;}
-.mode-tag-chip.clickable{cursor:pointer;transition:background-color .15s ease,color .15s ease;}
-.mode-tag-chip.clickable:hover{background:var(--surface-3);color:var(--accent);}
-.mode-tag-desc{display:none;font-size:11.5px;color:var(--text-muted);line-height:1.55;margin:6px 0 0;}
-.mode-tag-desc.open{display:block;}
+.mode-esc-list{display:flex;flex-direction:column;gap:10px;}
+.mode-tag-desc{font-size:11.5px;color:var(--text-muted);line-height:1.55;margin:5px 0 0;}
 .mode-boss-notes p{font-size:12px;line-height:1.55;color:var(--text-muted);margin:0 0 4px;}
 .mode-boss-notes p:first-child{font-weight:700;color:var(--text);}
 .mode-char-buff-row{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--border);padding:9px 0;}
@@ -499,7 +496,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.6</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.61</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -1934,8 +1931,7 @@ function dpmModeHtml(){
         b.escalationBuffs.map((buff) => {
           const name = typeof buff === 'string' ? buff : buff.name;
           const desc = typeof buff === 'string' ? null : buff.description;
-          return '<div class="mode-esc-item"><span class="mode-tag-chip' + (desc ? ' clickable' : '') + '"' +
-            (desc ? ' onclick="this.nextElementSibling.classList.toggle(\'open\')"' : '') + '>' + name + '</span>' +
+          return '<div class="mode-esc-item"><span class="mode-tag-chip">' + name + '</span>' +
             (desc ? '<p class="mode-tag-desc">' + desc + '</p>' : '') + '</div>';
         }).join('') +
         '</div></div>'
