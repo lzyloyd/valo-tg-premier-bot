@@ -36,6 +36,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = path.join(__dirname, '..', 'data', 'wuvochka-mode-details.json');
 const ICON_DIR = path.join(__dirname, '..', 'data', 'wuvochka-enemy-icons');
 const MONSTER_API = 'https://api-v2.encore.moe/api/en/monster';
+const ITEM_API = 'https://api-v2.encore.moe/api/en/item';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
 
 function lines(text) {
@@ -77,6 +78,168 @@ async function currentNumber(page, listUrl, pattern) {
   const nums = hrefs.map((h) => (h ? h.match(pattern) : null)).filter(Boolean).map((m) => Number(m[1]));
   if (!nums.length) throw new Error(`no numbered links found at ${listUrl}`);
   return Math.max(...nums);
+}
+
+// ---------- Russian translation of buff/mechanic descriptions ----------
+//
+// This is straight game data, so unlike Game8 boss-guide prose it isn't
+// rephrased — it's translated close to 1:1. Kuro reuses a small, stable set
+// of sentence templates for these buffs across seasons (only the numbers and
+// element names change), so each rule below is a regex over one template
+// with the varying parts captured, not a hardcoded exact string — it keeps
+// matching after a season rotates in new values. Policy: element names
+// (Aero, Fusion, ...) and mode-specific proper-noun mechanics (Ember, Vigor,
+// Concerto Energy, Tune Break/Strain, Mistune, Crisis Response, Escalation)
+// stay in English, same as how character/weapon/boss names stay English
+// elsewhere in this app — only the surrounding descriptive sentence is
+// translated. A line that matches nothing here is left in English rather
+// than dropped, so an unseen new template degrades gracefully instead of
+// silently disappearing (and shows up as English in the app, which is the
+// visible signal that this list needs a new rule).
+const TRANSLATE_EXACT = new Map([
+  ['Clear the challenge', 'Пройти испытание'],
+  ['When entering a Challenge, Concerto Energy is restored to 100%', 'При входе в испытание Concerto Energy восстанавливается до 100%'],
+  ['When entering a Challenge, Resonance Energy is restored to 100%', 'При входе в испытание Resonance Energy восстанавливается до 100%'],
+  ['Negative Statuses:', 'Негативные статусы:'],
+  ['Tune break:', 'Tune break:'],
+  ['Dealing damage or defeating enemies restores Ember.', 'Нанесение урона или добивание врагов восстанавливает Ember.'],
+  [
+    "When hit by a Resonator's skill, enemies in the Mistune state take an instance of Tune Break DMG and then exit the Mistune state.",
+    'Когда враг в состоянии Mistune получает удар навыком Резонатора, он получает урон Tune Break и выходит из состояния Mistune.',
+  ],
+  [
+    'All Tokens have unlimited uses while inside the Infinite Torrents.',
+    'Внутри Infinite Torrents все токены можно использовать неограниченное число раз.',
+  ],
+  // DPM buff-block titles and the suggested-buff category word.
+  ['General Enhancement', 'Общее усиление'],
+  ['Enhancement: Negative Status', 'Усиление: негативные статусы'],
+  ['Enhancement: Echo Skill', 'Усиление: Навык эхо'],
+  ['Enhancement: Tune Break', 'Усиление: Tune Break'],
+  ['General', 'Общий'],
+]);
+
+const TRANSLATE_RULES = [
+  [/^Clear the challenge with at least (\d+)s left$/, (m) => `Пройти испытание, оставив не менее ${m[1]}с на таймере`],
+  [/^Enemy (\w+) RES decreases by (\d+)%$/, (m) => `Резист врагов к стихии ${m[1]} снижен на ${m[2]}%`],
+  [
+    /^Resonators ignore (\d+)% of the enemy's DEF when dealing damage\. When enemies are affected by Negative Statuses, their DMG taken is Amplified by (\d+)%\.$/,
+    (m) => `Резонаторы игнорируют ${m[1]}% защиты врага при нанесении урона. Пока враг под негативным статусом, получаемый им урон усилен на ${m[2]}%.`,
+  ],
+  [
+    /^Enemies' (\w+) RES and (\w+) RES are decreased by (\d+)%, and their (\w+) RES and (\w+) RES are increased by (\d+)%\.$/,
+    (m) => `Резист врагов к ${m[1]} и ${m[2]} снижен на ${m[3]}%, а к ${m[4]} и ${m[5]} — повышен на ${m[6]}%.`,
+  ],
+  [
+    /^ATK is increased by (\d+)%\. Resonators gain (\d+)% All DMG Bonus for (\d+)s upon casting Intro Skill\.$/,
+    (m) => `АТК увеличена на ${m[1]}%. Резонаторы получают +${m[2]}% ко всему урону на ${m[3]}с при использовании Навыка вступления.`,
+  ],
+  [
+    /^(\d+)s after the battle starts, after a Resonator's attacks hit an enemy, that enemy takes (\d+)% more total DMG\. This value increases by (\d+)% every (\d+)s, up to a maximum of (\d+)%\.$/,
+    (m) => `Через ${m[1]}с после начала боя враг, получивший удар от Резонатора, начинает получать на ${m[2]}% больше суммарного урона. Значение растёт на ${m[3]}% каждые ${m[4]}с, вплоть до ${m[5]}%.`,
+  ],
+  [
+    /^Enemies' All-Attribute RES is increased by (\d+)%\. The (\w+) or (\w+) DMG taken by the enemies are not effected by this effect\.$/,
+    (m) => `Резист врагов ко всем стихиям повышен на ${m[1]}%. На получаемый урон ${m[2]} и ${m[3]} этот эффект не действует.`,
+  ],
+  [
+    /^Enemies take (\d+)% more total DMG and (\d+)% more total (\w+) DMG\. Resonators gain (\d+)% (\w+) DMG Bonus for (\d+)s upon gaining Shield, stacking up to (\d+) times\. Retriggering the effect resets its duration\.$/,
+    (m) => `Враги получают на ${m[1]}% больше суммарного урона и на ${m[2]}% больше урона ${m[3]}. Резонаторы получают +${m[4]}% к урону ${m[5]} на ${m[6]}с при получении щита, до ${m[7]} стаков. Повторное срабатывание обновляет длительность.`,
+  ],
+  [
+    /^Casting Intro Skill increases ATK by (\d+)% for (\d+)s\. Casting Resonance Skill grants (\d+)% Resonance Liberation DMG Bonus for (\d+)s\. Retriggering these effects resets their durations\.$/,
+    (m) => `Использование Навыка вступления повышает АТК на ${m[1]}% на ${m[2]}с. Использование Навыка резонанса даёт +${m[3]}% к урону Разрыва резонанса на ${m[4]}с. Повторное срабатывание обновляет длительность обоих эффектов.`,
+  ],
+  [
+    /^The Burning Waves state starts when Ember is full, which lasts for (\d+)s\. During this state, attacks that hit enemies cause them to take (\d+)% more Total DMG for (\d+)s\.$/,
+    (m) => `Когда Ember заполнен, начинается состояние Burning Waves длительностью ${m[1]}с. Пока оно активно, попадания по врагам заставляют их получать на ${m[2]}% больше урона в течение ${m[3]}с.`,
+  ],
+  [/^Total DMG taken by enemies is increased by (\d+)%\.$/, (m) => `Получаемый врагами суммарный урон увеличен на ${m[1]}%.`],
+  [
+    /^Enemies take (\d+)% more total DMG\. Enemies take (\d+)% more total Heavy Attack DMG\.$/,
+    (m) => `Враги получают на ${m[1]}% больше суммарного урона и на ${m[2]}% больше урона от тяжёлых атак.`,
+  ],
+  [
+    /^When inflicted with Negative Statuses, the target's total DMG taken is increased by (\d+)% for (\d+)s\. Enemies take (\d+)% more total (\w+) Chafe DMG\.$/,
+    (m) => `При наложении негативного статуса цель получает на ${m[1]}% больше суммарного урона в течение ${m[2]}с. Враги получают на ${m[3]}% больше урона ${m[4]} Chafe.`,
+  ],
+  [
+    /^Total Echo Skill DMG is increased by (\d+)%\. Total Havoc DMG is increased by (\d+)%\. Total Resonance Skill DMG is increased by (\d+)%\.$/,
+    (m) => `Суммарный урон от Навыка эхо увеличен на ${m[1]}%. Суммарный урон Havoc увеличен на ${m[2]}%. Суммарный урон от Навыка резонанса увеличен на ${m[3]}%.`,
+  ],
+  [
+    /^When a Resonator inflicts Tunability - Shifting, the total DMG dealt by all Resonators in the team is increased by (\d+)% for (\d+)s\.$/,
+    (m) => `Когда Резонатор накладывает Tunability - Shifting, суммарный урон всех Резонаторов в отряде увеличен на ${m[1]}% на ${m[2]}с.`,
+  ],
+  [
+    /^When a Resonator inflicts Tune Strain - Shifting, their total DMG is increased by (\d+)% for (\d+)s\.$/,
+    (m) => `Когда Резонатор накладывает Tune Strain - Shifting, его суммарный урон увеличен на ${m[1]}% на ${m[2]}с.`,
+  ],
+  [
+    /^- (.+) takes (\d+)% more total DMG for (\d+)s when inflicted with (\w+) Bane, stacking up to (\d+) times\.$/,
+    (m) => `- ${m[1]} получает на ${m[2]}% больше суммарного урона в течение ${m[3]}с при наложении ${m[4]} Bane, до ${m[5]} стаков.`,
+  ],
+  [
+    /^- (.+) takes (\d+)% more total DMG for (\d+)s when a (\w+) Bane stack on it is consumed\.$/,
+    (m) => `- ${m[1]} получает на ${m[2]}% больше суммарного урона в течение ${m[3]}с при расходовании стака ${m[4]} Bane.`,
+  ],
+  [
+    /^- (.+) takes (\d+)% more total DMG when affected by Tune Strain - Shifting or Tune Strain - Interfered\. The max limit of Tune Strain - Interfered on \1 is increased by (\d+)\. While affected by Tune Strain - Shifting, taking Treak Break additionally inflicts (\d+) stacks of Tune Strain - Interfered by the Resonators\. This effect can only be triggered once every battle\.$/,
+    (m) => `- ${m[1]} получает на ${m[2]}% больше суммарного урона при Tune Strain - Shifting или Tune Strain - Interfered. Максимум стаков Tune Strain - Interfered на ${m[1]} увеличен на ${m[3]}. Пока активен Tune Strain - Shifting, получение Treak Break дополнительно накладывает ${m[4]} стак(а) Tune Strain - Interfered от Резонаторов. Эффект срабатывает не чаще раза за бой.`,
+  ],
+  [
+    /^Resonators gain additional Vigor \(S2 Phase (\d+) only\)\.$/,
+    (m) => `Резонаторы получают дополнительный Vigor (только S2, фаза ${m[1]}).`,
+  ],
+  [
+    /^Resonators deal (\d+)% more total DMG\. Casting Resonance Liberation grants the Resonators in the team (\d+)% Resonance Skill DMG Bonus for (\d+)s\.$/,
+    (m) => `Резонаторы наносят на ${m[1]}% больше суммарного урона. Использование Разрыва резонанса даёт отряду +${m[2]}% к урону Навыка резонанса на ${m[3]}с.`,
+  ],
+  [
+    /^Resonators deal (\d+)% more total DMG\. Casting Resonance Liberation grants the Resonators in the team (\d+)% Resonance Liberation DMG Bonus for (\d+)s\.$/,
+    (m) => `Резонаторы наносят на ${m[1]}% больше суммарного урона. Использование Разрыва резонанса даёт отряду +${m[2]}% к урону Разрыва резонанса на ${m[3]}с.`,
+  ],
+  [/^Resonators deal (\d+)% more total DMG\.$/, (m) => `Резонаторы наносят на ${m[1]}% больше суммарного урона.`],
+  [
+    /^Resonator's total DMG dealt is increased by (\d+)%\. Upon casting Resonance Liberation, Resonators in the team gain a (\d+)% increase in (\w+) DMG Bonus for (\d+)s\.$/,
+    (m) => `Суммарный наносимый урон Резонатора увеличен на ${m[1]}%. При использовании Разрыва резонанса отряд получает +${m[2]}% к урону ${m[3]} на ${m[4]}с.`,
+  ],
+  // Wastes token effect lines (see fetchTokenDetail()).
+  [/^Amplifies all Attribute DMG by (\d+)%\.$/, (m) => `Усиливает урон всех стихий на ${m[1]}%.`],
+  [
+    /^Gaining Shield grants the Resonator (\d+)% (\w+) DMG Bonus and increases their total Heavy Attack DMG by ([\d.]+)% for (\d+)s, stacking up to (\d+) times\. Retriggering this effect refreshes the duration\.$/,
+    (m) => `Получение щита даёт Резонатору +${m[1]}% к урону ${m[2]} и увеличивает суммарный урон от тяжёлых атак на ${m[3]}% на ${m[4]}с, до ${m[5]} стаков. Повторное срабатывание обновляет длительность.`,
+  ],
+  [/^Enemies take (\d+)% more total (\w+) DMG\.$/, (m) => `Враги получают на ${m[1]}% больше урона ${m[2]}.`],
+  [
+    /^Resonators deal (\d+)% more total (\w+) DMG for (\d+)s upon casting Intro Skill\.$/,
+    (m) => `Резонаторы наносят на ${m[1]}% больше урона ${m[2]} в течение ${m[3]}с после использования Навыка вступления.`,
+  ],
+  [
+    /^Inflicting Tune Strain - Shifting increases the Resonator's total DMG dealt by (\d+)% for (\d+)s\.$/,
+    (m) => `Наложение Tune Strain - Shifting увеличивает суммарный наносимый урон Резонатора на ${m[1]}% на ${m[2]}с.`,
+  ],
+  [
+    /^Dealing Tune Break DMG grants (\d+)% All-Attribute DMG Bonus plus an additional (\d+)% (\w+) DMG Bonus to all Resonators in the team for (\d+)s\.$/,
+    (m) => `Нанесение урона Tune Break даёт всему отряду +${m[1]}% к урону всех стихий и ещё +${m[2]}% к урону ${m[3]} на ${m[4]}с.`,
+  ],
+  [
+    /^This Token can be used up to (\d+) times in (.+)\.$/,
+    (m) => `Этот токен можно использовать до ${m[1]} раз(а) в режиме «${m[2] === 'Whimpering Wastes' ? 'Тщетные Пустоши' : m[2]}».`,
+  ],
+];
+
+function translateLine(line) {
+  if (TRANSLATE_EXACT.has(line)) return TRANSLATE_EXACT.get(line);
+  for (const [re, fn] of TRANSLATE_RULES) {
+    const m = line.match(re);
+    if (m) return fn(m);
+  }
+  return null;
+}
+
+function translateOrKeep(line) {
+  return translateLine(line) ?? line;
 }
 
 // ---------- Tower of Adversity ----------
@@ -387,13 +550,98 @@ async function attachEnemyIcons(result, monsterIndex) {
   }
 }
 
+// ---------- Wastes token details ----------
+//
+// The rendered Wastes page only ever shows a token's name+icon, not what it
+// does — that lives on encore.moe's own per-item page (e.g. /item/71500018),
+// rendered from `AttributesDescription` on `api-v2.encore.moe/api/en/item/<id>`
+// (a plain JSON GET, no Puppeteer needed here). It's simple HTML (`<br>` line
+// breaks, a `<span style=...>` around the occasional highlighted number) —
+// stripped down to plain lines and run through the same translateLine() rules
+// as everything else.
+function stripItemHtml(html) {
+  return html
+    .split(/<br\s*\/?>/i)
+    .map((line) => line.replace(/<[^>]+>/g, '').trim())
+    .filter(Boolean);
+}
+
+async function fetchItemIndex() {
+  const res = await fetch(ITEM_API);
+  const data = await res.json();
+  const index = new Map();
+  for (const it of data.itemList || []) {
+    index.set(it.Name, { id: it.Id, iconUrl: toIconUrl(it.Icon) });
+  }
+  return index;
+}
+
+async function fetchTokenDetail(name, itemIndex) {
+  const info = itemIndex.get(name);
+  if (!info) return { name, id: null, effect: [] };
+  const res = await fetch(`${ITEM_API}/${info.id}`);
+  const data = await res.json();
+  const effect = stripItemHtml(data.AttributesDescription || '').map(translateOrKeep);
+  await downloadIcon(info.id, info.iconUrl);
+  return { name, id: info.id, effect };
+}
+
+// Replaces each level's bare token-name strings with `{name, id, effect}`,
+// fetching each distinct token once (the same handful of tokens repeat
+// across areas/levels within a rotation) and reusing its own icon-download
+// cache/dir — tokens and monsters don't share ids, but neither do their
+// filenames collide since both are just `<id>.webp` in the same directory.
+async function attachTokenDetails(result) {
+  const itemIndex = await fetchItemIndex();
+  const cache = new Map();
+  for (const area of result.wastes.areas) {
+    for (const level of area.levels) {
+      const resolved = [];
+      for (const name of level.tokens) {
+        if (!cache.has(name)) cache.set(name, await fetchTokenDetail(name, itemIndex));
+        resolved.push(cache.get(name));
+      }
+      level.tokens = resolved;
+    }
+  }
+}
+
 // ---------- Entry points ----------
+
+function translateModeDetails(result) {
+  for (const area of result.tower.areas) {
+    area.buffs.forEach((g) => { g.lines = g.lines.map(translateOrKeep); });
+    area.targets.forEach((g) => { g.lines = g.lines.map(translateOrKeep); });
+  }
+  for (const area of result.wastes.areas) {
+    for (const level of area.levels) {
+      level.mechanicLines = level.mechanicLines.map(translateOrKeep);
+      level.stages.forEach((s) => {
+        if (s.note) s.note = translateOrKeep(s.note);
+      });
+    }
+  }
+  for (const variant of result.dpm.variants) {
+    variant.buffs.forEach((b) => {
+      b.title = translateOrKeep(b.title);
+      b.lines = b.lines.map(translateOrKeep);
+    });
+    variant.bosses.forEach((b) => {
+      b.notes = b.notes.map(translateOrKeep);
+      if (b.suggestedBuff) b.suggestedBuff = translateOrKeep(b.suggestedBuff);
+    });
+    variant.characterBuffs.forEach((c) => {
+      c.text = translateOrKeep(c.text);
+    });
+  }
+}
 
 export async function scrapeModeDetails(page, { towerSeason, wastesSeason, dpmId }) {
   const tower = await scrapeTower(page, towerSeason);
   const wastes = await scrapeWastes(page, wastesSeason);
   const dpm = await scrapeDpm(page, dpmId);
   const result = { updated: new Date().toISOString().slice(0, 10), tower, wastes, dpm };
+  translateModeDetails(result);
   try {
     const monsterIndex = await fetchMonsterIndex();
     await attachEnemyIcons(result, monsterIndex);
@@ -402,6 +650,11 @@ export async function scrapeModeDetails(page, { towerSeason, wastesSeason, dpmId
     // already complete and correct at this point — don't lose that over an
     // icon-fetch hiccup.
     console.error('[fetch-mode-details] enemy icon fetch failed, continuing without icons:', err);
+  }
+  try {
+    await attachTokenDetails(result);
+  } catch (err) {
+    console.error('[fetch-mode-details] token detail fetch failed, leaving tokens as bare names:', err);
   }
   return result;
 }

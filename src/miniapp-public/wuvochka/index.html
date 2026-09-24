@@ -491,7 +491,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.4</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.5</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -1786,8 +1786,15 @@ function modesFormatDate(iso){
   const p = iso.split('-');
   return p[2] + '.' + p[1] + '.' + p[0];
 }
-function modeBossEntry(name){
-  return Object.entries(BOSSES).find(([, b]) => b.name === name);
+// Matched by monster id (mode-details.json's enemy/boss entries carry the
+// same id used as BOSSES' own object keys), not by name — a monster can show
+// up under a different display name per context (e.g. the Hazard Tower lists
+// "Scar: Aberrant Nightmare" for the exact same monster id our roster just
+// calls "Scar"), and id is exact where name-matching would miss that.
+function modeBossEntry(id){
+  if (id == null) return null;
+  const b = BOSSES[String(id)];
+  return b ? [String(id), b] : null;
 }
 // Prefers a known boss's own splash art (already fetched for the Боссы
 // section) over the generic monster-head icon, since it looks better at chip
@@ -1799,17 +1806,24 @@ function modeIconHtml(cssClass, entry, obj){
   if (obj && obj.id) return '<img class="' + cssClass + '" src="/wuvochka/enemy-icons/' + obj.id + '.webp" alt="">';
   return '';
 }
+// Not every boss/enemy — every monster in the game drops a same-named Echo
+// item, so a non-boss chip links to that instead of going nowhere.
+function modeLinkedChipHtml(cssClass, chipClass, name, id){
+  const entry = modeBossEntry(id);
+  const icon = modeIconHtml(cssClass, entry, { id });
+  if (entry) return '<span class="' + chipClass + ' linked" onclick="openBoss(\'' + entry[0] + '\')">' + icon + name + '</span>';
+  const echoItem = ECHO_ITEMS.find((x) => x.name === name);
+  if (echoItem) {
+    const nameAttr = name.replace(/'/g, "\\'");
+    return '<span class="' + chipClass + ' linked" onclick="openEchoItem(\'' + nameAttr + '\')">' + icon + name + '</span>';
+  }
+  return '<span class="' + chipClass + '">' + icon + name + '</span>';
+}
 function modeEnemyChipHtml(enemy){
-  const entry = modeBossEntry(enemy.name);
-  const icon = modeIconHtml('mode-icon-sm', entry, enemy);
-  if (entry) return '<span class="mode-enemy-chip linked" onclick="openBoss(\'' + entry[0] + '\')">' + icon + enemy.name + '</span>';
-  return '<span class="mode-enemy-chip">' + icon + enemy.name + '</span>';
+  return modeLinkedChipHtml('mode-icon-sm', 'mode-enemy-chip', enemy.name, enemy.id);
 }
 function modeBossNameHtml(boss){
-  const entry = modeBossEntry(boss.name);
-  const icon = modeIconHtml('mode-icon-md', entry, boss);
-  if (entry) return '<span class="mode-boss-name linked" onclick="openBoss(\'' + entry[0] + '\')">' + icon + boss.name + '</span>';
-  return '<span class="mode-boss-name">' + icon + boss.name + '</span>';
+  return modeLinkedChipHtml('mode-icon-md', 'mode-boss-name', boss.name, boss.id);
 }
 function modeLinesHtml(lines){
   return '<div class="mode-lines">' + (lines || []).map((l) => '<p>' + l + '</p>').join('') + '</div>';
@@ -1859,7 +1873,13 @@ function wastesModeHtml(){
   const level = area.levels[modesWastesLevelIdx] || area.levels[0];
   const mechanicHtml = '<div class="card"><h3>' + (level.mechanicName || 'Механика') + '</h3>' + modeLinesHtml(level.mechanicLines) + '</div>';
   const tokensHtml = level.tokens && level.tokens.length
-    ? '<div class="card"><h3>Токены</h3><div class="mode-tokens-row">' + level.tokens.map((t) => '<span class="mode-enemy-chip">' + t + '</span>').join('') + '</div></div>'
+    ? '<div class="card"><h3>Токены</h3>' + level.tokens.map((t) =>
+        '<div class="mode-floor-block"><div class="mode-floor-head">' +
+        (t.id ? '<img class="mode-icon-sm" src="/wuvochka/enemy-icons/' + t.id + '.webp" alt="">' : '') +
+        '<b>' + t.name + '</b></div>' +
+        (t.effect && t.effect.length ? modeLinesHtml(t.effect) : '<div class="boss-mode-empty">Нет данных.</div>') +
+        '</div>'
+      ).join('') + '</div>'
     : '';
   const scoresHtml = '<div class="card"><h3>Целевые очки</h3>' + modeScoresHtml(level.targetScores) + '</div>';
   const stagesHtml = '<div class="card"><h3>Волны</h3>' + level.stages.map((s) =>
