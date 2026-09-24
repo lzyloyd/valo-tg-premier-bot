@@ -491,7 +491,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.5</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.51</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -1914,9 +1914,9 @@ function dpmModeHtml(){
   ).join('');
   const bossesHtml = variant.bosses.map((b) => {
     const tagsHtml = b.tags.length ? '<div class="mode-tag-row">' + b.tags.map((t) => '<span class="mode-tag-chip">' + t + '</span>').join('') + '</div>' : '';
-    const notesHtml = b.notes.length
-      ? '<div class="mode-boss-notes">' + b.notes.map((n) => '<p>' + n + '</p>').join('') + '</div>'
-      : (b.suggestedBuff ? '<div class="mode-boss-notes"><p>Рекомендуемый бафф: ' + b.suggestedBuff + '</p></div>' : '');
+    const buffLine = b.suggestedBuff ? '<p>Рекомендуемый бафф: ' + b.suggestedBuff.replace(/:$/, '') + '</p>' : '';
+    const notesLines = b.notes.map((n) => '<p>' + n + '</p>').join('');
+    const notesHtml = (buffLine || notesLines) ? '<div class="mode-boss-notes">' + buffLine + notesLines + '</div>' : '';
     return '<div class="mode-boss-card"><div class="mode-boss-head">' + modeBossNameHtml(b) +
       (b.resistantTo ? '<span class="mode-resist-tag">' + b.resistantTo.replace(' RES', ' резист') + '</span>' : '') +
       '</div>' + tagsHtml + notesHtml + '</div>';

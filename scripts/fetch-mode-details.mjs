@@ -440,19 +440,22 @@ function parseDpmVariant(text) {
     j++; // skip 'Suggested Buff' label
     let resistantTo = null;
     if (tags.length && / RES$/.test(tags[0])) resistantTo = tags.shift();
+    // The line right after 'Suggested Buff' IS the buff category — either a
+    // plain word ("General") or a heading like "Negative Statuses:" that's
+    // followed by explanatory `-` bullets. Either way it's the suggested
+    // buff's name; the bullets (when present) are just extra detail on it,
+    // not a replacement for showing which buff is suggested.
     let suggestedBuff = null;
     const notes = [];
     if (j < bossesEnd) {
-      if (L[j].endsWith(':')) {
-        notes.push(L[j]);
-        j++;
+      suggestedBuff = L[j];
+      const hasNotes = L[j].endsWith(':');
+      j++;
+      if (hasNotes) {
         while (j < bossesEnd && L[j].startsWith('-')) {
           notes.push(L[j]);
           j++;
         }
-      } else {
-        suggestedBuff = L[j];
-        j++;
       }
     }
     bosses.push({ name, resistantTo, tags, suggestedBuff, notes });
