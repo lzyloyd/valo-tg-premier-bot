@@ -440,6 +440,16 @@ function parseDpmVariant(text) {
     j++; // skip 'Suggested Buff' label
     let resistantTo = null;
     if (tags.length && / RES$/.test(tags[0])) resistantTo = tags.shift();
+    // "Escalation" isn't itself a tag — it's the heading of a small group of
+    // named escalation buffs that follow it (one shared "Crisis Response -
+    // Pressing Advantage" plus, in multi-round variants, a boss-specific
+    // "Escalation - <name>"). Pull those out into their own field instead of
+    // listing "Escalation" as a flat tag alongside its own children.
+    let escalationBuffs = [];
+    if (tags.length && tags[0] === 'Escalation') {
+      escalationBuffs = tags.slice(1);
+      tags.length = 0;
+    }
     // The line right after 'Suggested Buff' IS the buff category — either a
     // plain word ("General") or a heading like "Negative Statuses:" that's
     // followed by explanatory `-` bullets. Either way it's the suggested
@@ -458,7 +468,7 @@ function parseDpmVariant(text) {
         }
       }
     }
-    bosses.push({ name, resistantTo, tags, suggestedBuff, notes });
+    bosses.push({ name, resistantTo, escalationBuffs, tags, suggestedBuff, notes });
   }
 
   const characterBuffs =
