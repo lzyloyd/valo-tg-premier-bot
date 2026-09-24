@@ -496,7 +496,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.61</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.62</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -1885,15 +1885,6 @@ function wastesModeHtml(){
   ).join('') + '</div>';
   const level = area.levels[modesWastesLevelIdx] || area.levels[0];
   const mechanicHtml = '<div class="card"><h3>' + (level.mechanicName || 'Механика') + '</h3>' + modeLinesHtml(level.mechanicLines) + '</div>';
-  const tokensHtml = level.tokens && level.tokens.length
-    ? '<div class="card"><h3>Токены</h3>' + level.tokens.map((t) =>
-        '<div class="mode-floor-block"><div class="mode-floor-head">' +
-        (t.id ? '<img class="mode-icon-sm" src="/wuvochka/enemy-icons/' + t.id + '.webp" alt="">' : '') +
-        '<b>' + t.name + '</b></div>' +
-        (t.effect && t.effect.length ? modeLinesHtml(t.effect) : '<div class="boss-mode-empty">Нет данных.</div>') +
-        '</div>'
-      ).join('') + '</div>'
-    : '';
   const scoresHtml = '<div class="card"><h3>Целевые очки</h3>' + modeScoresHtml(level.targetScores) + '</div>';
   const stagesHtml = '<div class="card"><h3>Волны</h3>' + level.stages.map((s) =>
     '<div class="mode-floor-block"><div class="mode-floor-head"><b>Волна ' + s.stage + '</b></div>' +
@@ -1901,7 +1892,7 @@ function wastesModeHtml(){
     (s.weakness ? '<div class="mode-weakness-tag">Слабость: ' + s.weakness.replace(' RES', '') + '</div>' : '') +
     '<div class="mode-enemy-row">' + s.enemies.map(modeEnemyChipHtml).join('') + '</div></div>'
   ).join('') + '</div>';
-  return areaTabs + levelTabs + mechanicHtml + tokensHtml + scoresHtml + stagesHtml;
+  return areaTabs + levelTabs + mechanicHtml + scoresHtml + stagesHtml;
 }
 function setModesWastesArea(idx){
   modesWastesAreaIdx = idx;

@@ -36,7 +36,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = path.join(__dirname, '..', 'data', 'wuvochka-mode-details.json');
 const ICON_DIR = path.join(__dirname, '..', 'data', 'wuvochka-enemy-icons');
 const MONSTER_API = 'https://api-v2.encore.moe/api/en/monster';
-const ITEM_API = 'https://api-v2.encore.moe/api/en/item';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
 
 function lines(text) {
@@ -234,29 +233,6 @@ const TRANSLATE_RULES = [
   [
     /^(.+) has equal RES to all attribute DMG\. Dealing damage to it yields ([\d.]+)x points\. \[For (\w+) only\] Defeating \1 additionally grants (\d+) points\.$/,
     (m) => `${m[1]} имеет одинаковый резист ко всем стихиям. Урон по нему даёт ${m[2]}x очков. [Только ${m[3]}] Победа над ${m[1]} дополнительно даёт ${m[4]} очков.`,
-  ],
-  // Wastes token effect lines (see fetchTokenDetail()).
-  [/^Amplifies all Attribute DMG by (\d+)%\.$/, (m) => `Усиливает урон всех стихий на ${m[1]}%.`],
-  [
-    /^Gaining Shield grants the Resonator (\d+)% (\w+) DMG Bonus and increases their total Heavy Attack DMG by ([\d.]+)% for (\d+)s, stacking up to (\d+) times\. Retriggering this effect refreshes the duration\.$/,
-    (m) => `Получение щита даёт Резонатору +${m[1]}% к урону ${m[2]} и увеличивает суммарный урон от тяжёлых атак на ${m[3]}% на ${m[4]}с, до ${m[5]} стаков. Повторное срабатывание обновляет длительность.`,
-  ],
-  [/^Enemies take (\d+)% more total (\w+) DMG\.$/, (m) => `Враги получают на ${m[1]}% больше урона ${m[2]}.`],
-  [
-    /^Resonators deal (\d+)% more total (\w+) DMG for (\d+)s upon casting Intro Skill\.$/,
-    (m) => `Резонаторы наносят на ${m[1]}% больше урона ${m[2]} в течение ${m[3]}с после использования Навыка вступления.`,
-  ],
-  [
-    /^Inflicting Tune Strain - Shifting increases the Resonator's total DMG dealt by (\d+)% for (\d+)s\.$/,
-    (m) => `Наложение Tune Strain - Shifting увеличивает суммарный наносимый урон Резонатора на ${m[1]}% на ${m[2]}с.`,
-  ],
-  [
-    /^Dealing Tune Break DMG grants (\d+)% All-Attribute DMG Bonus plus an additional (\d+)% (\w+) DMG Bonus to all Resonators in the team for (\d+)s\.$/,
-    (m) => `Нанесение урона Tune Break даёт всему отряду +${m[1]}% к урону всех стихий и ещё +${m[2]}% к урону ${m[3]} на ${m[4]}с.`,
-  ],
-  [
-    /^This Token can be used up to (\d+) times in (.+)\.$/,
-    (m) => `Этот токен можно использовать до ${m[1]} раз(а) в режиме «${m[2] === 'Whimpering Wastes' ? 'Тщетные Пустоши' : m[2]}».`,
   ],
 ];
 
@@ -710,62 +686,6 @@ async function attachEnemyIcons(result, monsterIndex) {
   }
 }
 
-// ---------- Wastes token details ----------
-//
-// The rendered Wastes page only ever shows a token's name+icon, not what it
-// does — that lives on encore.moe's own per-item page (e.g. /item/71500018),
-// rendered from `AttributesDescription` on `api-v2.encore.moe/api/en/item/<id>`
-// (a plain JSON GET, no Puppeteer needed here). It's simple HTML (`<br>` line
-// breaks, a `<span style=...>` around the occasional highlighted number) —
-// stripped down to plain lines and run through the same translateLine() rules
-// as everything else.
-function stripItemHtml(html) {
-  return html
-    .split(/<br\s*\/?>/i)
-    .map((line) => line.replace(/<[^>]+>/g, '').trim())
-    .filter(Boolean);
-}
-
-async function fetchItemIndex() {
-  const res = await fetch(ITEM_API);
-  const data = await res.json();
-  const index = new Map();
-  for (const it of data.itemList || []) {
-    index.set(it.Name, { id: it.Id, iconUrl: toIconUrl(it.Icon) });
-  }
-  return index;
-}
-
-async function fetchTokenDetail(name, itemIndex) {
-  const info = itemIndex.get(name);
-  if (!info) return { name, id: null, effect: [] };
-  const res = await fetch(`${ITEM_API}/${info.id}`);
-  const data = await res.json();
-  const effect = stripItemHtml(data.AttributesDescription || '').map(translateOrKeep);
-  await downloadIcon(info.id, info.iconUrl);
-  return { name, id: info.id, effect };
-}
-
-// Replaces each level's bare token-name strings with `{name, id, effect}`,
-// fetching each distinct token once (the same handful of tokens repeat
-// across areas/levels within a rotation) and reusing its own icon-download
-// cache/dir — tokens and monsters don't share ids, but neither do their
-// filenames collide since both are just `<id>.webp` in the same directory.
-async function attachTokenDetails(result) {
-  const itemIndex = await fetchItemIndex();
-  const cache = new Map();
-  for (const area of result.wastes.areas) {
-    for (const level of area.levels) {
-      const resolved = [];
-      for (const name of level.tokens) {
-        if (!cache.has(name)) cache.set(name, await fetchTokenDetail(name, itemIndex));
-        resolved.push(cache.get(name));
-      }
-      level.tokens = resolved;
-    }
-  }
-}
-
 // ---------- Entry points ----------
 
 function translateModeDetails(result) {
@@ -810,11 +730,6 @@ export async function scrapeModeDetails(page, { towerSeason, wastesSeason, dpmId
     // already complete and correct at this point — don't lose that over an
     // icon-fetch hiccup.
     console.error('[fetch-mode-details] enemy icon fetch failed, continuing without icons:', err);
-  }
-  try {
-    await attachTokenDetails(result);
-  } catch (err) {
-    console.error('[fetch-mode-details] token detail fetch failed, leaving tokens as bare names:', err);
   }
   return result;
 }
