@@ -510,6 +510,56 @@ function parseDpmVariant(text) {
   return { ends, buffs, targetScores, bosses, characterBuffs };
 }
 
+// encore.moe shows a cookie-consent banner on a fresh session that sits on
+// top of the page and swallows real mouse-coordinate events — harmless for
+// the click()-based tab switching used everywhere else in this script (that
+// dispatches straight to the target DOM node, bypassing whatever overlay
+// sits on top of it on screen) but it silently ate every hover used for
+// escalation-buff tooltips below, since a real mouse move only reaches
+// whatever element is topmost at that pixel. Two more gotchas found via a
+// VPS diagnostic session: (1) this CMP's own buttons ignore synthetic
+// `element.click()` — nothing happens, no error — so dismissal needs a real
+// `page.mouse` click, same trick as the hover fix below; (2) the flow is
+// three steps, not two — "Advanced Settings" reveals "Reject all" (which
+// only flips the category toggles off) and "Accept All", but the modal only
+// actually closes once "Save & Exit" is clicked afterward.
+async function dismissCookieConsent(page) {
+  const clickByText = async (re, clsFilter) => {
+    for (const handle of await page.$$('button, a')) {
+      const text = await handle.evaluate((el) => el.textContent || '');
+      if (!re.test(text)) continue;
+      if (clsFilter) {
+        const cls = await handle.evaluate((el) => el.className || '');
+        if (!clsFilter(cls)) continue;
+      }
+      await handle.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      const box = await handle.boundingBox();
+      if (!box) continue;
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 });
+      await new Promise((resolve) => setTimeout(resolve, 80));
+      await page.mouse.down();
+      await new Promise((resolve) => setTimeout(resolve, 60));
+      await page.mouse.up();
+      return true;
+    }
+    return false;
+  };
+  const openedAdvanced = await clickByText(/advanced settings/i);
+  if (openedAdvanced) {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    await clickByText(/reject all/i, (cls) => cls.includes('danger'));
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    await clickByText(/save & exit/i);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+  } else {
+    // No "Advanced Settings" found — either there's no banner this run, or
+    // it's a simpler variant with "Reject all" shown directly.
+    await clickByText(/reject all/i);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+  }
+}
+
 // "Crisis Response - Pressing Advantage" and "Escalation - <name>" render as
 // small pill buttons with no visible description on the page — the actual
 // text only exists in a hover tooltip the site renders into a fixed-position
@@ -567,6 +617,7 @@ async function fetchEscalationTooltips(page, bosses) {
 async function scrapeDpm(page, dpmId) {
   await page.goto(`https://encore.moe/dpmatrix/${dpmId}`, { waitUntil: 'networkidle2', timeout: 45000 });
   await new Promise((resolve) => setTimeout(resolve, 1500));
+  await dismissCookieConsent(page);
   const label = (await page.title()).split('|')[0].trim();
   const variantLabels = await topTabLabels(page);
   const effectiveVariants = variantLabels.length ? variantLabels : [null];
