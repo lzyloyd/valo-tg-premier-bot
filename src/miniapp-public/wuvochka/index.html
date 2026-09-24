@@ -422,7 +422,8 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .mode-weakness-tag{font-size:10.5px;font-weight:700;color:var(--text-muted);margin-bottom:7px;}
 .mode-stage-note{font-size:11.5px;color:var(--text-muted);margin-bottom:8px;}
 .mode-score-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:2px;}
-.mode-score-chip{font-size:11.5px;font-weight:700;font-family:'JetBrains Mono',monospace;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);}
+.mode-score-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;font-family:'JetBrains Mono',monospace;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:5px 10px 5px 6px;color:var(--text);}
+.mode-score-icon{width:20px;height:20px;object-fit:contain;flex-shrink:0;}
 .mode-tokens-row{display:flex;flex-wrap:wrap;gap:7px;}
 .mode-boss-card{border-top:1px solid var(--border);padding:12px 0;}
 .mode-boss-card:first-child{border-top:none;padding-top:0;}
@@ -433,6 +434,11 @@ h1,h2,h3,.disp{font-family:'Exo 2',sans-serif;text-wrap:balance;}
 .mode-tag-chip{font-size:10.5px;font-weight:600;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text-muted);}
 .mode-tag-section{margin-bottom:7px;}
 .mode-tag-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);font-weight:700;margin:0 0 5px;}
+.mode-esc-list{display:flex;flex-direction:column;gap:6px;}
+.mode-tag-chip.clickable{cursor:pointer;transition:background-color .15s ease,color .15s ease;}
+.mode-tag-chip.clickable:hover{background:var(--surface-3);color:var(--accent);}
+.mode-tag-desc{display:none;font-size:11.5px;color:var(--text-muted);line-height:1.55;margin:6px 0 0;}
+.mode-tag-desc.open{display:block;}
 .mode-boss-notes p{font-size:12px;line-height:1.55;color:var(--text-muted);margin:0 0 4px;}
 .mode-boss-notes p:first-child{font-weight:700;color:var(--text);}
 .mode-char-buff-row{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--border);padding:9px 0;}
@@ -493,7 +499,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.52</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.6</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -1830,9 +1836,17 @@ function modeBossNameHtml(boss){
 function modeLinesHtml(lines){
   return '<div class="mode-lines">' + (lines || []).map((l) => '<p>' + l + '</p>').join('') + '</div>';
 }
+// Same score-rank badges the game itself shows next to each threshold
+// (0/B/A/S/SS/SSS/king-gold/king-color, ascending). DPM's first threshold is
+// a real reachable "0" tier so its badge set starts from "empty"; Wastes
+// never shows a 0 tier, so its badges start one rank higher, at B.
+const MODE_SCORE_RANKS = ['empty', 'b', 'a', 's', 'ss', 'sss', 'kinggold', 'kingcolor'];
 function modeScoresHtml(scores){
   if (!scores || !scores.length) return '<div class="boss-mode-empty">Нет данных.</div>';
-  return '<div class="mode-score-row">' + scores.map((s) => '<span class="mode-score-chip">' + s.toLocaleString('ru-RU') + '</span>').join('') + '</div>';
+  const ranks = scores[0] === 0 ? MODE_SCORE_RANKS.slice(0, scores.length) : MODE_SCORE_RANKS.slice(1, 1 + scores.length);
+  return '<div class="mode-score-row">' + scores.map((s, idx) =>
+    '<span class="mode-score-chip">' + (ranks[idx] ? '<img class="mode-score-icon" src="/wuwa-assets/app/score-' + ranks[idx] + '.webp" alt="">' : '') + s.toLocaleString('ru-RU') + '</span>'
+  ).join('') + '</div>';
 }
 
 function towerModeHtml(){
@@ -1916,7 +1930,15 @@ function dpmModeHtml(){
   ).join('');
   const bossesHtml = variant.bosses.map((b) => {
     const escalationHtml = b.escalationBuffs && b.escalationBuffs.length
-      ? '<div class="mode-tag-section"><div class="mode-tag-section-label">Эскалация</div><div class="mode-tag-row">' + b.escalationBuffs.map((t) => '<span class="mode-tag-chip">' + t + '</span>').join('') + '</div></div>'
+      ? '<div class="mode-tag-section"><div class="mode-tag-section-label">Усиления</div><div class="mode-esc-list">' +
+        b.escalationBuffs.map((buff) => {
+          const name = typeof buff === 'string' ? buff : buff.name;
+          const desc = typeof buff === 'string' ? null : buff.description;
+          return '<div class="mode-esc-item"><span class="mode-tag-chip' + (desc ? ' clickable' : '') + '"' +
+            (desc ? ' onclick="this.nextElementSibling.classList.toggle(\'open\')"' : '') + '>' + name + '</span>' +
+            (desc ? '<p class="mode-tag-desc">' + desc + '</p>' : '') + '</div>';
+        }).join('') +
+        '</div></div>'
       : '';
     const tagsHtml = b.tags.length ? '<div class="mode-tag-row">' + b.tags.map((t) => '<span class="mode-tag-chip">' + t + '</span>').join('') + '</div>' : '';
     const buffLine = b.suggestedBuff ? '<p>Рекомендуемый бафф: ' + b.suggestedBuff.replace(/:$/, '') + '</p>' : '';

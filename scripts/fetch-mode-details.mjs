@@ -204,6 +204,37 @@ const TRANSLATE_RULES = [
     /^Resonator's total DMG dealt is increased by (\d+)%\. Upon casting Resonance Liberation, Resonators in the team gain a (\d+)% increase in (\w+) DMG Bonus for (\d+)s\.$/,
     (m) => `Суммарный наносимый урон Резонатора увеличен на ${m[1]}%. При использовании Разрыва резонанса отряд получает +${m[2]}% к урону ${m[3]} на ${m[4]}с.`,
   ],
+  // DPM escalation-buff tooltip descriptions (see fetchEscalationTooltips()).
+  // Boss names are captured, not hardcoded, since these repeat per-boss with
+  // only the name (and occasionally the numbers) changing.
+  [
+    /^Upon defeating (?:an? )?(.+), all Resonators in the current team become immune to all DMG and interruptions for (\d+)s\.$/,
+    (m) => `После победы над ${m[1]} все Резонаторы в отряде становятся неуязвимы ко всему урону и прерываниям на ${m[2]}с.`,
+  ],
+  [
+    /^For (\d+)s after defeating (?:an? )?(.+), all Resonators in the team are immune to all types of damage and interruptions\.$/,
+    (m) => `В течение ${m[1]}с после победы над ${m[2]} все Резонаторы в отряде неуязвимы ко всем видам урона и прерываниям.`,
+  ],
+  [
+    /^The Vibration Strength Reduction Rate against (.+) is reduced by (\d+)%\. Counterattacks restore (\d+) points of Resonance Energy on hit and additionally reduces the Vibration Strength of the target by (\d+)% of its maximum\.$/,
+    (m) => `Против ${m[1]} Vibration Strength Reduction Rate снижена на ${m[2]}%. Контратаки восстанавливают ${m[3]} очков Resonance Energy при попадании и дополнительно снижают Vibration Strength цели на ${m[4]}% от максимума.`,
+  ],
+  [
+    /^(.+) has its ATK increased by (\d+)%\. Dodge Counter restores (\d+) points of Resonance Energy on hit and additionally reduces the target's Vibration Strength by (\d+)% of its maximum\. CD: (\d+)s\.$/,
+    (m) => `АТК ${m[1]} увеличена на ${m[2]}%. Контратака уклонением восстанавливает ${m[3]} очков Resonance Energy при попадании и дополнительно снижает Vibration Strength цели на ${m[4]}% от максимума. КД: ${m[5]}с.`,
+  ],
+  [
+    /^Vibration Strength Reduction taken by (.+) is reduced by (\d+)%\. When \1 is in mid-air, it deals (\d+)% more DMG\. If it's affected by Negative Statuses or Tunability - Shifting, Resonators' Vibration Strength Reduction Rate is increased by (\d+)%\.$/,
+    (m) => `Получаемое ${m[1]} снижение Vibration Strength уменьшено на ${m[2]}%. Пока ${m[1]} в воздухе, он наносит на ${m[3]}% больше урона. Если он под негативным статусом или Tunability - Shifting, Vibration Strength Reduction Rate Резонаторов увеличена на ${m[4]}%.`,
+  ],
+  [
+    /^Counterattack increases the target's Off-Tune Level by (\d+)% of the maximum and reduces their Vibration Strength by (\d+)% of the maximum on hit\.$/,
+    (m) => `Контратака увеличивает Off-Tune Level цели на ${m[1]}% от максимума и снижает её Vibration Strength на ${m[2]}% от максимума при попадании.`,
+  ],
+  [
+    /^(.+) has equal RES to all attribute DMG\. Dealing damage to it yields ([\d.]+)x points\. \[For (\w+) only\] Defeating \1 additionally grants (\d+) points\.$/,
+    (m) => `${m[1]} имеет одинаковый резист ко всем стихиям. Урон по нему даёт ${m[2]}x очков. [Только ${m[3]}] Победа над ${m[1]} дополнительно даёт ${m[4]} очков.`,
+  ],
   // Wastes token effect lines (see fetchTokenDetail()).
   [/^Amplifies all Attribute DMG by (\d+)%\.$/, (m) => `Усиливает урон всех стихий на ${m[1]}%.`],
   [
@@ -479,6 +510,49 @@ function parseDpmVariant(text) {
   return { ends, buffs, targetScores, bosses, characterBuffs };
 }
 
+// "Crisis Response - Pressing Advantage" and "Escalation - <name>" render as
+// small pill buttons with no visible description on the page — the actual
+// text only exists in a hover tooltip the site renders into a fixed-position
+// div, so this hovers each pill with Puppeteer and reads that div rather
+// than something present in the static text. The tooltip names the boss
+// directly (e.g. "after defeating Mourning Aix"), so it has to be captured
+// per boss instance rather than cached by buff name — the same buff name
+// carries a different description for each boss.
+async function fetchEscalationTooltips(page, bosses) {
+  const handles = await page.$$('main button.shadow-sm');
+  const pillTexts = await Promise.all(handles.map((h) => h.evaluate((el) => el.textContent.trim())));
+  let ptr = 0;
+  for (const boss of bosses) {
+    const details = [];
+    for (const name of boss.escalationBuffs) {
+      while (ptr < pillTexts.length && pillTexts[ptr] !== name) ptr++;
+      if (ptr >= pillTexts.length) {
+        details.push({ name, description: null });
+        continue;
+      }
+      const handle = handles[ptr];
+      await handle.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      // Occasionally the first hover after a scroll doesn't register a
+      // mouseenter (the tooltip is a JS hover-state component, not a native
+      // title attribute) — one retry with a longer wait clears that up.
+      let tooltipText = null;
+      for (let attempt = 0; attempt < 2 && !tooltipText; attempt++) {
+        await handle.hover();
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        tooltipText = await page.evaluate(() => {
+          const el = document.querySelector('div.fixed.pointer-events-none');
+          if (!el) return null;
+          return el.innerText.split('\n').slice(1).join(' ').trim() || null;
+        });
+      }
+      details.push({ name, description: tooltipText ? translateOrKeep(tooltipText) : null });
+      ptr++;
+    }
+    boss.escalationBuffs = details;
+  }
+}
+
 async function scrapeDpm(page, dpmId) {
   await page.goto(`https://encore.moe/dpmatrix/${dpmId}`, { waitUntil: 'networkidle2', timeout: 45000 });
   await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -491,6 +565,17 @@ async function scrapeDpm(page, dpmId) {
     if (variantLabel) await clickTab(page, 'div.inline-flex.rounded-xl', variantLabel);
     await new Promise((resolve) => setTimeout(resolve, 300));
     const parsed = parseDpmVariant(await mainText(page));
+    try {
+      await fetchEscalationTooltips(page, parsed.bosses);
+    } catch (err) {
+      // Same graceful-degrade policy as the icon/token fetches: the text
+      // data above is already complete and correct, so a tooltip hiccup
+      // shouldn't lose it — just leave descriptions null this run.
+      console.error('[fetch-mode-details] escalation tooltip fetch failed:', err);
+      parsed.bosses.forEach((b) => {
+        b.escalationBuffs = b.escalationBuffs.map((e) => (typeof e === 'string' ? { name: e, description: null } : e));
+      });
+    }
     variants.push({ title: variantLabel, ...parsed });
   }
   return { label, variants };
