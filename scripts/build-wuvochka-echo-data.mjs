@@ -90,7 +90,7 @@ async function main() {
     element: s.element,
     badge: `/wuwa-assets/echo-sets/${s.icon}.webp`,
     bg: setBackgrounds.get(s.name) || null,
-    bonuses: echoFacts[s.name]?.bonuses || null,
+    bonuses: echoFacts[s.name]?.bonuses.map((b) => ({ pieces: b.n, text: b.t })) || null,
   }));
 
   const withIcon = items.filter((it) => it.icon).length;

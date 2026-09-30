@@ -1346,6 +1346,60 @@
       "АТК% <b>+12%</b>"
     ]
   },
+  "1311": {
+    "skills": {
+      "active": [
+        {
+          "name": "Базовая атака — Manifold Bloom",
+          "desc": "В форме Answering — до 4 ударов подряд, урон Electro; первый удар после Forte-тяжёлой ставит Modular Heartlock, который взрывается следующими ударами. В форме Illumining — до 3 ударов, похожий механизм с Heartlock."
+        },
+        {
+          "name": "Навык резонанса — Heartward by Moon",
+          "desc": "В форме Answering — удар Electro; если Hsin сдвинется с места вскоре после каста, превращается в Moon Fox (вне боя лечится и получает скрытность). Liberation недоступна в форме Moon Fox. В форме Illumining — призывает Colossal Xuanfang Mechanism для удара."
+        },
+        {
+          "name": "Ультимативный навык — Nexus Alight (Formshift)",
+          "desc": "Переводит Hsin в форму Illumining и состояние Heart Manifest. После второй Forte-тяжёлой атаки доступен второй ультимативный навык Pillars Across Heaven — урон по области, засчитывается как урон навыка резонанса, возвращает в форму Answering. Formshift даёт стаки Edict, которые автоматически бьют по цели Coordinated Attack при уроне тиммейтов."
+        }
+      ],
+      "passive": [
+        {
+          "name": "Forte Circuit — формы и очки Heart",
+          "desc": "В форме Answering копится Answering Heart, в форме Illumining — Illumining Heart. При 100 очках Answering Heart тяжёлая атака превращается в Realm Wanderer (со временем — в усиленный Realm Protector), при обнулении Illumining Heart в Mechanism Dominion — в Beholding All Horizons (затем Stilling All Horizons). Обе тяжёлые атаки открывают доступ к соответствующему ультимативному навыку."
+        },
+        {
+          "name": "Pillars Aligned и Mechanism Dominion",
+          "desc": "При 300 очках Illumining Heart на земле навык резонанса заменяется на Pillars Aligned — урон по области, переводящий Hsin в состояние Mechanism Dominion на 13 секунд, где базовая атака и контратака уклонением усилены и расходуют Illumining Heart при попадании активным персонажем."
+        },
+        {
+          "name": "Resonance Mode — Unison",
+          "desc": "Позволяет запускать Unison Response: интро-навыки усиливаются в Manifold Unison после срабатывания или получения Source Intent, а каст интро в форме Illumining сразу переводит в Mechanism Dominion."
+        },
+        {
+          "name": "Resonance Mode — Electro Flare",
+          "desc": "Лишние стаки Electro Rage от тиммейтов конвертируются в Heart of Thunder (до 100 стаков); финальная стадия навыка резонанса разряжает их в отдельный урон Electro Flare. Formshift и усиленные атаки в Mechanism Dominion накладывают Flare на врагов напрямую."
+        },
+        {
+          "name": "Врождённые навыки — Tides of Succession / Gleaning Simple Joys",
+          "desc": "В Unison: интро Manifold Unison даёт +50% АТК на 8с. В Electro Flare: наложение Flare тиммейтами даёт до 2 стаков +25% бонуса урона Electro, а с Electro Rover в команде оба получают +20% урона Electro при его интро. Вторая врождёнка: в Unison — +1 к макс. стакам Unison Boon и его раздача по команде при Unison Response; в Electro Flare — копит Thunderglow от чужих наложений Flare и в состоянии Heart Manifest самостоятельно накладывает Flare на врагов вплоть до лимита."
+        }
+      ],
+      "concerto": [
+        {
+          "name": "Интро-навык — Glance on a Whim",
+          "desc": "Удар Electro; версия Manifold Unison (в обеих формах) сильнее и засчитывается как урон навыка резонанса."
+        },
+        {
+          "name": "Аутро-навык — Herself a Thousand Lanterns",
+          "desc": "Урон Electro, равный 100% АТК Hsin. Расходует Nightglow: в Unison-режиме даёт тиммейтам с Shared Light +20% усиления всего урона на 30с; в режиме Electro Flare усиливает урон Electro тиммейтов на 20% на 20с."
+        }
+      ]
+    },
+    "minorFortes": [
+      "Крит. шанс <b>+8%</b>",
+      "АТК% <b>+12%</b>"
+    ]
+  },
   "1402": {
     "skills": {
       "active": [

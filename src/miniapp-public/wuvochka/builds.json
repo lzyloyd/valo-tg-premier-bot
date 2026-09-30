@@ -4287,6 +4287,208 @@
       "Интро"
     ]
   },
+  "1311": {
+    "variants": [
+      {
+        "id": "unison",
+        "name": "Unison",
+        "teammates": [
+          {
+            "charId": 1304,
+            "weaponId": 21010026,
+            "echoSet": "Celestial Light",
+            "echoItemIcon": "/wuwa-assets/echoes/6020067.webp",
+            "echoItemName": "Jué"
+          },
+          {
+            "charId": 1505,
+            "weaponId": 21050036,
+            "echoSet": "Rejuvenating Glow",
+            "echoItemIcon": "/wuwa-assets/echoes/6000060.webp",
+            "echoItemName": "Fallacy of No Return"
+          }
+        ]
+      },
+      {
+        "id": "electroFlare",
+        "name": "Electro Flare",
+        "teammates": [
+          {
+            "charId": 1309,
+            "weaponId": 21020016,
+            "echoSet": "Flash of Electric Reflection",
+            "echoItemIcon": "/wuwa-assets/echoes/6000224.webp",
+            "echoItemName": "Soulfrayer"
+          },
+          {
+            "charId": 1110,
+            "weaponId": 21050096,
+            "echoSet": "Song of Feathered Trace",
+            "echoItemIcon": "/wuwa-assets/echoes/391090205.webp",
+            "echoItemName": "Forbidden Bastion"
+          }
+        ]
+      }
+    ],
+    "weapons": [
+      {
+        "id": 21050116,
+        "scores": {
+          "unison": 100,
+          "electroFlare": 100
+        },
+        "note": "Сигнатурное оружие Hsin — обычные АТК, бонус урона и крит. шанс, плюс усиление урона навыка резонанса, игнор Electro-резиста и усиление урона Electro Flare. Сильно превосходит постоянные варианты."
+      },
+      {
+        "id": 21050066,
+        "scores": {
+          "unison": 76.2,
+          "electroFlare": 80.6
+        },
+        "note": "Хорошая альтернатива сигнатуре во Flare-командах — даёт урон навыка резонанса и игнор защиты, но всё ещё сильно уступает в Unison из-за проблем с ап-таймом баффов."
+      },
+      {
+        "id": 21050016,
+        "scores": {
+          "unison": 72.8,
+          "electroFlare": 78.9
+        },
+        "note": "Один из лучших универсальных Rectifier — высокие АТК и крит. шанс, но заметно слабее сигнатуры в любой команде."
+      },
+      {
+        "id": 21050056,
+        "scores": {
+          "unison": 71,
+          "electroFlare": 77.8
+        },
+        "note": "По сути стат-стик на АТК и крит. урон — бонус урона базовой атаки почти не раскрывается на Hsin."
+      },
+      {
+        "id": 21050086,
+        "scores": {
+          "unison": 69.8,
+          "electroFlare": 75.9
+        },
+        "note": "Стат-стик на АТК и крит. шанс — эффекты, завязанные на Glacio Chafe, Hsin не использует."
+      },
+      {
+        "id": 21050046,
+        "scores": {
+          "unison": 69.8,
+          "electroFlare": 75.9
+        },
+        "note": "Стат-стик на АТК и крит. шанс, эффекты Spectro Frazzle не задействуются; слабее Freeze Frame из-за меньшей базовой АТК."
+      },
+      {
+        "id": 21050076,
+        "scores": {
+          "unison": 66,
+          "electroFlare": 70.3
+        },
+        "note": "Аналог Luminous Hymn по роли и силе."
+      },
+      {
+        "id": 21050015,
+        "scores": {
+          "unison": 64.6,
+          "electroFlare": 70.3
+        },
+        "note": "Лучшее постоянно доступное оружие почти для всех ДПС на Rectifier, но отсутствие крит-статов и завязка на урон базовой атаки не подходят Hsin — сигнатура приоритетнее."
+      },
+      {
+        "id": 21050074,
+        "scores": {
+          "unison": 58.7,
+          "electroFlare": 64.1
+        },
+        "note": "Баттлпасс-оружие со стат-стиком на АТК и крит. шанс — статы заметно ниже 5★ вариантов."
+      },
+      {
+        "id": 21050084,
+        "scores": {
+          "unison": 57.6,
+          "electroFlare": 68.6
+        },
+        "note": "Даёт немного энергии и АТК при навыке резонанса, неплохая база АТК для 4★, но общий набор статов хуже почти любого 5★."
+      },
+      {
+        "id": 21050104,
+        "scores": {
+          "unison": 56.7,
+          "electroFlare": 62.6
+        },
+        "note": "Баттлпасс-оружие на АТК и крит. урон, лучше раскрывается во Flare-режиме за счёт частых навыков, но низкая базовая АТК не даёт рекомендовать его выше остальных 5★."
+      },
+      {
+        "id": 21050044,
+        "scores": {
+          "unison": 52,
+          "electroFlare": 56
+        },
+        "note": "Лучший постоянно доступный вариант для Unison-Hsin, но по статам сильно уступает сигнатуре — меняйте при первой возможности."
+      }
+    ],
+    "echoSet": "Heart of Sworn Vigil",
+    "echoSetNote": "Собственный сет Hsin — в сумме даёт 15% крит. шанса и 32.5% бонуса урона Electro, лучшая комбинация статов для неё.",
+    "echoMainItems": [
+      {
+        "name": "Reminiscence: Suhsin the Inevitable",
+        "icon": "/wuwa-assets/echoes/6000225.webp",
+        "note": "Простое эхо-призыв, даёт 20% бонуса урона Electro в главном слоте — лучший выбор просто за счёт этого бонуса."
+      }
+    ],
+    "echoStatPriority": [
+      {
+        "slot": "4-cost",
+        "stat": "Крит. шанс / Крит. урон"
+      },
+      {
+        "slot": "3-cost",
+        "stat": "Бонус урона Electro"
+      },
+      {
+        "slot": "1-cost",
+        "stat": "АТК%"
+      }
+    ],
+    "stats": [
+      {
+        "label": "HP",
+        "value": "14 500+"
+      },
+      {
+        "label": "DEF",
+        "value": "1 100+"
+      },
+      {
+        "label": "АТК",
+        "value": "2 100–2 500+"
+      },
+      {
+        "label": "Крит. шанс",
+        "value": "65%+ (до сет-бонусов)"
+      },
+      {
+        "label": "Крит. урон",
+        "value": "230–270%+"
+      },
+      {
+        "label": "Восст. энергии",
+        "value": "110–115%+"
+      },
+      {
+        "label": "Бонус Electro",
+        "value": "50–80%+"
+      }
+    ],
+    "skillPriority": [
+      "Forte Circuit",
+      "Liberation",
+      "Базовая атака",
+      "Навык резонанса",
+      "Интро"
+    ]
+  },
   "1402": {
     "weapons": [
       {

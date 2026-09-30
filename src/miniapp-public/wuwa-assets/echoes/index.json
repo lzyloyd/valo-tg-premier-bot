@@ -1029,6 +1029,34 @@
     "rarity": 2
   },
   {
+    "id": 6000222,
+    "name": "Stay tuned",
+    "file": "6000222.webp",
+    "element": "Spectro",
+    "rarity": 0
+  },
+  {
+    "id": 6000223,
+    "name": "Stay tuned",
+    "file": "6000223.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000224,
+    "name": "Stay tuned",
+    "file": "6000224.webp",
+    "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000225,
+    "name": "Stay tuned",
+    "file": "6000225.webp",
+    "element": "Spectro",
+    "rarity": 3
+  },
+  {
     "id": 6010042,
     "name": "Phantom: Crownless",
     "file": "6010042.webp",
@@ -1258,6 +1286,13 @@
     "file": "6010217.webp",
     "element": "Spectro",
     "rarity": 2
+  },
+  {
+    "id": 6010220,
+    "name": "Stay tuned",
+    "file": "6010220.webp",
+    "element": "Spectro",
+    "rarity": 1
   },
   {
     "id": 6020001,
@@ -2188,6 +2223,20 @@
     "name": "Forbidden Bastion",
     "file": "391090205.webp",
     "element": "Spectro",
+    "rarity": 1
+  },
+  {
+    "id": 6000225,
+    "name": "Reminiscence: Suhsin the Inevitable",
+    "file": "6000225.webp",
+    "element": "Electro",
+    "rarity": 3
+  },
+  {
+    "id": 6000224,
+    "name": "Soulfrayer",
+    "file": "6000224.webp",
+    "element": "Electro",
     "rarity": 1
   }
 ]

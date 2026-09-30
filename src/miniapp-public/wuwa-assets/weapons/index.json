@@ -852,5 +852,19 @@
     "file": "21020106.webp",
     "weaponType": "Sword",
     "rarity": 5
+  },
+  {
+    "id": 21020107,
+    "name": "Unspoken Rue",
+    "file": "21020107.webp",
+    "weaponType": "Sword",
+    "rarity": 5
+  },
+  {
+    "id": 21050116,
+    "name": "Blooming Jadehaven",
+    "file": "21050116.webp",
+    "weaponType": "Rectifier",
+    "rarity": 5
   }
 ]
