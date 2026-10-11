@@ -31,7 +31,7 @@ export async function recordMiss(username, weekStart, dayKey, slot, meta, now = 
   const data = await readFile();
   data[username] ??= { count: 0, history: [] };
   const alreadyMarked = data[username].history.some(
-    (h) => h.weekStart === weekStart && h.dayKey === dayKey && h.slot === slot,
+    (h) => (h.weekStart === weekStart || (meta.dateIso && h.dateIso === meta.dateIso)) && h.dayKey === dayKey && h.slot === slot,
   );
   if (alreadyMarked) return null;
 

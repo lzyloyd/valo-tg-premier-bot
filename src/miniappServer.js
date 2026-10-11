@@ -62,10 +62,11 @@ async function buildAttendanceView(week) {
   const attendance = await loadAttendance();
   const now = new Date();
   const startedSessions = computeWeekSessions(week).filter((s) => s.startsAt <= now);
+  const weekDates = new Set(weekDayDates(weekStartFromIso(week.weekStart)).map((d) => d.dateIso));
   return ROSTER.map((username) => {
     const record = attendance[username];
     const markedThisWeek = new Set(
-      (record?.history ?? []).filter((h) => h.weekStart === week.weekStart).map((h) => `${h.dayKey}|${h.slot}`),
+      (record?.history ?? []).filter((h) => h.weekStart === week.weekStart || weekDates.has(h.dateIso)).map((h) => `${h.dayKey}|${h.slot}`),
     );
     const options = startedSessions
       .filter((s) => s.lineup.includes(username) && !markedThisWeek.has(`${s.dayKey}|${s.slot}`))
@@ -180,6 +181,11 @@ export function startMiniAppServer() {
       if (isPostDeadlineEdit) {
         handlePostDeadlineEdit(week.edits[0]).catch((err) =>
           console.error('[miniapp] failed to handle post-deadline edit:', err),
+        );
+      } else {
+        // Keep reminders in sync while players fill in availability.
+        scheduleUpcomingSessionReminders().catch((err) =>
+          console.error('[miniapp] failed to reschedule session reminders:', err),
         );
       }
       res.json(await weekView(week, auth));

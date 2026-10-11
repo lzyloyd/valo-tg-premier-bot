@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs';
 import { config } from './config.js';
-import { DAYS, currentWeekStart, weekDeadline, mskIsoDate } from './scheduleModel.js';
+import { DAYS, currentWeekStart, weekDeadline, weekStartFromIso, mskIsoDate } from './scheduleModel.js';
 
 function emptyWeek(weekStart) {
   return {
@@ -38,6 +38,13 @@ export async function loadCurrentWeek(now = new Date()) {
   const wantedWeekStart = mskIsoDate(currentWeekStart(now));
   const stored = await readFile();
   if (stored && stored.weekStart === wantedWeekStart) return stored;
+
+  // Preserve Tue-Sun answers when upgrading a stored Tuesday-based week.
+  if (stored && mskIsoDate(new Date(weekStartFromIso(stored.weekStart).getTime() - 24 * 60 * 60 * 1000)) === wantedWeekStart) {
+    stored.weekStart = wantedWeekStart;
+    await writeFile(stored);
+    return stored;
+  }
 
   const fresh = emptyWeek(currentWeekStart(now));
   await writeFile(fresh);

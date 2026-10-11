@@ -12,11 +12,12 @@ export const QUORUM = 5;
 // No-show warnings never reset and never expire — see attendanceStore.js.
 export const MAX_WARNINGS = 3;
 
-// A week runs Tue-Sun. Practice days share the same two slots but only one
+// A week runs Mon-Sun. Practice days share the same two slots but only one
 // of them actually happens (pickOneSlot); Saturday's Premier plays both
 // times as independent sessions; Sunday's tournament is optional and only
 // ever has one slot.
 export const DAYS = [
+  { key: 'mon', label: 'Понедельник', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
   { key: 'tue', label: 'Вторник', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
   { key: 'wed', label: 'Среда', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
   { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
@@ -56,7 +57,7 @@ export function weekStartFromIso(dateIso) {
 }
 
 /**
- * The Tuesday (00:00 MSK, as a UTC instant) that starts the week currently
+ * The Monday (00:00 MSK, as a UTC instant) that starts the week currently
  * open for editing. Weeks roll over at their own Sunday 20:00 MSK — the
  * data store's reset job fires exactly then, this just has to agree with it
  * so a freshly-booted server (no reset job having run yet) computes the
@@ -65,28 +66,26 @@ export function weekStartFromIso(dateIso) {
 export function currentWeekStart(now = new Date()) {
   const msk = toMsk(now);
   const dow = msk.getUTCDay(); // 0=Sun..6=Sat
-  const daysSinceTue = (dow - 2 + 7) % 7;
-  const tue = mskMidnightUtc(msk.getUTCFullYear(), msk.getUTCMonth(), msk.getUTCDate() - daysSinceTue);
-  const resetInstant = new Date(tue.getTime() + 5 * DAY_MS + 20 * 60 * 60 * 1000); // that week's Sun 20:00 MSK
-  return now >= resetInstant ? new Date(tue.getTime() + 7 * DAY_MS) : tue;
+  const daysSinceMon = (dow - 1 + 7) % 7;
+  const mon = mskMidnightUtc(msk.getUTCFullYear(), msk.getUTCMonth(), msk.getUTCDate() - daysSinceMon);
+  const resetInstant = weekResetInstant(mon);
+  return now >= resetInstant ? new Date(mon.getTime() + 7 * DAY_MS) : mon;
 }
 
 // The instant the *next* week starts — also when the current one's data
-// gets wiped and replaced (Sunday 20:00 MSK, i.e. weekStart + 5d20h).
+// gets wiped and replaced (Sunday 20:00 MSK, i.e. weekStart + 6d20h).
 export function weekResetInstant(weekStart) {
-  return new Date(weekStart.getTime() + 5 * DAY_MS + 20 * 60 * 60 * 1000);
+  return new Date(weekStart.getTime() + 6 * DAY_MS + 20 * 60 * 60 * 1000);
 }
 
-// The deadline for filling in a week's own schedule is simply its own start
-// (Tuesday 00:00 MSK) — anything changed after this is a post-deadline edit.
+// Filling closes Sunday 24:00 MSK = Monday 00:00, before the first playing day.
 export function weekDeadline(weekStart) {
   return weekStart;
 }
 
-// 4 hours before the deadline (Monday 20:00 MSK, since the deadline itself
-// is Tuesday 00:00 MSK) — when the "last chance" reminder goes out.
+// Sunday 20:00 MSK — 4 hours before the deadline, also the week opening.
 export function reminderInstant(weekStart) {
-  return new Date(weekStart.getTime() - 4 * 60 * 60 * 1000);
+  return new Date(weekDeadline(weekStart).getTime() - 4 * 60 * 60 * 1000);
 }
 
 // Whichever of weekResetInstant/reminderInstant hasn't happened yet for the
@@ -105,7 +104,7 @@ export function nextReminderInstant(now = new Date()) {
   return nextOccurrence(now, reminderInstant);
 }
 
-// The deadline itself (Monday 24:00 MSK = Tuesday 00:00 MSK) — when
+// The deadline itself (Sunday 24:00 MSK = Monday 00:00 MSK) — when
 // submissions close, the automatic summary goes out unprompted.
 export function nextDeadlineInstant(now = new Date()) {
   return nextOccurrence(now, weekDeadline);
@@ -115,8 +114,7 @@ export function weekDayDates(weekStart) {
   return DAYS.map((d, i) => ({ ...d, dateIso: mskIsoDate(new Date(weekStart.getTime() + i * DAY_MS)) }));
 }
 
-// "Answered" means all 6 days have a yes/no — a stray click on just one day
-// (leaving the other 5 untouched) shouldn't read as a completed submission.
+// "Answered" means every playing day has a yes/no.
 export function hasFullyAnswered(responses, username, daysOff = []) {
   return DAYS.filter((d) => !daysOff.includes(d.key)).every((d) => responses[username]?.[d.key]?.avail);
 }
@@ -203,7 +201,7 @@ export function computeWeekSessions(week) {
 export function buildSummaryText(week) {
   const days = weekDayDates(weekStartFromIso(week.weekStart));
   const daysOff = week.daysOff ?? [];
-  const lines = [`📅 Расписание — ${formatDayDate(days[0].dateIso)}–${formatDayDate(days[5].dateIso)}`, ''];
+  const lines = [`📅 Расписание — ${formatDayDate(days[0].dateIso)}–${formatDayDate(days.at(-1).dateIso)}`, ''];
 
   for (const day of days) {
     lines.push(`${day.label} ${formatDayDate(day.dateIso)} · ${day.kind}`);
