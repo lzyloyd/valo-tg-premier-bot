@@ -1,11 +1,11 @@
 // Fixed roster of Telegram usernames (lowercase, no @) allowed to use the
 // mini app — matched against Telegram WebApp initData, not self-registered.
-export const ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'yozhee', 'natomatrixx', 'mania_boo', 'lzyloyd'];
+export const ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'kitkatfn', 'mania_boo', 'lzyloyd'];
 
-// The 5 starters and their 2 subs — who actually plays a session is resolved
+// The 5 starters and their substitute — who actually plays a session is resolved
 // from these, not from raw availability (see resolveLineup below).
-export const MAIN_ROSTER = ['qu1ly', 'yozhee', 'toshir0000', 'natomatrixx', 'lzyloyd'];
-export const SUB_ROSTER = ['men4ikcs', 'mania_boo']; // in preference order — Men4ikcs fills a single gap first
+export const MAIN_ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'kitkatfn', 'lzyloyd'];
+export const SUB_ROSTER = ['mania_boo'];
 
 export const QUORUM = 5;
 
@@ -135,19 +135,17 @@ function formatDayDate(dateIso) {
 /**
  * Who actually plays a slot, given who's available for it — a team needs
  * exactly 5. All 5 starters present: no subs, even if one's also free.
- * One starter missing: whichever sub is available fills in (Men4ikcs
- * preferred when both are). Two starters missing: both subs have to be
- * available, or there's no team. Fewer than 3 starters: never enough subs
- * to cover it. Returns the 5 usernames, or null if no viable lineup.
+ * Missing starters are filled from the available substitutes in roster
+ * order. If there aren't enough substitutes, there's no team.
+ * Returns the 5 usernames, or null if no viable lineup.
  */
 export function resolveLineup(available) {
   const mains = MAIN_ROSTER.filter((u) => available.includes(u));
   const subs = SUB_ROSTER.filter((u) => available.includes(u));
 
-  if (mains.length === 5) return [...mains];
-  if (mains.length === 4) return subs.length >= 1 ? [...mains, subs[0]] : null;
-  if (mains.length === 3) return subs.length === 2 ? [...mains, ...subs] : null;
-  return null;
+  const missing = QUORUM - mains.length;
+  if (subs.length < missing) return null;
+  return [...mains, ...subs.slice(0, missing)];
 }
 
 function mainsAvailableCount(responses, day, slot) {
