@@ -1,11 +1,11 @@
 // Fixed roster of Telegram usernames (lowercase, no @) allowed to use the
 // mini app — matched against Telegram WebApp initData, not self-registered.
-export const ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'kitkatfn', 'mania_boo', 'lzyloyd'];
+export const ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'kitkatfn', 'bonrik1', 'mania_boo', 'lzyloyd'];
 
-// The 5 starters and their substitute — who actually plays a session is resolved
+// The 5 starters and their substitutes — who actually plays a session is resolved
 // from these, not from raw availability (see resolveLineup below).
 export const MAIN_ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'kitkatfn', 'lzyloyd'];
-export const SUB_ROSTER = ['mania_boo'];
+export const SUB_ROSTER = ['bonrik1', 'mania_boo']; // First available substitute wins priority.
 
 export const QUORUM = 5;
 
