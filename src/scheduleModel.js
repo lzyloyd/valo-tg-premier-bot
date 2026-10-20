@@ -235,7 +235,8 @@ export function buildSummaryText(week) {
 }
 
 function describeAnswer(entry) {
-  if (!entry || entry.avail !== 'yes') return 'не может';
+  if (!entry) return 'без ответа';
+  if (entry.avail !== 'yes') return 'не может';
   return entry.slots.length ? entry.slots.join(', ') : 'может';
 }
 

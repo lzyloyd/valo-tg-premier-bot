@@ -78,7 +78,9 @@ export async function setResponse(username, day, avail, slots, now = new Date())
 
   week.responses[username] ??= {};
   const previous = week.responses[username][day];
-  week.responses[username][day] = { avail, slots: avail === 'yes' ? slots : [] };
+  // avail null = the user un-picked their last time slot: back to unanswered.
+  if (avail === null) delete week.responses[username][day];
+  else week.responses[username][day] = { avail, slots: avail === 'yes' ? slots : [] };
   week.lastSaved ??= {};
   week.lastSaved[username] = now.toISOString();
 
@@ -87,7 +89,7 @@ export async function setResponse(username, day, avail, slots, now = new Date())
       username,
       day,
       before: previous ?? null,
-      after: week.responses[username][day],
+      after: week.responses[username][day] ?? null,
       at: now.toISOString(),
     });
     week.edits = week.edits.slice(0, 50); // keep the log from growing forever

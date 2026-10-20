@@ -172,7 +172,7 @@ export function startMiniAppServer() {
     if (!auth) return;
     const { day, avail, slots } = req.body ?? {};
     const dayDef = DAYS.find((d) => d.key === day);
-    if (!dayDef || !['yes', 'no'].includes(avail) || !Array.isArray(slots) || slots.some((s) => !dayDef.slots.includes(s))) {
+    if (!dayDef || !['yes', 'no', null].includes(avail) || !Array.isArray(slots) || slots.some((s) => !dayDef.slots.includes(s))) {
       res.status(400).json({ error: 'Некорректные данные.' });
       return;
     }
