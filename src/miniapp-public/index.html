@@ -25,7 +25,7 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .screen{padding:16px;flex:1;}
 .day-list{display:flex;flex-direction:column;gap:8px;}
-.day-card{border:1px solid var(--border);border-radius:12px;padding:18px 12px;display:grid;grid-template-columns:80px 1fr 130px;align-items:center;gap:8px;background:var(--surface);}
+.day-card{border:1px solid var(--border);border-radius:12px;padding:18px 12px;display:grid;grid-template-columns:76px 1fr 158px;align-items:center;gap:8px;background:var(--surface);}
 .day-name{font-weight:700;font-size:13px;}
 .day-date{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
 .day-kind{font-size:9.5px;color:var(--text-muted);margin-top:1px;white-space:nowrap;}
@@ -34,7 +34,7 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .avail-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;}
 .avail-btn.yes.active{background:var(--on-bg);border-color:var(--on);color:var(--on);}
 .avail-btn.no.active{background:var(--surface-3);border-color:var(--text-muted);color:var(--text);}
-.slot-chip{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px;padding:6px 11px;border-radius:8px;cursor:pointer;}
+.slot-chip{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-weight:600;font-size:11px;padding:6px 8px;border-radius:8px;cursor:pointer;}
 .slot-chip.on{background:var(--on-bg);border-color:var(--on);color:var(--on);}
 .slot-chip[disabled]{opacity:.35;cursor:not-allowed;}
 .save-status{margin-top:14px;font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;text-align:center;}
@@ -304,7 +304,7 @@ function renderTeamScreen() {
         <button class="seg-btn${teamMode === 'pips' ? ' active' : ''}" data-teammode="pips">Полоска</button>
       </div>
     </div>
-    <div class="team-grid" style="--day-count:${state.days.length}">${header}${rowFor('20:00')}${rowFor('22:00')}${rowFor('18:00')}</div>
+    <div class="team-grid" style="--day-count:${state.days.length}">${header}${rowFor('20:00')}${rowFor('21:00')}${rowFor('22:00')}${rowFor('18:00')}</div>
   </div>`;
 }
 

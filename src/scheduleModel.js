@@ -17,11 +17,11 @@ export const MAX_WARNINGS = 3;
 // times as independent sessions; Sunday's tournament is optional and only
 // ever has one slot.
 export const DAYS = [
-  { key: 'mon', label: 'Понедельник', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
-  { key: 'tue', label: 'Вторник', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
-  { key: 'wed', label: 'Среда', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
-  { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
-  { key: 'fri', label: 'Пятница', kind: 'Праки', slots: ['20:00', '22:00'], pickOneSlot: true },
+  { key: 'mon', label: 'Понедельник', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
+  { key: 'tue', label: 'Вторник', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
+  { key: 'wed', label: 'Среда', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
+  { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
+  { key: 'fri', label: 'Пятница', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
   { key: 'sat', label: 'Суббота', kind: 'Премьер', slots: ['20:00', '22:00'] },
   { key: 'sun', label: 'Воскресенье', kind: 'МСК турнир', slots: ['18:00'] },
 ];
@@ -164,12 +164,19 @@ export function computeDaySessions(day, responses) {
 
   if (!day.pickOneSlot) return candidates;
   if (candidates.length <= 1) return candidates;
-  // Both slots are viable — pick by starter turnout, earlier time on a tie.
-  const [a, b] = day.slots;
-  const countA = mainsAvailableCount(responses, day.key, a);
-  const countB = mainsAvailableCount(responses, day.key, b);
-  const winner = countB > countA ? b : a;
-  return candidates.filter((c) => c.slot === winner);
+  // Several slots are viable — pick by starter turnout, earliest time on a tie
+  // (candidates keep day.slots' chronological order, and only a strictly
+  // higher count replaces the current pick).
+  let winner = candidates[0];
+  let bestCount = mainsAvailableCount(responses, day.key, winner.slot);
+  for (const c of candidates.slice(1)) {
+    const count = mainsAvailableCount(responses, day.key, c.slot);
+    if (count > bestCount) {
+      winner = c;
+      bestCount = count;
+    }
+  }
+  return [winner];
 }
 
 // The absolute instant (UTC) a given day+slot within a week actually starts.
