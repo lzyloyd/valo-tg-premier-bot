@@ -138,11 +138,12 @@ async function findPremierTeamByPlayers(players) {
   return null;
 }
 
-// The current season's placement — only for a team actually enrolled in it;
-// an unenrolled team still reports a provisional placeholder division.
+// The current season's placement, unless it's only provisional — a team that
+// hasn't played the season yet still reports a placeholder division. (v2's
+// "enrolled" flag isn't usable: it's false even for teams that did play.)
 function currentSeasonPlacement(teamV2) {
   const season = teamV2?.current_season;
-  if (!season?.enrolled || season.placement?.is_provisional) return null;
+  if (!season?.placement || season.placement.is_provisional) return null;
   return season.placement ?? null;
 }
 
