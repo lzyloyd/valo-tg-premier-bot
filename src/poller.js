@@ -22,7 +22,7 @@ export async function runPollCycle() {
 
   for (const { id } of newMatches) {
     console.log(`[poller] new match ${id}, fetching detail...`);
-    const match = await buildMatchView(await fetchMatch(id), { requireOurTeam: true, withStandings: true });
+    const match = await buildMatchView(await fetchMatch(id), { requireOurTeam: true, withStandings: true, fillRanks: true });
     match.playlistName = 'Premier'; // this poller only ever watches Premier matches
     const png = await renderScoreboardPng(await getBrowser(), match);
     await sendMatchReport(match, png);

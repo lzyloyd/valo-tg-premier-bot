@@ -62,7 +62,7 @@ async function saveOffset(offset) {
 // one, but only its match id is used — the data comes from Henrik. "Our" side
 // is whichever team a roster member played on, or the first team otherwise.
 async function summarizeMatch(matchId, message, { withStandings, pinPremier }) {
-  const match = await buildMatchView(await fetchMatch(matchId), { withStandings });
+  const match = await buildMatchView(await fetchMatch(matchId), { withStandings, fillRanks: true });
   if (pinPremier) match.playlistName = 'Premier';
   const png = await renderScoreboardPng(await getBrowser(), match);
   await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);

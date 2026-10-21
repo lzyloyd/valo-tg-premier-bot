@@ -54,6 +54,28 @@ export async function fetchPremierHistory() {
     .sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
 }
 
+const TIER_CACHE_MS = 30 * 60 * 1000;
+const tierCache = new Map(); // puuid -> { tierId, at }
+
+/**
+ * A player's current competitive tier id (0 if unranked/unknown). Custom
+ * games carry no ranks at all, so the card fills them in from here; cached
+ * briefly since one card needs up to 10 of these.
+ */
+export async function fetchCurrentTier(puuid) {
+  const cached = tierCache.get(puuid);
+  if (cached && Date.now() - cached.at < TIER_CACHE_MS) return cached.tierId;
+  try {
+    const data = await henrikGet(`/valorant/v3/by-puuid/mmr/${config.henrikRegion}/pc/${encodeURIComponent(puuid)}`);
+    const tierId = data?.current?.tier?.id ?? 0;
+    tierCache.set(puuid, { tierId, at: Date.now() });
+    return tierId;
+  } catch (err) {
+    console.error(`[henrik] rank lookup failed for ${puuid}:`, err.message);
+    return 0;
+  }
+}
+
 /** A Premier roster's current standing (placement + crest), or null if unavailable. */
 export async function fetchPremierTeam(rosterId) {
   try {

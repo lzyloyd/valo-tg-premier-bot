@@ -15,7 +15,7 @@ if (process.argv.includes('--raw')) {
   console.log(JSON.stringify(raw, null, 2));
   process.exit(0);
 }
-const match = await buildMatchView(raw, { withStandings: true });
+const match = await buildMatchView(raw, { withStandings: true, fillRanks: true });
 console.log(`${match.mapName} · ${match.playlistName} · ${match.dateStarted} · ${match.durationText}`);
 console.log(`${match.ourTeamName} ${match.ourScore}:${match.theirScore} ${match.theirTeamName} (won: ${match.won})`);
 console.log(`standing: #${match.ourTeamRank} ${match.ourTeamDivision} ${match.ourTeamZone} | logo: ${match.ourTeamLogoUrl}`);

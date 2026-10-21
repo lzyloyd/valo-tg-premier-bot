@@ -15,7 +15,7 @@ if (!matchId) {
 }
 
 try {
-  const match = await buildMatchView(await fetchMatch(matchId), { withStandings: true });
+  const match = await buildMatchView(await fetchMatch(matchId), { withStandings: true, fillRanks: true });
   match.playlistName = 'Premier';
   console.log('ourTeamName:', match.ourTeamName, '| theirTeamName:', match.theirTeamName);
   console.log('score:', match.ourScore, '-', match.theirScore, '| won:', match.won);

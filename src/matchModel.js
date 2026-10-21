@@ -1,7 +1,7 @@
 import { findOurTeamId } from './statsRoster.js';
 import { rankName, rankIconUrl, averageTierId } from './rankTiers.js';
 import { agentAsset, mapImageUrl } from './valorantAssets.js';
-import { fetchPremierTeam } from './henrikClient.js';
+import { fetchPremierTeam, fetchCurrentTier } from './henrikClient.js';
 
 // A death counts as traded (the "T" in KAST) if a teammate kills the killer
 // within this window — and a "multi-kill" round is one with at least this
@@ -43,7 +43,8 @@ function roundResultKey(result) {
   const s = (result ?? '').toLowerCase();
   if (s.includes('defus')) return 'Defuse';
   if (s.includes('detonat')) return 'Detonate';
-  if (s.includes('time') || s.includes('expire')) return 'Time';
+  // An empty result is how Henrik reports a round that ran out the clock.
+  if (!s || s.includes('time') || s.includes('expire')) return 'Time';
   return 'Elimination';
 }
 
@@ -52,7 +53,9 @@ const riotIdOf = (p) => `${p.name}#${p.tag}`;
 /**
  * Per-player stats Henrik doesn't hand over ready-made, derived from the kill
  * feed: first kills/deaths, multi-kill rounds and KAST (rounds with a Kill,
- * Assist, Survived or Traded death).
+ * Assist, Survived or Traded death). Matches tracker.gg's numbers on a
+ * side-by-side check, including that a round with no kills at all (e.g. a
+ * surrender) doesn't count as "survived".
  */
 function deriveKillStats(match) {
   const killsByRound = new Map();
@@ -84,7 +87,8 @@ function deriveKillStats(match) {
             k.time_in_round_in_ms >= death.time_in_round_in_ms &&
             k.time_in_round_in_ms - death.time_in_round_in_ms <= TRADE_WINDOW_MS,
         );
-      if (killCount > 0 || assisted || !death || traded) s.kastRounds++;
+      const survived = !death && kills.length > 0;
+      if (killCount > 0 || assisted || survived || traded) s.kastRounds++;
     }
   }
   return stats;
@@ -119,9 +123,10 @@ async function premierTeamInfo(roster, withStandings) {
  * played on; with none of us in the match it's a neutral team1-vs-team2 view
  * — unless `requireOurTeam` is set, which throws instead. `withStandings`
  * also looks up each Premier team's current placement (one extra API call
- * per team).
+ * per team); `fillRanks` looks up the current rank of any player the match
+ * itself left unranked (custom games carry no ranks).
  */
-export async function buildMatchView(match, { requireOurTeam = false, withStandings = false } = {}) {
+export async function buildMatchView(match, { requireOurTeam = false, withStandings = false, fillRanks = false } = {}) {
   const { metadata } = match;
   const roundCount = match.rounds.length;
   const isCustom = isCustomQueue(metadata.queue);
@@ -141,7 +146,7 @@ export async function buildMatchView(match, { requireOurTeam = false, withStandi
     const shots = s.headshots + s.bodyshots + s.legshots;
     const ks = killStats.get(p.puuid);
     const agent = await agentAsset(p.agent.id);
-    const tierId = p.tier?.id ?? 0;
+    const tierId = p.tier?.id || (fillRanks ? await fetchCurrentTier(p.puuid) : 0);
     return {
       name: p.name,
       riotId: riotIdOf(p),

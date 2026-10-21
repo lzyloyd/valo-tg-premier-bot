@@ -15,7 +15,7 @@ if (!matchId) {
 }
 
 try {
-  const match = await buildMatchView(await fetchMatch(matchId), { withStandings: true });
+  const match = await buildMatchView(await fetchMatch(matchId), { withStandings: true, fillRanks: true });
   match.playlistName = 'Premier';
   const png = await renderScoreboardPng(await getBrowser(), match);
   await sendMatchReport(match, png);
