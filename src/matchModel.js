@@ -150,25 +150,28 @@ function currentSeasonPlacement(teamV2) {
 }
 
 /**
- * Name, crest and standing ("#51 · Contender · DACH") of one side. A Premier
+ * Name, crest and standing ("#51 · Contender · DACH", the place only once the
+ * team has played this season) of one side. A Premier
  * match carries its rosters; a custom one doesn't, so with `withStandings`
  * the team is found through its players instead.
  */
 async function premierTeamInfo(players, roster, withStandings) {
   if (!withStandings) return roster ? { name: roster.name.trim(), logoUrl: roster.customization?.image ?? null } : null;
 
-  let byPlayers = roster ? null : await findPremierTeamByPlayers(players);
+  const byPlayers = roster ? null : await findPremierTeamByPlayers(players);
   const id = roster?.id ?? byPlayers?.id;
   if (!id) return null;
-  // v1 knows the league place but doesn't resolve every team; v2 resolves
-  // them but only has division/conference.
-  const standing = await fetchPremierTeam(id);
-  if (!standing?.placement) byPlayers ??= await fetchPremierTeamV2(id);
-  const placement = standing?.placement ?? currentSeasonPlacement(byPlayers);
+  // v2 describes the current season (division, conference, matches played);
+  // v1 has the league place but no season marker — it can still report last
+  // season's — so its place only counts once the team has played this one.
+  const teamV2 = byPlayers ?? (await fetchPremierTeamV2(id));
+  const playedThisSeason = (teamV2?.current_season?.stats?.matches ?? 0) > 0;
+  const standing = playedThisSeason || !teamV2 ? await fetchPremierTeam(id) : null;
+  const placement = currentSeasonPlacement(teamV2) ?? standing?.placement;
   return {
-    name: (roster?.name ?? byPlayers?.name ?? standing?.name ?? '').trim() || null,
-    logoUrl: roster?.customization?.image ?? byPlayers?.customization?.image ?? standing?.customization?.image ?? null,
-    rank: standing?.placement?.place ?? null,
+    name: (roster?.name ?? teamV2?.name ?? standing?.name ?? '').trim() || null,
+    logoUrl: roster?.customization?.image ?? teamV2?.customization?.image ?? standing?.customization?.image ?? null,
+    rank: playedThisSeason ? standing?.placement?.place ?? null : null,
     divisionName: divisionName(placement?.division),
     zoneName: conferenceName(placement?.conference),
   };
