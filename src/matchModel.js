@@ -1,7 +1,7 @@
 import { findOurTeamId } from './statsRoster.js';
 import { rankName, rankIconUrl, averageTierId } from './rankTiers.js';
 import { agentAsset, mapImageUrl } from './valorantAssets.js';
-import { fetchPremierTeam, fetchCurrentTier } from './henrikClient.js';
+import { fetchPremierTeam, fetchPremierTeamByPlayer, fetchCurrentTier } from './henrikClient.js';
 
 // A death counts as traded (the "T" in KAST) if a teammate kills the killer
 // within this window — and a "multi-kill" round is one with at least this
@@ -105,16 +105,65 @@ function attackerTeamOf(round, roundNumber) {
   return (roundNumber - 25) % 2 === 0 ? 'Red' : 'Blue';
 }
 
-async function premierTeamInfo(roster, withStandings) {
-  if (!roster) return null;
-  const standing = withStandings && roster.id ? await fetchPremierTeam(roster.id) : null;
+// Premier's division ladder: 1-5 Open, 6-10 Intermediate, 11-15 Advanced,
+// 16-20 Elite (each tier numbered 1-5), then Contender and Invite.
+function divisionName(division) {
+  if (!division) return null;
+  if (division >= 22) return 'Invite';
+  if (division === 21) return 'Contender';
+  const tiers = ['Open', 'Intermediate', 'Advanced', 'Elite'];
+  return `${tiers[Math.floor((division - 1) / 5)]} ${((division - 1) % 5) + 1}`;
+}
+
+// "EU_DACH" -> "DACH", "EU_FRANCE" -> "France": short codes are acronyms.
+function conferenceName(conference) {
+  if (!conference) return null;
+  const part = conference.replace(/^[A-Z]+_/, '');
+  if (part.length <= 4) return part;
+  return part.split('_').map((w) => w[0] + w.slice(1).toLowerCase()).join(' ');
+}
+
+// A side's Premier team, by majority: the team at least two of its players
+// are on (one sub on another team, or on none, shouldn't decide it).
+async function findPremierTeamByPlayers(players) {
+  const votes = new Map();
+  for (const p of players) {
+    const team = await fetchPremierTeamByPlayer(p.puuid);
+    if (!team) continue;
+    const entry = votes.get(team.id) ?? { team, count: 0 };
+    entry.count++;
+    votes.set(team.id, entry);
+    if (entry.count >= 2) return team;
+  }
+  return null;
+}
+
+function currentSeasonPlacement(teamV2) {
+  const seasons = teamV2?.seasons ?? [];
+  const currentId = typeof teamV2?.current_season === 'string' ? teamV2.current_season : teamV2?.current_season?.id;
+  return (seasons.find((s) => s.id === currentId) ?? seasons.at(-1))?.placement ?? null;
+}
+
+/**
+ * Name, crest and standing ("#51 · Contender · DACH") of one side. A Premier
+ * match carries its rosters; a custom one doesn't, so with `withStandings`
+ * the team is found through its players instead.
+ */
+async function premierTeamInfo(players, roster, withStandings) {
+  if (!withStandings) return roster ? { name: roster.name.trim(), logoUrl: roster.customization?.image ?? null } : null;
+
+  let byPlayers = roster ? null : await findPremierTeamByPlayers(players);
+  const id = roster?.id ?? byPlayers?.id;
+  if (!id) return null;
+  const standing = await fetchPremierTeam(id);
+  if (!standing?.placement) byPlayers ??= await findPremierTeamByPlayers(players);
+  const placement = standing?.placement ?? currentSeasonPlacement(byPlayers);
   return {
-    name: roster.name,
-    logoUrl: roster.customization?.image ?? standing?.customization?.image ?? null,
+    name: (roster?.name ?? byPlayers?.name ?? standing?.name ?? '').trim() || null,
+    logoUrl: roster?.customization?.image ?? byPlayers?.customization?.image ?? standing?.customization?.image ?? null,
     rank: standing?.placement?.place ?? null,
-    divisionName: standing?.placement?.division ? `Див. ${standing.placement.division}` : null,
-    // "EU_DACH" -> "DACH"
-    zoneName: standing?.placement?.conference?.replace(/^[A-Z]+_/, '') ?? null,
+    divisionName: divisionName(placement?.division),
+    zoneName: conferenceName(placement?.conference),
   };
 }
 
@@ -183,7 +232,7 @@ export async function buildMatchView(match, { requireOurTeam = false, withStandi
       roundsWon: team?.rounds?.won ?? 0,
       hasWon: team?.won ?? false,
       players,
-      info: await premierTeamInfo(team?.premier_roster, withStandings),
+      info: await premierTeamInfo(match.players.filter((p) => p.team_id === teamId), team?.premier_roster, withStandings),
     };
   };
 

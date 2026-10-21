@@ -80,12 +80,40 @@ export async function fetchCurrentTier(puuid) {
   }
 }
 
+const teamByPlayerCache = new Map(); // puuid -> { team, at }
+
+/**
+ * The Premier team a player is currently on (v2 shape: id, name, tag,
+ * customization, current_season, seasons[].placement), or null if they
+ * aren't on one. Custom games carry no team info, so this is how a practice
+ * card still gets team names; cached like ranks.
+ */
+export async function fetchPremierTeamByPlayer(puuid) {
+  const cached = teamByPlayerCache.get(puuid);
+  if (cached && Date.now() - cached.at < TIER_CACHE_MS) return cached.team;
+  let team = null;
+  try {
+    team = await henrikGet(`/valorant/v2/premier/players/${config.henrikRegion}/${encodeURIComponent(puuid)}`);
+  } catch (err) {
+    if (!/ 404 /.test(err.message)) console.error(`[henrik] premier team lookup failed for player ${puuid}:`, err.message);
+  }
+  teamByPlayerCache.set(puuid, { team, at: Date.now() });
+  return team;
+}
+
 /** A Premier roster's current standing (placement + crest), or null if unavailable. */
 export async function fetchPremierTeam(rosterId) {
-  try {
-    return await henrikGet(`/valorant/v1/premier/${encodeURIComponent(rosterId)}?affinity=${config.henrikRegion}`);
-  } catch (err) {
-    console.error(`[henrik] premier team lookup failed for ${rosterId}:`, err.message);
-    return null;
+  const path = `/valorant/v1/premier/${encodeURIComponent(rosterId)}`;
+  // Pinning our region is faster, but some teams only resolve without it.
+  for (const query of [`?affinity=${config.henrikRegion}`, '']) {
+    try {
+      return await henrikGet(path + query);
+    } catch (err) {
+      if (!/ 404 /.test(err.message)) {
+        console.error(`[henrik] premier team lookup failed for ${rosterId}:`, err.message);
+        return null;
+      }
+    }
   }
+  return null;
 }
