@@ -138,13 +138,15 @@ async function findPremierTeamByPlayers(players) {
   return null;
 }
 
-// The current season's placement, unless it's only provisional — a team that
-// hasn't played the season yet still reports a placeholder division. (v2's
-// "enrolled" flag isn't usable: it's false even for teams that did play.)
+// The current season's placement. A team that hasn't played the season yet
+// only has a provisional one: its division matches what the game shows, but
+// its conference doesn't (e.g. EU_EAST for a team the game lists in France),
+// so the conference is dropped then. (v2's "enrolled" flag isn't usable —
+// it's false even for teams that did play.)
 function currentSeasonPlacement(teamV2) {
-  const season = teamV2?.current_season;
-  if (!season?.placement || season.placement.is_provisional) return null;
-  return season.placement ?? null;
+  const placement = teamV2?.current_season?.placement;
+  if (!placement?.division) return null;
+  return placement.is_provisional ? { division: placement.division, conference: null } : placement;
 }
 
 /**
