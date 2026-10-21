@@ -9,8 +9,8 @@ import {
   slotInstant, computeWeekSessions, buildSummaryText,
 } from '../src/scheduleModel.js';
 
-assert.deepEqual(SUB_ROSTER, ['men4ikcs', 'mania_boo']);
-assert(ROSTER.includes('bonrik1') && ROSTER.includes('men4ikcs'));
+assert.deepEqual(SUB_ROSTER, ['deadqq', 'men4ikcs', 'mania_boo']);
+assert(SUB_ROSTER.every(u => ROSTER.includes(u)) && MAIN_ROSTER.every(u => ROSTER.includes(u)));
 for (let mask = 0; mask < 2 ** ROSTER.length; mask++) {
   const available = ROSTER.filter((_, i) => mask & (1 << i));
   const mains = MAIN_ROSTER.filter(u => available.includes(u));
@@ -20,9 +20,11 @@ for (let mask = 0; mask < 2 ** ROSTER.length; mask++) {
   assert.equal(Boolean(lineup), subs.length >= missing);
   if (lineup) assert.deepEqual(lineup, [...mains, ...subs.slice(0, missing)]);
 }
-assert.deepEqual(resolveLineup([...MAIN_ROSTER.slice(1), ...SUB_ROSTER]), [...MAIN_ROSTER.slice(1), 'men4ikcs']);
+assert.deepEqual(resolveLineup([...MAIN_ROSTER.slice(1), ...SUB_ROSTER]), [...MAIN_ROSTER.slice(1), 'deadqq']);
+assert.deepEqual(resolveLineup([...MAIN_ROSTER.slice(1), 'men4ikcs', 'mania_boo']), [...MAIN_ROSTER.slice(1), 'men4ikcs']);
 assert.deepEqual(resolveLineup([...MAIN_ROSTER.slice(1), 'mania_boo']), [...MAIN_ROSTER.slice(1), 'mania_boo']);
-assert.deepEqual(resolveLineup([...MAIN_ROSTER.slice(2), ...SUB_ROSTER]), [...MAIN_ROSTER.slice(2), ...SUB_ROSTER]);
+assert.deepEqual(resolveLineup([...MAIN_ROSTER.slice(2), ...SUB_ROSTER]), [...MAIN_ROSTER.slice(2), 'deadqq', 'men4ikcs']);
+assert.deepEqual(resolveLineup([...MAIN_ROSTER.slice(3), ...SUB_ROSTER]), [...MAIN_ROSTER.slice(3), ...SUB_ROSTER]);
 
 const now = new Date('2026-10-12T10:00:00Z');
 const start = currentWeekStart(now);
