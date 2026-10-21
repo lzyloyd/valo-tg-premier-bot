@@ -115,10 +115,17 @@ function divisionName(division) {
   return `${tiers[Math.floor((division - 1) / 5)]} ${((division - 1) % 5) + 1}`;
 }
 
-// "EU_DACH" -> "DACH", "EU_FRANCE" -> "France": short codes are acronyms.
+// Region-wide conferences go by a compass point, named the way the game does.
+const DIRECTION_NAMES = { EAST: 'Eastern', WEST: 'Western', NORTH: 'Northern', SOUTH: 'Southern', CENTRAL: 'Central' };
+const REGION_NAMES = { EU: 'Europe', NA: 'North America', LATAM: 'Latin America', AP: 'Asia Pacific', KR: 'Korea', BR: 'Brazil' };
+
+// "EU_DACH" -> "DACH", "EU_FRANCE" -> "France", "EU_EAST" -> "Eastern Europe":
+// short codes are acronyms.
 function conferenceName(conference) {
   if (!conference) return null;
-  const part = conference.replace(/^[A-Z]+_/, '');
+  const [region, ...rest] = conference.split('_');
+  const part = rest.join('_') || region;
+  if (DIRECTION_NAMES[part]) return `${DIRECTION_NAMES[part]} ${REGION_NAMES[region] ?? region}`;
   if (part.length <= 4) return part;
   return part.split('_').map((w) => w[0] + w.slice(1).toLowerCase()).join(' ');
 }
@@ -138,15 +145,12 @@ async function findPremierTeamByPlayers(players) {
   return null;
 }
 
-// The current season's placement. A team that hasn't played the season yet
-// only has a provisional one: its division matches what the game shows, but
-// its conference doesn't (e.g. EU_EAST for a team the game lists in France),
-// so the conference is dropped then. (v2's "enrolled" flag isn't usable —
-// it's false even for teams that did play.)
+// The current season's placement (division + conference). Before a team's
+// first match of the season it's marked provisional, but the division and
+// conference are still the team's own — only the league place is missing.
 function currentSeasonPlacement(teamV2) {
   const placement = teamV2?.current_season?.placement;
-  if (!placement?.division) return null;
-  return placement.is_provisional ? { division: placement.division, conference: null } : placement;
+  return placement?.division ? placement : null;
 }
 
 /**
