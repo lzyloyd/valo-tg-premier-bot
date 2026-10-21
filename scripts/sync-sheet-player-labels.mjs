@@ -1,6 +1,6 @@
 import { config } from '../src/config.js';
-import { batchUpdate, getSpreadsheetMeta } from '../src/sheetsClient.js';
-import { ROSTER, displayName, trackerProfileUrl } from '../src/statsRoster.js';
+import { batchUpdate, getSpreadsheetMeta, getValues } from '../src/sheetsClient.js';
+import { ROSTER, displayName, trackerProfileUrl, LABEL_TO_RIOT_ID } from '../src/statsRoster.js';
 import {
   OVERALL_PREMIER_TAB, ANCHOR_FIRST_ROW, BLOCK_SIZE, ROSTER_SIZE, TABLE1_FIRST_ROW, TABLE2_FIRST_ROW,
 } from '../src/sheetsStats.js';
@@ -17,6 +17,22 @@ if (ROSTER.length !== ROSTER_SIZE) {
 const spreadsheetId = config.statsSpreadsheetId;
 const sheet = (await getSpreadsheetMeta(spreadsheetId)).find((s) => s.title === OVERALL_PREMIER_TAB);
 if (!sheet) throw new Error(`Tab "${OVERALL_PREMIER_TAB}" not found`);
+
+// Game data lives in each player's row block — relabelling a block that
+// already has games would put that data under someone else's name.
+const tab = `'${OVERALL_PREMIER_TAB}'!`;
+const lastRow = ANCHOR_FIRST_ROW + BLOCK_SIZE * ROSTER_SIZE - 1;
+const hasGames = (await getValues(spreadsheetId, `${tab}R1:BZ${lastRow}`)).flat().some((c) => c !== '');
+if (hasGames) {
+  const q = await getValues(spreadsheetId, `${tab}Q1:Q${lastRow}`);
+  const moved = ROSTER.filter(({ riotId }, i) => {
+    const current = q[ANCHOR_FIRST_ROW + i * BLOCK_SIZE - 1]?.[0] ?? '';
+    return LABEL_TO_RIOT_ID.get(current.toLowerCase()) !== riotId.toLowerCase();
+  });
+  if (moved.length) {
+    throw new Error(`Games are already logged, and these rows would change player: ${moved.map((r) => r.riotId).join(', ')}. Reorder only on an empty sheet.`);
+  }
+}
 
 const LINK_COLOR = { red: 0.06666667, green: 0.33333334, blue: 0.8 };
 const linkedCell = (riotId) => ({

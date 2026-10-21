@@ -2,16 +2,20 @@
 // — players rename in-game, and the sheet's label text may still be an older
 // one. So each roster entry has its CURRENT Riot ID (what tracker.gg returns
 // for new matches — matching is keyed on it) plus every older label that might
-// still appear in the sheet for that person. Order = row order in the sheet.
+// still appear in the sheet for that person. Order = row order in the sheet:
+// starters (any order), then substitutes in priority order — keep it in step
+// with MAIN_ROSTER / SUB_ROSTER in scheduleModel.js.
 export const ROSTER = [
+  // Starters
   { riotId: 'Space Kururugi#mench', sheetLabels: ['Space#flick', 'Space#mench'] },
-  { riotId: 'ジ lzyloyd#pivo', sheetLabels: [] },
-  { riotId: 'AHotNik#2410', sheetLabels: ['toshir0000#6666'] },
-  { riotId: 'Mench Lamperouge#space', sheetLabels: ['Mench#space'] },
-  { riotId: 'Mania#uma', sheetLabels: [] },
+  { riotId: 'ジ lzyloyd#pivo', sheetLabels: [] }, // @lzyloyd
+  { riotId: 'AHotNik#2410', sheetLabels: ['toshir0000#6666'] }, // @toshir0000
   { riotId: 'Ax1oM#6525', sheetLabels: [] },
-  { riotId: 'speak with dead#amen', sheetLabels: [] },
-  { riotId: 'MILITANTUM#bonr', sheetLabels: [] },
+  { riotId: 'MILITANTUM#bonr', sheetLabels: [] }, // @Bonrik1
+  // Substitutes, by priority
+  { riotId: 'speak with dead#amen', sheetLabels: [] }, // @deadqq
+  { riotId: 'Mench Lamperouge#space', sheetLabels: ['Mench#space'] }, // @Men4ikcs
+  { riotId: 'Mania#uma', sheetLabels: [] }, // @mania_boo
 ];
 
 // The team's current Riot IDs — the one source of truth for "which side is
