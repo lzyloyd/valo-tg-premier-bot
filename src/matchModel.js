@@ -234,6 +234,9 @@ export async function buildMatchView(match, { requireOurTeam = false, withStandi
       multiKills: ks.multiKills,
       kdRatio: Math.round((s.deaths ? s.kills / s.deaths : s.kills) * 100) / 100,
       trs: null, // tracker.gg's own score — not available outside tracker.gg
+      // Riot's per-player performance score (0-500), where the match carries
+      // it — ranked games do, customs don't.
+      perf: p.performance?.score != null ? Math.round(p.performance.score) : null,
     };
   };
 
@@ -275,7 +278,7 @@ export async function buildMatchView(match, { requireOurTeam = false, withStandi
     matchId: metadata.match_id,
     playlistName: playlistLabel(metadata.queue),
     isCustom,
-    hasTrs: false,
+    hasPerf: match.players.some((p) => p.performance?.score != null),
     mapName: metadata.map.name,
     mapImageUrl: await mapImageUrl(metadata.map.id),
     dateStarted: metadata.started_at,
