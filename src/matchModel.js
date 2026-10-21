@@ -203,6 +203,12 @@ export async function buildMatchView(match, { requireOurTeam = false, withStandi
   const otherTeamId = match.teams.map((t) => t.team_id).find((id) => id !== ourTeamId);
 
   const killStats = deriveKillStats(match);
+  // Matches that carry Riot's performance score (ranked) rank players by it;
+  // the rest (customs) by ACS. A player missing the score sorts last.
+  const hasPerf = match.players.some((p) => p.performance?.score != null);
+  const byScore = hasPerf
+    ? (a, b) => (b.perf ?? -1) - (a.perf ?? -1) || b.acs - a.acs
+    : (a, b) => b.acs - a.acs;
   const perRound = (value) => (roundCount ? value / roundCount : 0);
 
   const toPlayer = async (p) => {
@@ -241,9 +247,7 @@ export async function buildMatchView(match, { requireOurTeam = false, withStandi
 
   const buildTeam = async (teamId) => {
     const team = match.teams.find((t) => t.team_id === teamId);
-    const players = (await Promise.all(match.players.filter((p) => p.team_id === teamId).map(toPlayer))).sort(
-      (a, b) => b.acs - a.acs,
-    );
+    const players = (await Promise.all(match.players.filter((p) => p.team_id === teamId).map(toPlayer))).sort(byScore);
     return {
       roundsWon: team?.rounds?.won ?? 0,
       hasWon: team?.won ?? false,
@@ -277,7 +281,7 @@ export async function buildMatchView(match, { requireOurTeam = false, withStandi
     matchId: metadata.match_id,
     playlistName: playlistLabel(metadata.queue),
     isCustom,
-    hasPerf: match.players.some((p) => p.performance?.score != null),
+    hasPerf,
     mapName: metadata.map.name,
     mapImageUrl: await mapImageUrl(metadata.map.id),
     dateStarted: metadata.started_at,
