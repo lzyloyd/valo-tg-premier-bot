@@ -160,13 +160,37 @@ function signedColor(value) {
   return value > 0 ? 'var(--win)' : value < 0 ? 'var(--loss)' : 'var(--muted)';
 }
 
+// Tiers for Riot's performance score (0-500), set from ~170 real ranked
+// players: S is roughly the top 2%, A the next ~8%, B above the median.
+const PERF_MAX = 500;
+function perfTier(perf) {
+  if (perf >= 450) return { letter: 'S', color: '#ffd166' };
+  if (perf >= 350) return { letter: 'A', color: '#3ecbff' };
+  if (perf >= 250) return { letter: 'B', color: '#3ddb8a' };
+  if (perf >= 150) return { letter: 'C', color: '#a7c6cc' };
+  return { letter: 'D', color: '#ff5a68' };
+}
+
+function perfBadge({ letter, color }) {
+  return `<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,1.5 21.5,7 21.5,17 12,22.5 2.5,17 2.5,7" fill="${color}"/><text x="12" y="16.2" text-anchor="middle" font-family="Manrope, sans-serif" font-size="11.5" font-weight="800" fill="#141b26">${letter}</text></svg>`;
+}
+
 function playerRow(p, showPerf) {
   // Riot's own per-player performance score (0-500), only in matches that
-  // carry it (ranked games do, customs don't) — sits where TRS used to.
-  const perfCells = showPerf ? `
-      <div></div>
-      <div class="sb-trs">${p.perf ?? '–'}</div>
-      <div></div>` : '';
+  // carry it (ranked games do, customs don't) — sits where TRS used to:
+  // a tier badge, then the number over a 0-500 bar in the tier's color.
+  let perfCells = '';
+  if (showPerf) {
+    const tier = p.perf == null ? null : perfTier(p.perf);
+    const barWidth = tier ? Math.round((Math.min(p.perf, PERF_MAX) / PERF_MAX) * 100) : 0;
+    perfCells = `
+      <div class="sb-trs-badge">${tier ? perfBadge(tier) : ''}</div>
+      <div class="sb-trs sb-perf">
+        <span>${p.perf ?? '–'}</span>
+        ${tier ? `<span class="sb-perf-bar"><span style="width:${barWidth}%;background:${tier.color}"></span></span>` : ''}
+      </div>
+      <div></div>`;
+  }
   return `
     <div class="sb-row${showPerf ? '' : ' no-trs'}">
       <div class="sb-avatar-wrap">
@@ -290,7 +314,10 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-rank-badge{position:absolute;bottom:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#141b26;border:1px solid #141b26;object-fit:contain;}
 .sb-name{font-family:'Manrope',sans-serif;font-weight:700;color:#e8ecf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sb-trs-badge{display:flex;align-items:center;justify-content:center;}
-.sb-trs-badge img{width:21px;height:21px;}
+.sb-trs-badge svg{width:22px;height:22px;display:block;}
+.sb-perf{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.sb-perf-bar{display:block;width:38px;height:3px;border-radius:2px;background:#232d3a;overflow:hidden;}
+.sb-perf-bar>span{display:block;height:100%;border-radius:2px;}
 .sb-trs{font-weight:800;color:#eef2f6;text-align:center;font-variant-numeric:tabular-nums;}
 .sb-acs{font-weight:800;color:#eef2f6;text-align:center;font-variant-numeric:tabular-nums;}
 .sb-num{text-align:center;font-variant-numeric:tabular-nums;}
