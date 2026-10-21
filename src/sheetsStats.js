@@ -19,11 +19,11 @@ import {
 // every later column one letter left — LAYOUT below reflects that shift.
 export const OVERALL_PREMIER_TAB = 'Статистика за V26A5';
 
-const BLOCK_SIZE = 14;
-const ANCHOR_FIRST_ROW = 2;
-const ROSTER_SIZE = 8;
-const TABLE1_FIRST_ROW = 3;
-const TABLE2_FIRST_ROW = 14;
+export const BLOCK_SIZE = 14;
+export const ANCHOR_FIRST_ROW = 2;
+export const ROSTER_SIZE = 8;
+export const TABLE1_FIRST_ROW = 3;
+export const TABLE2_FIRST_ROW = 14;
 
 const STAT_ROWS_PREMIER = [
   'trs', 'acs', 'kills', 'deaths', 'assists', 'plusMinus', 'kdRatio',
