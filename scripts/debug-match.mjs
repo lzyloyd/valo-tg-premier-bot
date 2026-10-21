@@ -1,6 +1,5 @@
 import { getBrowser, closeBrowser } from '../src/browser.js';
-import { gotoTrackerProfile, fetchMatchDetail } from '../src/trackerClient.js';
-import { config } from '../src/config.js';
+import { openTracker, fetchMatchDetail } from '../src/trackerClient.js';
 
 const matchId = process.argv[2];
 if (!matchId) {
@@ -11,12 +10,11 @@ if (!matchId) {
 const browser = await getBrowser();
 const page = await browser.newPage();
 try {
-  await gotoTrackerProfile(page);
+  await openTracker(page);
   const raw = await fetchMatchDetail(page, matchId);
   const players = raw.segments
     .filter((s) => s.type === 'player-summary')
     .map((s) => s.attributes.platformUserIdentifier);
-  console.log('configured TRACKED_RIOT_ID =', config.trackedRiotId);
   console.log('players in match:', players);
 } finally {
   await page.close();

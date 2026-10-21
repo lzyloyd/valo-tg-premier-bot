@@ -14,7 +14,18 @@ export const ROSTER = [
   { riotId: 'MILITANTUM#bonr', sheetLabels: ['MILITANTUM#bonr'] },
 ];
 
+// The team's current Riot IDs — the one source of truth for "which side is
+// ours" in a match and whose profiles the Premier poller checks.
+export const TEAM_RIOT_IDS = ROSTER.map((r) => r.riotId);
+
 // Any label text (lowercased) -> the roster's canonical (current) Riot ID (lowercased).
 export const LABEL_TO_RIOT_ID = new Map(
   ROSTER.flatMap((r) => [r.riotId, ...r.sheetLabels].map((label) => [label.toLowerCase(), r.riotId.toLowerCase()])),
 );
+
+/** The teamId of the side any of our roster members played on, or null. */
+export function findOurTeamId(playerSummaries) {
+  const ours = new Set(TEAM_RIOT_IDS.map((id) => id.toLowerCase()));
+  const member = playerSummaries.find((p) => ours.has(p.attributes.platformUserIdentifier.toLowerCase()));
+  return member?.metadata.teamId ?? null;
+}

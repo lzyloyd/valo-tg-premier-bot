@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { getBrowser } from './browser.js';
-import { fetchMatchDetail, fetchTeamStandings, gotoTrackerProfile } from './trackerClient.js';
+import { fetchMatchDetail, fetchTeamStandings, openTracker } from './trackerClient.js';
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
 import { sendPhotoTo, sendTextTo, sendAnimationTo, matchCaption } from './telegram.js';
@@ -57,22 +57,20 @@ async function saveOffset(offset) {
   await fs.writeFile(OFFSET_PATH, JSON.stringify({ offset }));
 }
 
-// "Резалтик, покажи премьер матч <ссылка>" — looks up the tracked player's
-// Premier team standings when they're in the match; if they're not (subbed
-// out, or someone pastes a link where they didn't play), falls back to
-// treating the first team as "our" side instead of failing outright —
-// the same fallback "покажи матч" already uses.
+// "Резалтик, покажи премьер матч <ссылка>" — Premier team standings for both
+// sides; "our" side is whichever team a roster member played on, falling back
+// to the first team if none of us is in the match.
 async function summarizePremierMatch(matchId, message) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   try {
     // A fresh page has no origin yet — api.tracker.gg only allows fetches
     // that originate from a tracker.gg page (CORS), so we have to land on
-    // one first, same as the scheduled poller does via fetchRecentMatches.
-    await gotoTrackerProfile(page);
+    // one first, same as the scheduled poller does.
+    await openTracker(page);
     const raw = await fetchMatchDetail(page, matchId);
-    const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
-    const match = buildMatchView(raw, teamsInfo, { trackedRiotId: config.trackedRiotId, requireTracked: false });
+    const teamsInfo = await fetchTeamStandings(page, raw);
+    const match = buildMatchView(raw, teamsInfo);
     match.playlistName = 'Premier'; // this command is specifically for Premier matches — pin it regardless of tracker.gg's raw queueId
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
@@ -83,7 +81,7 @@ async function summarizePremierMatch(matchId, message) {
 
 // "Резалтик, покажи прак <ссылка>" — for custom (scrim) matches: same
 // Premier roster lookup as "покажи премьер матч" (team name + rank/standing,
-// gracefully falling back if the tracked player isn't in this match either),
+// same fallback when none of us played),
 // but no playlistName override — the match's own queueId is null for a
 // custom lobby, so buildMatchView's isCustom kicks in on its own (no TRS
 // column, MVP by ACS, "Кастомка" label) exactly like "покажи матч" already does.
@@ -91,10 +89,10 @@ async function summarizePracticeMatch(matchId, message) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   try {
-    await gotoTrackerProfile(page);
+    await openTracker(page);
     const raw = await fetchMatchDetail(page, matchId);
-    const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
-    const match = buildMatchView(raw, teamsInfo, { trackedRiotId: config.trackedRiotId, requireTracked: false });
+    const teamsInfo = await fetchTeamStandings(page, raw);
+    const match = buildMatchView(raw, teamsInfo);
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
   } finally {
@@ -105,21 +103,15 @@ async function summarizePracticeMatch(matchId, message) {
 // "Резалтик, покажи матч <ссылка>" — any match, any player, any playlist.
 // No Premier roster lookup (doesn't make sense outside Premier anyway), so
 // team names fall back to "Команда A"/"Команда B" with no rank/standing.
-// "Our" side is whichever team has a known roster member in it (checked
-// against config.teamRosterRiotIds, since the tracked player specifically
-// might not be the one who played this match); if nobody we know played,
-// it's just a neutral team1-vs-team2 view.
+// "Our" side is whichever team a roster member played on; if nobody we know
+// played, it's just a neutral team1-vs-team2 view.
 async function summarizeAnyMatch(matchId, message) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   try {
-    await gotoTrackerProfile(page);
+    await openTracker(page);
     const raw = await fetchMatchDetail(page, matchId);
-    const match = buildMatchView(raw, {}, {
-      trackedRiotId: null,
-      requireTracked: false,
-      ourRosterRiotIds: config.teamRosterRiotIds,
-    });
+    const match = buildMatchView(raw);
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
   } finally {
@@ -130,15 +122,14 @@ async function summarizeAnyMatch(matchId, message) {
 // "Резалтик, добавь в таблицу статистики следующие премьер матчи:"/"...праки:"
 // — logs each match's per-player stats as a new "Game N" column on the
 // relevant "<Map> - <Mode>" tab of the Google Sheet, instead of rendering a
-// scoreboard. "Our team" is resolved the same permissive way as "покажи
-// матч" (tracked player first, falling back to any known roster member) so
-// a match Space didn't play still gets logged correctly.
+// scoreboard. A match with none of our roster in it is rejected rather than
+// logging the other side's stats.
 async function addMatchesToStatsSheet(matchIds, mode, message) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   const lines = [];
   try {
-    await gotoTrackerProfile(page);
+    await openTracker(page);
     for (const matchId of matchIds) {
       const short = matchId.slice(0, 8);
       try {
@@ -158,11 +149,7 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
           continue;
         }
 
-        const match = buildMatchView(raw, {}, {
-          trackedRiotId: config.trackedRiotId,
-          requireTracked: false,
-          ourRosterRiotIds: config.teamRosterRiotIds,
-        });
+        const match = buildMatchView(raw, {}, { requireOurTeam: true });
         const { tabTitle, gameNumber, written, skipped, alreadyLogged, sheetId } = await appendMatchToStatsSheet({
           mapName: match.mapName,
           mode,

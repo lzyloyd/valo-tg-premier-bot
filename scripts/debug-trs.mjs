@@ -1,5 +1,5 @@
 import { getBrowser, closeBrowser } from '../src/browser.js';
-import { gotoTrackerProfile, fetchMatchDetail } from '../src/trackerClient.js';
+import { openTracker, fetchMatchDetail } from '../src/trackerClient.js';
 
 // Prints the full trnPerformanceScore stat object for every player in a
 // match, to check whether tracker.gg's API already tags a rating grade
@@ -13,7 +13,7 @@ if (!matchId) {
 const browser = await getBrowser();
 const page = await browser.newPage();
 try {
-  await gotoTrackerProfile(page);
+  await openTracker(page);
   const raw = await fetchMatchDetail(page, matchId);
   const players = raw.segments.filter((s) => s.type === 'player-summary');
   for (const p of players) {

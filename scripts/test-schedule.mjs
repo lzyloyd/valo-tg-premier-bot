@@ -62,7 +62,7 @@ assert(buildSummaryText(week).includes('12.10–18.10'));
 assert(buildSummaryText(week).includes('Понедельник 12.10'));
 
 // Use an isolated directory: this test never touches real schedule data.
-for (const key of ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'TRACKER_PROFILE_URL', 'TRACKED_RIOT_ID']) {
+for (const key of ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID']) {
   process.env[key] ||= 'test';
 }
 const { config } = await import('../src/config.js');

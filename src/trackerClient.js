@@ -1,44 +1,54 @@
-import { config } from './config.js';
+import { TEAM_RIOT_IDS, findOurTeamId } from './statsRoster.js';
 
+const TRACKER_HOME_URL = 'https://tracker.gg/valorant';
 const MATCH_API_BASE = 'https://api.tracker.gg/api/v2/valorant/standard/matches';
 const PROFILE_API_BASE = 'https://api.tracker.gg/api/v2/valorant/standard/profile/riot';
 const ROSTER_API_BASE = 'https://api.tracker.gg/api/v1/valorant/premier/roster';
 const IMAGE_PROXY_BASE = 'https://imgsvc.trackercdn.com/url';
 
+// A teammate's Premier history includes matches from before they joined (for
+// another team) — only matches this recent count as "ours to post", so adding
+// someone to the roster never dumps their old matches into the chat.
+const RECENT_MATCH_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000;
+
 /**
- * Cloudflare's "Just a moment..." interstitial can still be showing by the
- * time page.goto's own waitUntil condition is satisfied — networkidle2 is
- * happy to fire on the challenge page itself. Confirm the real page actually
- * landed by waiting for the state object every genuine tracker.gg page embeds,
- * instead of trusting navigation-lifecycle timing alone.
+ * Lands a page on tracker.gg so later in-page API fetches ride its cleared
+ * Cloudflare session. The challenge interstitial can still be showing when
+ * networkidle2 fires, so wait for the state object every genuine tracker.gg
+ * page embeds instead of trusting navigation timing alone.
  */
-export async function gotoTrackerProfile(page) {
-  await page.goto(config.trackerProfileUrl, { waitUntil: 'networkidle2', timeout: 60_000 });
+export async function openTracker(page) {
+  await page.goto(TRACKER_HOME_URL, { waitUntil: 'networkidle2', timeout: 60_000 });
   await page.waitForFunction(() => window.__INITIAL_STATE__ !== undefined, { timeout: 30_000 });
 }
 
 /**
- * tracker.gg embeds its initial React state as `window.__INITIAL_STATE__` in the
- * server-rendered HTML — reading it avoids needing a separate API call (and its
- * own Cloudflare check) just to list recent matches.
+ * Recent Premier matches played by anyone on the team, deduplicated across
+ * players — no single "tracked" player whose rename or absence would blind
+ * the poller. A failing lookup for one player (renamed, private profile) is
+ * logged and skipped rather than aborting the whole check.
  */
-export async function fetchRecentMatches(page) {
-  await gotoTrackerProfile(page);
+export async function fetchRecentMatches(page, { now = new Date() } = {}) {
+  await openTracker(page);
 
-  const matches = await page.evaluate(() => {
-    const state = window.__INITIAL_STATE__;
-    const bucket = state?.stats?.standardProfileMatches?.['0'];
-    if (!bucket?.matches) return [];
-    return bucket.matches.map((m) => ({
-      id: m.attributes.id,
-      timestamp: m.metadata.timestamp,
-      mapName: m.metadata.mapName,
-      result: m.metadata.result,
-    }));
-  });
+  const byId = new Map();
+  for (const riotId of TEAM_RIOT_IDS) {
+    let json;
+    try {
+      json = await fetchJson(page, `${MATCH_API_BASE}/riot/${encodeURIComponent(riotId)}?type=premier`);
+    } catch (err) {
+      console.error(`[trackerClient] recent matches lookup failed for ${riotId}:`, err.message);
+      continue;
+    }
+    for (const m of json.data?.matches ?? []) {
+      const timestamp = m.metadata.timestamp;
+      if (now - new Date(timestamp) > RECENT_MATCH_MAX_AGE_MS) continue;
+      byId.set(m.attributes.id, { id: m.attributes.id, timestamp, mapName: m.metadata.mapName, result: m.metadata.result });
+    }
+  }
 
   // Oldest first, so if several matches are new they get posted in the right order.
-  return matches.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  return [...byId.values()].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 }
 
 function sleep(ms) {
@@ -124,37 +134,34 @@ async function fetchRosterInfoForPlayer(page, riotId) {
  * (metadata.premierRosterId). Any player on a side works to look their
  * roster up, so this doesn't depend on the match being recent — but a given
  * player might not currently have one (subbed in, left their roster since),
- * so try each of the five in turn instead of betting on just one.
+ * so each side's players are tried in turn instead of betting on just one.
+ * "Our" side is whichever side any team member played on.
  */
-export async function fetchTeamStandings(page, raw, trackedRiotId) {
+export async function fetchTeamStandings(page, raw) {
   const playerSummaries = raw.segments.filter((s) => s.type === 'player-summary');
-  const tracked = playerSummaries.find(
-    (p) => p.attributes.platformUserIdentifier.toLowerCase() === trackedRiotId.toLowerCase(),
-  );
-  if (!tracked) return { ourTeam: null, theirTeam: null };
+  const ourTeamId = findOurTeamId(playerSummaries);
+  if (!ourTeamId) return { ourTeam: null, theirTeam: null };
 
-  const opponents = playerSummaries.filter((p) => p.metadata.teamId !== tracked.metadata.teamId);
+  const ours = playerSummaries.filter((p) => p.metadata.teamId === ourTeamId);
+  const opponents = playerSummaries.filter((p) => p.metadata.teamId !== ourTeamId);
+  return {
+    ourTeam: await firstRosterInfo(page, ours),
+    theirTeam: await firstRosterInfo(page, opponents),
+  };
+}
 
-  let ourTeam = null;
-  try {
-    ourTeam = await fetchRosterInfoForPlayer(page, trackedRiotId);
-  } catch (err) {
-    console.error(`[trackerClient] roster lookup failed for ${trackedRiotId}:`, err.message);
-  }
-
-  // fetchRosterInfoForPlayer throws once its own retries are exhausted (a
-  // transient Cloudflare block on that one request) — that must not abort
-  // the whole lookup while there are still other opponents left to try.
-  let theirTeam = null;
-  for (const opponent of opponents) {
+// fetchRosterInfoForPlayer throws once its own retries are exhausted (a
+// transient Cloudflare block on that one request) — that must not abort the
+// lookup while there are still other players on that side left to try.
+async function firstRosterInfo(page, players) {
+  for (const p of players) {
+    const riotId = p.attributes.platformUserIdentifier;
     try {
-      theirTeam = await fetchRosterInfoForPlayer(page, opponent.attributes.platformUserIdentifier);
+      const info = await fetchRosterInfoForPlayer(page, riotId);
+      if (info) return info;
     } catch (err) {
-      console.error(`[trackerClient] roster lookup failed for ${opponent.attributes.platformUserIdentifier}:`, err.message);
-      continue;
+      console.error(`[trackerClient] roster lookup failed for ${riotId}:`, err.message);
     }
-    if (theirTeam) break;
   }
-
-  return { ourTeam, theirTeam };
+  return null;
 }

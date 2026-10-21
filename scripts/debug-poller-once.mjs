@@ -1,5 +1,5 @@
 import { getBrowser, closeBrowser } from '../src/browser.js';
-import { gotoTrackerProfile, fetchMatchDetail, fetchTeamStandings } from '../src/trackerClient.js';
+import { openTracker, fetchMatchDetail, fetchTeamStandings } from '../src/trackerClient.js';
 import { buildMatchView } from '../src/matchModel.js';
 import { renderScoreboardPng } from '../src/render/renderCard.js';
 import { config } from '../src/config.js';
@@ -18,9 +18,9 @@ if (!matchId) {
 const browser = await getBrowser();
 const page = await browser.newPage();
 try {
-  await gotoTrackerProfile(page);
+  await openTracker(page);
   const raw = await fetchMatchDetail(page, matchId);
-  const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
+  const teamsInfo = await fetchTeamStandings(page, raw);
   const match = buildMatchView(raw, teamsInfo);
   match.playlistName = 'Premier';
   console.log('ourTeamName:', match.ourTeamName, '| theirTeamName:', match.theirTeamName);

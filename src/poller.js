@@ -4,7 +4,6 @@ import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
 import { sendMatchReport } from './telegram.js';
 import { loadSeenMatchIds, saveSeenMatchIds } from './state.js';
-import { config } from './config.js';
 
 export async function runPollCycle() {
   console.log('[poller] checking for new Premier matches...');
@@ -24,8 +23,8 @@ export async function runPollCycle() {
     for (const { id } of newMatches) {
       console.log(`[poller] new match ${id}, fetching detail...`);
       const raw = await fetchMatchDetail(page, id);
-      const teamsInfo = await fetchTeamStandings(page, raw, config.trackedRiotId);
-      const match = buildMatchView(raw, teamsInfo);
+      const teamsInfo = await fetchTeamStandings(page, raw);
+      const match = buildMatchView(raw, teamsInfo, { requireOurTeam: true });
       match.playlistName = 'Premier'; // this poller only ever watches Premier matches — pin it regardless of tracker.gg's raw queueId
       const png = await renderScoreboardPng(browser, match);
       await sendMatchReport(match, png);

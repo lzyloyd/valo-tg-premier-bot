@@ -1,5 +1,5 @@
 import { getBrowser, closeBrowser } from '../src/browser.js';
-import { gotoTrackerProfile, fetchMatchDetail } from '../src/trackerClient.js';
+import { openTracker, fetchMatchDetail } from '../src/trackerClient.js';
 import { buildMatchView } from '../src/matchModel.js';
 import { appendMatchToStatsSheet } from '../src/sheetsStats.js';
 import { config } from '../src/config.js';
@@ -16,13 +16,9 @@ if (!matchId) {
 const browser = await getBrowser();
 const page = await browser.newPage();
 try {
-  await gotoTrackerProfile(page);
+  await openTracker(page);
   const raw = await fetchMatchDetail(page, matchId);
-  const match = buildMatchView(raw, {}, {
-    trackedRiotId: config.trackedRiotId,
-    requireTracked: false,
-    ourRosterRiotIds: config.teamRosterRiotIds,
-  });
+  const match = buildMatchView(raw);
   console.log('mapName:', match.mapName, '| ourTeam:', match.ourTeam.map((p) => p.riotId));
   const result = await appendMatchToStatsSheet({ mapName: match.mapName, mode, players: match.ourTeam, matchId });
   console.log(result);

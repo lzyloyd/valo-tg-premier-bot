@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { getBrowser, closeBrowser } from '../src/browser.js';
-import { gotoTrackerProfile, fetchMatchDetail } from '../src/trackerClient.js';
+import { openTracker, fetchMatchDetail } from '../src/trackerClient.js';
 import { config } from '../src/config.js';
 
 // Dumps the full raw match payload to disk, plus a de-duplicated list of
@@ -29,7 +29,7 @@ function collectKeys(node, path, into) {
 const browser = await getBrowser();
 const page = await browser.newPage();
 try {
-  await gotoTrackerProfile(page);
+  await openTracker(page);
   const raw = await fetchMatchDetail(page, matchId);
   const outPath = path.join(config.dataDir, 'debug-raw-match.json');
   await fs.mkdir(config.dataDir, { recursive: true });
