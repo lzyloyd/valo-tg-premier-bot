@@ -21,9 +21,9 @@ export const OVERALL_PREMIER_TAB = 'Статистика за V26A5';
 
 const BLOCK_SIZE = 14;
 const ANCHOR_FIRST_ROW = 2;
-const ROSTER_SIZE = 7;
+const ROSTER_SIZE = 8;
 const TABLE1_FIRST_ROW = 3;
-const TABLE2_FIRST_ROW = 13;
+const TABLE2_FIRST_ROW = 14;
 
 const STAT_ROWS_PREMIER = [
   'trs', 'acs', 'kills', 'deaths', 'assists', 'plusMinus', 'kdRatio',
@@ -220,7 +220,7 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   ]);
 
   // The clone still has the master's old per-game data — wipe every game
-  // column's header + all 7 players' raw rows (column Q/P player labels are
+  // column's header + every player's raw rows (column Q/P player labels are
   // identical for every tab, so those stay).
   await clearValues(spreadsheetId, `'${tabTitle}'!${layout.firstGameColumn}1:BZ${BLOCK_SIZE * ROSTER_SIZE + 2}`);
   // The clone also still has whichever heatmap formulas the master happened
