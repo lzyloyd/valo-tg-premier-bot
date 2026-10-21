@@ -162,7 +162,7 @@ function signedColor(value) {
 
 function playerRow(p, showPerf) {
   // Riot's own per-player performance score (0-500), only in matches that
-  // carry it (ranked/Premier, not customs) — sits where TRS used to.
+  // carry it (ranked games do, customs don't) — sits where TRS used to.
   const perfCells = showPerf ? `
       <div></div>
       <div class="sb-trs">${p.perf ?? '–'}</div>

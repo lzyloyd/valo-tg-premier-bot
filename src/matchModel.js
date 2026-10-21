@@ -233,7 +233,6 @@ export async function buildMatchView(match, { requireOurTeam = false, withStandi
       firstDeaths: ks.firstDeaths,
       multiKills: ks.multiKills,
       kdRatio: Math.round((s.deaths ? s.kills / s.deaths : s.kills) * 100) / 100,
-      trs: null, // tracker.gg's own score — not available outside tracker.gg
       // Riot's per-player performance score (0-500), where the match carries
       // it — ranked games do, customs don't.
       perf: p.performance?.score != null ? Math.round(p.performance.score) : null,

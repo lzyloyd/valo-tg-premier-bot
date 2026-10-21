@@ -7,7 +7,7 @@ export async function renderScoreboardPng(browser, match) {
     await page.setContent(buildScoreboardHtml(match), { waitUntil: 'networkidle0' });
     // `networkidle0` fires once no more than 0 connections are open for 500ms —
     // it's a network-level heuristic, not a guarantee that every <img> (avatars,
-    // rank emblems, TRS badges — ~30 external requests per card) has actually
+    // rank emblems, round icons — ~30 external requests per card) has actually
     // finished loading. Under load a handful can still be in flight when it
     // fires, so those icons render blank. Wait on the images themselves instead.
     await page.evaluate(() =>

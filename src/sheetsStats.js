@@ -15,7 +15,7 @@ import {
 // layout) rather than from "whichever existing tab happens to match this
 // mode" — that used to inherit whatever drift/inconsistency a given
 // existing tab had accumulated. Praки mode additionally deletes the master's
-// TRS column (meaningless for customs) right after cloning, which shifts
+// PERF column (customs don't carry it) right after cloning, which shifts
 // every later column one letter left — LAYOUT below reflects that shift.
 export const OVERALL_PREMIER_TAB = 'Статистика за V26A5';
 
@@ -26,10 +26,10 @@ export const TABLE1_FIRST_ROW = 3;
 export const TABLE2_FIRST_ROW = 14;
 
 const STAT_ROWS_PREMIER = [
-  'trs', 'acs', 'kills', 'deaths', 'assists', 'plusMinus', 'kdRatio',
+  'perf', 'acs', 'kills', 'deaths', 'assists', 'plusMinus', 'kdRatio',
   'ddelta', 'adr', 'hsAccuracy', 'kast', 'firstKills', 'firstDeaths', 'multiKills',
 ];
-// offset 0 (the anchor/label row) carries no stat in Praки mode — TRS's
+// offset 0 (the anchor/label row) carries no stat in Праки mode — PERF's
 // column got physically deleted, so there's nothing to shift into it.
 const STAT_ROWS_PRAKTIKA = [
   null, 'acs', 'kills', 'deaths', 'assists', 'plusMinus', 'kdRatio',
@@ -44,7 +44,7 @@ const LAYOUT = {
     statRows: STAT_ROWS_PREMIER,
     table1Columns: ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'],
     table2Columns: ['C', 'D', 'E', 'F', 'G', 'H', 'I'],
-    table2Stats: ['trs', 'acs', 'kdRatio', 'ddelta', 'adr', 'hsAccuracy', 'kast'],
+    table2Stats: ['perf', 'acs', 'kdRatio', 'ddelta', 'adr', 'hsAccuracy', 'kast'],
     table1PercentCols: ['L', 'M'],
     table2PercentCols: ['H', 'I'],
     probeColumn: 'C',
@@ -134,7 +134,7 @@ async function formatGameColumn(spreadsheetId, sheetId, colIndex, matchId) {
 
 function valueForStatKey(p, key) {
   switch (key) {
-    case 'trs': return p.trs ?? ''; // null since match data moved off tracker.gg
+    case 'perf': return p.perf ?? ''; // Riot's performance score — customs don't carry it
     case 'acs': return p.acs;
     case 'kills': return p.kills;
     case 'deaths': return p.deaths;
@@ -191,7 +191,7 @@ async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   const newSheetId = dupRes.replies[0].duplicateSheet.properties.sheetId;
 
   if (mode === 'Праки') {
-    // The master template tracks TRS (column C) — meaningless for customs.
+    // The master template tracks PERF (column C) — customs don't carry it.
     // Deleting it (rather than just leaving it blank) shifts every later
     // column one letter left, which is what LAYOUT.Праки's column letters
     // assume from here on.
@@ -414,13 +414,14 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
     // (idempotent: re-writing an already-live formula is harmless).
     const playerIndex = (anchorRow - ANCHOR_FIRST_ROW) / BLOCK_SIZE;
     const t1Row = TABLE1_FIRST_ROW + playerIndex;
-    // No TRS to average (tracker.gg-only stat) — keep its heatmap cells at "-"
-    // instead of an AVERAGE over empty cells, which would show #DIV/0!.
-    const noTrs = p.trs == null;
+    // PERF can be missing from some games (customs don't carry it), so its
+    // average shows "-" rather than #DIV/0! until there's at least one.
+    const formulaFor = (key, rawRow) => {
+      const f = averageFormula(layout.firstGameColumn, rawRow, endColLetter);
+      return key === 'perf' ? `=IFERROR(${f.slice(1)},"-")` : f;
+    };
     const t1Values = layout.table1Columns.map((_, k) =>
-      noTrs && layout.statRows[k + layout.firstStatOffset] === 'trs'
-        ? '-'
-        : averageFormula(layout.firstGameColumn, anchorRow + k + layout.firstStatOffset, endColLetter),
+      formulaFor(layout.statRows[k + layout.firstStatOffset], anchorRow + k + layout.firstStatOffset),
     );
     data.push({
       range: `'${tabTitle}'!${layout.table1Columns[0]}${t1Row}:${layout.table1Columns[layout.table1Columns.length - 1]}${t1Row}`,
@@ -428,9 +429,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
     });
 
     const t2Row = TABLE2_FIRST_ROW + playerIndex;
-    const t2Values = layout.table2Stats.map((key) =>
-      noTrs && key === 'trs' ? '-' : averageFormula(layout.firstGameColumn, anchorRow + statOffset(mode, key), endColLetter),
-    );
+    const t2Values = layout.table2Stats.map((key) => formulaFor(key, anchorRow + statOffset(mode, key)));
     data.push({
       range: `'${tabTitle}'!${layout.table2Columns[0]}${t2Row}:${layout.table2Columns[layout.table2Columns.length - 1]}${t2Row}`,
       values: [t2Values],
