@@ -7,10 +7,10 @@
 // with MAIN_ROSTER / SUB_ROSTER in scheduleModel.js.
 export const ROSTER = [
   // Starters
-  { riotId: 'Space Kururugi#mench', sheetLabels: ['Space#flick', 'Space#mench'] },
+  { riotId: 'Space Kururugi#mench', sheetLabels: ['Space#flick', 'Space#mench'] }, // @Qu1ly
   { riotId: 'ジ lzyloyd#pivo', sheetLabels: [] }, // @lzyloyd
   { riotId: 'AHotNik#2410', sheetLabels: ['toshir0000#6666'] }, // @toshir0000
-  { riotId: 'Ax1oM#6525', sheetLabels: [] },
+  { riotId: 'Ax1oM#6525', sheetLabels: [] }, // @KitKatFN
   { riotId: 'MILITANTUM#bonr', sheetLabels: [] }, // @Bonrik1
   // Substitutes, by priority
   { riotId: 'speak with dead#amen', sheetLabels: [] }, // @deadqq
