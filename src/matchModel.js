@@ -257,7 +257,7 @@ export async function buildMatchView(match, { requireOurTeam = false, withStandi
   };
 
   const [ourTeam, theirTeam] = await Promise.all([buildTeam(ourTeamId), buildTeam(otherTeamId)]);
-  const mvp = [...ourTeam.players].sort((a, b) => b.acs - a.acs)[0];
+  const mvp = [...ourTeam.players].sort(byScore)[0];
   const ourAvgRankTierId = averageTierId(ourTeam.players.map((p) => p.rankTierId));
   const theirAvgRankTierId = averageTierId(theirTeam.players.map((p) => p.rankTierId));
 

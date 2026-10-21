@@ -240,11 +240,14 @@ function teamBlock({ side, teamName, logoUrl, rank, divisionName, zoneName, play
     </div>`;
 }
 
-function mvpBlock(mvp) {
-  // Best player by ACS, shown as the headline stat.
-  const statValue = mvp.acs;
-  const statLabel = 'ACS';
-  const subLine = `${escapeHtml(mvp.agentName)} · ${mvp.kills}/${mvp.deaths}/${mvp.assists} · KAST ${mvp.kast}%`;
+function mvpBlock(mvp, showPerf) {
+  // Best player by PERF where the match has it (ACS then moves to the
+  // sub-line), by ACS otherwise — the same order the team table uses.
+  const byPerf = showPerf && mvp.perf != null;
+  const statValue = byPerf ? mvp.perf : mvp.acs;
+  const statLabel = byPerf ? 'PERF' : 'ACS';
+  const acsPart = byPerf ? ` · ACS ${mvp.acs}` : '';
+  const subLine = `${escapeHtml(mvp.agentName)}${acsPart} · ${mvp.kills}/${mvp.deaths}/${mvp.assists} · KAST ${mvp.kast}%`;
   return `
     <div class="sb-mvp">
       <div class="sb-mvp-label">Лучший игрок команды</div>
@@ -374,7 +377,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
     avgRankIconUrl: match.theirTeamAvgRankIconUrl,
     showPerf: match.hasPerf,
   })}
-  ${mvpBlock(match.mvp)}
+  ${mvpBlock(match.mvp, match.hasPerf)}
 </div>
 </body></html>`;
 }
