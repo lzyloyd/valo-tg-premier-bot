@@ -15,7 +15,6 @@ const OFFSET_PATH = path.join(config.dataDir, 'telegram-offset.json');
 
 // How you get the bot's attention — "Резалтик, ..." with or without the comma.
 const TRIGGER = /^рез[аa]лтик[\s,:-]*/i;
-const MATCH_URL_RE = /tracker\.gg\/valorant\/match\/([0-9a-f-]{36})/i;
 const MATCH_URL_RE_G = /tracker\.gg\/valorant\/match\/([0-9a-f-]{36})/gi;
 const HEALTHCHECK_RE = /^healthcheck$/i;
 const SCHEDULE_RE = /^расписание$/i;
@@ -57,61 +56,40 @@ async function saveOffset(offset) {
   await fs.writeFile(OFFSET_PATH, JSON.stringify({ offset }));
 }
 
-// "Резалтик, покажи премьер матч <ссылка>" — Premier team standings for both
-// sides; "our" side is whichever team a roster member played on, falling back
-// to the first team if none of us is in the match.
-async function summarizePremierMatch(matchId, message) {
-  const browser = await getBrowser();
-  const page = await browser.newPage();
-  try {
-    // A fresh page has no origin yet — api.tracker.gg only allows fetches
-    // that originate from a tracker.gg page (CORS), so we have to land on
-    // one first, same as the scheduled poller does.
-    await openTracker(page);
-    const raw = await fetchMatchDetail(page, matchId);
-    const teamsInfo = await fetchTeamStandings(page, raw);
-    const match = buildMatchView(raw, teamsInfo);
-    match.playlistName = 'Premier'; // this command is specifically for Premier matches — pin it regardless of tracker.gg's raw queueId
-    const png = await renderScoreboardPng(browser, match);
-    await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
-  } finally {
-    await page.close();
-  }
+// A match to process: either a tracker.gg id the bot fetches itself, or the
+// match payload a user uploaded as a JSON file (opened from api.tracker.gg in
+// their own browser — the server's own requests there can be blocked by
+// Cloudflare). Uploads win over a link to the same match.
+function collectMatchRefs(text, uploads) {
+  const refs = new Map(uploads.map((raw) => [raw.attributes.id, { id: raw.attributes.id, raw }]));
+  for (const id of extractAllMatchIds(text)) if (!refs.has(id)) refs.set(id, { id });
+  return [...refs.values()];
 }
 
-// "Резалтик, покажи прак <ссылка>" — for custom (scrim) matches: same
-// Premier roster lookup as "покажи премьер матч" (team name + rank/standing,
-// same fallback when none of us played),
-// but no playlistName override — the match's own queueId is null for a
-// custom lobby, so buildMatchView's isCustom kicks in on its own (no TRS
-// column, MVP by ACS, "Кастомка" label) exactly like "покажи матч" already does.
-async function summarizePracticeMatch(matchId, message) {
-  const browser = await getBrowser();
-  const page = await browser.newPage();
-  try {
-    await openTracker(page);
-    const raw = await fetchMatchDetail(page, matchId);
-    const teamsInfo = await fetchTeamStandings(page, raw);
-    const match = buildMatchView(raw, teamsInfo);
-    const png = await renderScoreboardPng(browser, match);
-    await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
-  } finally {
-    await page.close();
-  }
+// Uploaded payloads skip tracker.gg entirely — including the Premier team
+// lookup, which is another api.tracker.gg call — so their card falls back
+// to "Команда A/B" names. A fetched match needs a tracker.gg page first:
+// api.tracker.gg only allows fetches originating from one (CORS).
+async function loadMatch(page, ref, { withStandings = false } = {}) {
+  if (ref.raw) return { raw: ref.raw, teamsInfo: {} };
+  await openTracker(page);
+  const raw = await fetchMatchDetail(page, ref.id);
+  return { raw, teamsInfo: withStandings ? await fetchTeamStandings(page, raw) : {} };
 }
 
-// "Резалтик, покажи матч <ссылка>" — any match, any player, any playlist.
-// No Premier roster lookup (doesn't make sense outside Premier anyway), so
-// team names fall back to "Команда A"/"Команда B" with no rank/standing.
-// "Our" side is whichever team a roster member played on; if nobody we know
-// played, it's just a neutral team1-vs-team2 view.
-async function summarizeAnyMatch(matchId, message) {
+// "покажи премьер матч" (Premier team standings, card pinned to "Premier"
+// whatever tracker.gg's raw queueId says), "покажи прак" (same standings
+// lookup; a custom lobby's null queueId makes buildMatchView render it as
+// "Кастомка" with no TRS on its own) and "покажи матч" (any match, no
+// standings lookup). "Our" side is whichever team a roster member played on,
+// or the first team if none of us is in the match.
+async function summarizeMatch(ref, message, { withStandings, pinPremier }) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   try {
-    await openTracker(page);
-    const raw = await fetchMatchDetail(page, matchId);
-    const match = buildMatchView(raw);
+    const { raw, teamsInfo } = await loadMatch(page, ref, { withStandings });
+    const match = buildMatchView(raw, teamsInfo);
+    if (pinPremier) match.playlistName = 'Premier';
     const png = await renderScoreboardPng(browser, match);
     await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
   } finally {
@@ -124,16 +102,16 @@ async function summarizeAnyMatch(matchId, message) {
 // relevant "<Map> - <Mode>" tab of the Google Sheet, instead of rendering a
 // scoreboard. A match with none of our roster in it is rejected rather than
 // logging the other side's stats.
-async function addMatchesToStatsSheet(matchIds, mode, message) {
+async function addMatchesToStatsSheet(refs, mode, message) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   const lines = [];
   try {
-    await openTracker(page);
-    for (const matchId of matchIds) {
+    for (const ref of refs) {
+      const matchId = ref.id;
       const short = matchId.slice(0, 8);
       try {
-        const raw = await fetchMatchDetail(page, matchId);
+        const { raw } = await loadMatch(page, ref);
         const queueId = raw.metadata.queueId?.toLowerCase() ?? null;
 
         // The command trusts the caller's claim about what kind of match
@@ -247,9 +225,34 @@ function healthcheckReply() {
   return `✅ На связи, вижу сообщения. Аптайм процесса: ${uptimeMin} мин.`;
 }
 
-async function handleCommand(commandText, message) {
+const NEED_MATCH = 'Нужна ссылка на матч tracker.gg или JSON-файл матча.';
+
+// A match JSON the user saved from api.tracker.gg/.../matches/<id> in their
+// own browser and attached to the command (Bot API downloads cap at 20 MB;
+// a match is ~1-2 MB).
+async function downloadMatchFiles(documents) {
+  const out = [];
+  for (const doc of documents) {
+    const meta = await (await fetch(`${API_BASE}/getFile?file_id=${encodeURIComponent(doc.file_id)}`)).json();
+    if (!meta.ok) throw new Error(`не удалось скачать ${doc.file_name}: ${meta.description}`);
+    const res = await fetch(`https://api.telegram.org/file/bot${config.telegramBotToken}/${meta.result.file_path}`);
+    let json;
+    try {
+      json = JSON.parse(await res.text());
+    } catch {
+      throw new Error(`${doc.file_name} — не JSON`);
+    }
+    const data = json.data ?? json;
+    if (!data?.attributes?.id || !Array.isArray(data.segments)) {
+      throw new Error(`${doc.file_name} — это не данные матча tracker.gg`);
+    }
+    out.push(data);
+  }
+  return out;
+}
+
+async function handleCommand(commandText, message, documents = []) {
   const trimmed = commandText.trim();
-  const urlMatch = commandText.match(MATCH_URL_RE);
   try {
     if (HEALTHCHECK_RE.test(trimmed)) {
       await sendTextTo(message.chat.id, message.message_thread_id, healthcheckReply());
@@ -281,28 +284,20 @@ async function handleCommand(commandText, message) {
       await sendTextTo(message.chat.id, message.message_thread_id, `🎐 Вувочка: ${config.miniappWuvochkaLaunchUrl}`);
       return;
     }
-    if (PREMIER_MATCH_RE.test(trimmed)) {
-      if (!urlMatch) {
-        await sendTextTo(message.chat.id, message.message_thread_id, 'Нужна ссылка на матч tracker.gg.');
+    const matchCommand = PREMIER_MATCH_RE.test(trimmed)
+      ? { withStandings: true, pinPremier: true }
+      : PRACTICE_MATCH_RE.test(trimmed)
+        ? { withStandings: true, pinPremier: false }
+        : ANY_MATCH_RE.test(trimmed)
+          ? { withStandings: false, pinPremier: false }
+          : null;
+    if (matchCommand) {
+      const [ref] = collectMatchRefs(commandText, await downloadMatchFiles(documents));
+      if (!ref) {
+        await sendTextTo(message.chat.id, message.message_thread_id, NEED_MATCH);
         return;
       }
-      await summarizePremierMatch(urlMatch[1], message);
-      return;
-    }
-    if (PRACTICE_MATCH_RE.test(trimmed)) {
-      if (!urlMatch) {
-        await sendTextTo(message.chat.id, message.message_thread_id, 'Нужна ссылка на матч tracker.gg.');
-        return;
-      }
-      await summarizePracticeMatch(urlMatch[1], message);
-      return;
-    }
-    if (ANY_MATCH_RE.test(trimmed)) {
-      if (!urlMatch) {
-        await sendTextTo(message.chat.id, message.message_thread_id, 'Нужна ссылка на матч tracker.gg.');
-        return;
-      }
-      await summarizeAnyMatch(urlMatch[1], message);
+      await summarizeMatch(ref, message, matchCommand);
       return;
     }
     if (SEASON_STATS_RE.test(trimmed)) {
@@ -315,13 +310,13 @@ async function handleCommand(commandText, message) {
       return;
     }
     if (STATS_PREMIER_RE.test(trimmed) || STATS_PRACTICE_RE.test(trimmed)) {
-      const matchIds = extractAllMatchIds(commandText);
-      if (matchIds.length === 0) {
-        await sendTextTo(message.chat.id, message.message_thread_id, 'Нужна хотя бы одна ссылка на матч tracker.gg.');
+      const refs = collectMatchRefs(commandText, await downloadMatchFiles(documents));
+      if (refs.length === 0) {
+        await sendTextTo(message.chat.id, message.message_thread_id, NEED_MATCH);
         return;
       }
       const mode = STATS_PREMIER_RE.test(trimmed) ? 'Premier' : 'Праки';
-      await addMatchesToStatsSheet(matchIds, mode, message);
+      await addMatchesToStatsSheet(refs, mode, message);
       return;
     }
     await sendTextTo(message.chat.id, message.message_thread_id, 'Не знаю такой команды пока.');
@@ -333,6 +328,36 @@ async function handleCommand(commandText, message) {
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Several files sent as one album arrive as separate messages sharing a
+// media_group_id, with the caption (the command) on only one of them —
+// gather them until the album goes quiet, then handle it as one command.
+const ALBUM_SETTLE_MS = 2000;
+const pendingAlbums = new Map();
+
+function bufferAlbumPart(message) {
+  const album = pendingAlbums.get(message.media_group_id) ?? { messages: [], timer: null };
+  album.messages.push(message);
+  clearTimeout(album.timer);
+  album.timer = setTimeout(() => {
+    pendingAlbums.delete(message.media_group_id);
+    dispatch(album.messages);
+  }, ALBUM_SETTLE_MS);
+  pendingAlbums.set(message.media_group_id, album);
+}
+
+// The command is a message's text, or a file's caption; attached .json files
+// ride along as match payloads.
+function dispatch(messages) {
+  const head = messages.find((m) => m.text ?? m.caption);
+  const text = head?.text ?? head?.caption;
+  if (!text) return;
+  const triggerMatch = TRIGGER.exec(text);
+  if (!triggerMatch) return;
+  const commandText = text.slice(triggerMatch[0].length).trim();
+  const documents = messages.map((m) => m.document).filter((d) => d && /\.json$/i.test(d.file_name ?? ''));
+  handleCommand(commandText, head, documents).catch((err) => console.error('[listener] unhandled command error:', err));
 }
 
 /**
@@ -363,14 +388,10 @@ export async function runTelegramListener() {
 
     for (const update of updates) {
       offset = update.update_id + 1;
-      const text = update.message?.text;
-      if (!text) continue;
-      const triggerMatch = TRIGGER.exec(text);
-      if (!triggerMatch) continue;
-      const commandText = text.slice(triggerMatch[0].length).trim();
-      handleCommand(commandText, update.message).catch((err) =>
-        console.error('[listener] unhandled command error:', err),
-      );
+      const message = update.message;
+      if (!message) continue;
+      if (message.media_group_id) bufferAlbumPart(message);
+      else dispatch([message]);
     }
 
     if (updates.length > 0) await saveOffset(offset);
