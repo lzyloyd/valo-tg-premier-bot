@@ -32,15 +32,19 @@ async function henrikGet(path, attempt = 1) {
   const json = await res.json().catch(() => null);
   if (!res.ok) {
     const message = json?.errors?.[0]?.message ?? res.statusText;
-    if (res.status === 404) throw new Error(`матч не найден в Henrik API (${message})`);
     throw new Error(`Henrik API ${res.status} на ${path}: ${message}`);
   }
   return json.data;
 }
 
 /** Full match details (Henrik v4 shape: metadata/players/teams/rounds/kills). */
-export function fetchMatch(matchId) {
-  return henrikGet(`/valorant/v4/match/${config.henrikRegion}/${encodeURIComponent(matchId)}`);
+export async function fetchMatch(matchId) {
+  try {
+    return await henrikGet(`/valorant/v4/match/${config.henrikRegion}/${encodeURIComponent(matchId)}`);
+  } catch (err) {
+    if (/ 404 /.test(err.message)) throw new Error(`матч ${matchId} не найден в Henrik API`);
+    throw err;
+  }
 }
 
 /**

@@ -17,9 +17,9 @@ export const config = {
   // HenrikDev VALORANT API — where match data comes from (see henrikClient.js).
   henrikApiKey: process.env.HENRIK_API_KEY || null,
   henrikRegion: process.env.HENRIK_REGION || 'eu',
-  // Our Premier roster's id (same UUID tracker.gg/Riot use) — the Saturday
+  // Our Premier roster's id ("Overthinkers" OVT) — the Saturday
   // poller reads this team's league-match history.
-  premierRosterId: process.env.PREMIER_ROSTER_ID || 'a5561de0-11c4-43d6-a2dc-35a7fad3322f',
+  premierRosterId: process.env.PREMIER_ROSTER_ID || 'ec384896-710f-4397-bad8-3fa8a8805e8f',
   headless: process.env.HEADLESS !== 'false',
   dataDir,
   statePath: path.join(dataDir, 'state.json'),

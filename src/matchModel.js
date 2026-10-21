@@ -113,7 +113,8 @@ async function premierTeamInfo(roster, withStandings) {
     logoUrl: roster.customization?.image ?? standing?.customization?.image ?? null,
     rank: standing?.placement?.place ?? null,
     divisionName: standing?.placement?.division ? `Див. ${standing.placement.division}` : null,
-    zoneName: standing?.placement?.conference ?? null,
+    // "EU_DACH" -> "DACH"
+    zoneName: standing?.placement?.conference?.replace(/^[A-Z]+_/, '') ?? null,
   };
 }
 
