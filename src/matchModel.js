@@ -1,9 +1,13 @@
 import { findOurTeamId } from './statsRoster.js';
 import { rankName, rankIconUrl, averageTierId } from './rankTiers.js';
+import { agentAsset, mapImageUrl } from './valorantAssets.js';
+import { fetchPremierTeam } from './henrikClient.js';
 
-function riotName(identifier) {
-  return identifier.split('#')[0];
-}
+// A death counts as traded (the "T" in KAST) if a teammate kills the killer
+// within this window — and a "multi-kill" round is one with at least this
+// many kills.
+const TRADE_WINDOW_MS = 5000;
+const MULTI_KILL_MIN = 3;
 
 function formatDuration(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60);
@@ -11,7 +15,6 @@ function formatDuration(totalSeconds) {
   return `${minutes}м ${seconds}с`;
 }
 
-// tracker.gg's queueId is a lowercase internal slug, not a display name.
 const QUEUE_LABELS = {
   competitive: 'Competitive',
   unrated: 'Unrated',
@@ -24,138 +27,209 @@ const QUEUE_LABELS = {
   snowball: 'Snowball Fight',
 };
 
-function playlistLabel(queueId) {
-  if (!queueId) return 'Кастомка';
-  return QUEUE_LABELS[queueId.toLowerCase()] ?? queueId;
+function isCustomQueue(queue) {
+  const id = (queue?.id ?? '').toLowerCase();
+  return !id || id === 'custom';
+}
+
+function playlistLabel(queue) {
+  if (isCustomQueue(queue)) return 'Кастомка';
+  return QUEUE_LABELS[queue.id.toLowerCase()] ?? queue.name ?? queue.id;
+}
+
+// Henrik's round result strings ("Elimination", "Bomb defused", "Bomb
+// detonated", "Round timer expired", ...) -> the round-icon keys the card uses.
+function roundResultKey(result) {
+  const s = (result ?? '').toLowerCase();
+  if (s.includes('defus')) return 'Defuse';
+  if (s.includes('detonat')) return 'Detonate';
+  if (s.includes('time') || s.includes('expire')) return 'Time';
+  return 'Elimination';
+}
+
+const riotIdOf = (p) => `${p.name}#${p.tag}`;
+
+/**
+ * Per-player stats Henrik doesn't hand over ready-made, derived from the kill
+ * feed: first kills/deaths, multi-kill rounds and KAST (rounds with a Kill,
+ * Assist, Survived or Traded death).
+ */
+function deriveKillStats(match) {
+  const killsByRound = new Map();
+  for (const k of match.kills) {
+    if (!killsByRound.has(k.round)) killsByRound.set(k.round, []);
+    killsByRound.get(k.round).push(k);
+  }
+
+  const stats = new Map(match.players.map((p) => [p.puuid, { firstKills: 0, firstDeaths: 0, multiKills: 0, kastRounds: 0 }]));
+  for (const { id: round } of match.rounds) {
+    const kills = [...(killsByRound.get(round) ?? [])].sort((a, b) => a.time_in_round_in_ms - b.time_in_round_in_ms);
+    if (kills.length) {
+      const first = kills[0];
+      if (stats.has(first.killer.puuid)) stats.get(first.killer.puuid).firstKills++;
+      if (stats.has(first.victim.puuid)) stats.get(first.victim.puuid).firstDeaths++;
+    }
+    for (const p of match.players) {
+      const s = stats.get(p.puuid);
+      const killCount = kills.filter((k) => k.killer.puuid === p.puuid && k.victim.team !== p.team_id).length;
+      if (killCount >= MULTI_KILL_MIN) s.multiKills++;
+      const assisted = kills.some((k) => k.assistants?.some((a) => a.puuid === p.puuid));
+      const death = kills.find((k) => k.victim.puuid === p.puuid);
+      const traded =
+        death &&
+        kills.some(
+          (k) =>
+            k.victim.puuid === death.killer.puuid &&
+            k.killer.team === p.team_id &&
+            k.time_in_round_in_ms >= death.time_in_round_in_ms &&
+            k.time_in_round_in_ms - death.time_in_round_in_ms <= TRADE_WINDOW_MS,
+        );
+      if (killCount > 0 || assisted || !death || traded) s.kastRounds++;
+    }
+  }
+  return stats;
+}
+
+// Which side a team played each round. A plant is always by the attackers
+// and a defuse by the defenders; otherwise fall back to the fixed schedule —
+// Red attacks rounds 1-12, Blue 13-24, then sides swap every overtime round.
+function attackerTeamOf(round, roundNumber) {
+  if (round.plant?.player?.team) return round.plant.player.team;
+  if (round.defuse?.player?.team) return round.defuse.player.team === 'Red' ? 'Blue' : 'Red';
+  if (roundNumber <= 12) return 'Red';
+  if (roundNumber <= 24) return 'Blue';
+  return (roundNumber - 25) % 2 === 0 ? 'Red' : 'Blue';
+}
+
+async function premierTeamInfo(roster, withStandings) {
+  if (!roster) return null;
+  const standing = withStandings && roster.id ? await fetchPremierTeam(roster.id) : null;
+  return {
+    name: roster.name,
+    logoUrl: roster.customization?.image ?? standing?.customization?.image ?? null,
+    rank: standing?.placement?.place ?? null,
+    divisionName: standing?.placement?.division ? `Див. ${standing.placement.division}` : null,
+    zoneName: standing?.placement?.conference ?? null,
+  };
 }
 
 /**
- * Turns the raw tracker.gg match payload (data.segments is a flat bag of
- * team-summary / player-summary / round-summary / loadout-* entries) into
- * the shape the scoreboard template wants.
- *
- * "Our team" is whichever side any roster member (statsRoster.js) played
- * on. If none of them is in the match it's a neutral team1-vs-team2 view
- * (whichever team appears first) — unless `requireOurTeam` is set (the
- * scheduled poller), which throws instead.
+ * Turns a Henrik v4 match into the shape the scoreboard card and the stats
+ * sheet use. "Our team" is whichever side any roster member (statsRoster.js)
+ * played on; with none of us in the match it's a neutral team1-vs-team2 view
+ * — unless `requireOurTeam` is set, which throws instead. `withStandings`
+ * also looks up each Premier team's current placement (one extra API call
+ * per team).
  */
-export function buildMatchView(raw, teamsInfo = {}, { requireOurTeam = false } = {}) {
-  const teamSummaries = raw.segments.filter((s) => s.type === 'team-summary');
-  const playerSummaries = raw.segments.filter((s) => s.type === 'player-summary');
-  const roundSummaries = raw.segments.filter((s) => s.type === 'round-summary');
+export async function buildMatchView(match, { requireOurTeam = false, withStandings = false } = {}) {
+  const { metadata } = match;
+  const roundCount = match.rounds.length;
+  const isCustom = isCustomQueue(metadata.queue);
 
-  // Custom (private lobby) matches aren't tied to any ranked queue — tracker.gg
-  // leaves queueId null for them, and TRS is meaningless (always 0) since it's
-  // computed against a queue's own rating system. MVP falls back to ACS.
-  const isCustom = !raw.metadata.queueId;
-
-  const rosterTeamId = findOurTeamId(playerSummaries);
+  const rosterTeamId = findOurTeamId(match.players.map((p) => ({ riotId: riotIdOf(p), teamId: p.team_id })));
   if (requireOurTeam && !rosterTeamId) {
-    throw new Error(`в матче нет никого из нашего состава`);
+    throw new Error('в матче нет никого из нашего состава');
   }
-  const ourTeamId = rosterTeamId ?? teamSummaries[0]?.attributes.teamId;
-  const otherTeamId = teamSummaries.map((t) => t.attributes.teamId).find((id) => id !== ourTeamId);
+  const ourTeamId = rosterTeamId ?? match.teams[0]?.team_id;
+  const otherTeamId = match.teams.map((t) => t.team_id).find((id) => id !== ourTeamId);
 
-  const toPlayer = (p) => ({
-    name: riotName(p.attributes.platformUserIdentifier),
-    agentName: p.metadata.agentName,
-    agentColor: p.metadata.agentColor,
-    agentImageUrl: p.metadata.agentImageUrl,
-    rankTierId: p.stats.rank?.metadata?.tierId ?? 0,
-    rankName: rankName(p.stats.rank?.metadata?.tierId ?? 0),
-    rankIconUrl: rankIconUrl(p.stats.rank?.metadata?.tierId ?? 0),
-    acs: Math.round(p.stats.scorePerRound?.value ?? 0),
-    kills: p.stats.kills?.value ?? 0,
-    deaths: p.stats.deaths?.value ?? 0,
-    assists: p.stats.assists?.value ?? 0,
-    plusMinus: (p.stats.kills?.value ?? 0) - (p.stats.deaths?.value ?? 0),
-    adr: Math.round(p.stats.damagePerRound?.value ?? 0),
-    ddelta: Math.round(p.stats.damageDeltaPerRound?.value ?? 0),
-    hsAccuracy: Math.round(p.stats.hsAccuracy?.value ?? 0),
-    kast: Math.round(p.stats.kast?.value ?? 0),
-    firstKills: p.stats.firstKills?.value ?? 0,
-    firstDeaths: p.stats.firstDeaths?.value ?? 0,
-    trs: Math.round(p.stats.trnPerformanceScore?.value ?? 0),
-    kdRatio: p.stats.kdRatio?.value ?? 0,
-    multiKills: p.stats.multiKills?.value ?? 0,
-    riotId: p.attributes.platformUserIdentifier,
-  });
+  const killStats = deriveKillStats(match);
+  const perRound = (value) => (roundCount ? value / roundCount : 0);
 
-  const buildTeam = (teamId) => {
-    const summary = teamSummaries.find((t) => t.attributes.teamId === teamId);
-    const players = playerSummaries
-      .filter((p) => p.metadata.teamId === teamId)
-      .map(toPlayer)
-      .sort((a, b) => b.acs - a.acs);
+  const toPlayer = async (p) => {
+    const s = p.stats;
+    const shots = s.headshots + s.bodyshots + s.legshots;
+    const ks = killStats.get(p.puuid);
+    const agent = await agentAsset(p.agent.id);
+    const tierId = p.tier?.id ?? 0;
     return {
-      roundsWon: summary?.stats.roundsWon?.value ?? 0,
-      hasWon: summary?.metadata.hasWon ?? false,
-      players,
+      name: p.name,
+      riotId: riotIdOf(p),
+      agentName: p.agent.name,
+      agentColor: agent.color,
+      agentImageUrl: agent.imageUrl,
+      rankTierId: tierId,
+      rankName: rankName(tierId),
+      rankIconUrl: rankIconUrl(tierId),
+      acs: Math.round(perRound(s.score)),
+      kills: s.kills,
+      deaths: s.deaths,
+      assists: s.assists,
+      plusMinus: s.kills - s.deaths,
+      adr: Math.round(perRound(s.damage.dealt)),
+      ddelta: Math.round(perRound(s.damage.dealt - s.damage.received)),
+      hsAccuracy: shots ? Math.round((100 * s.headshots) / shots) : 0,
+      kast: Math.round(100 * perRound(ks.kastRounds)),
+      firstKills: ks.firstKills,
+      firstDeaths: ks.firstDeaths,
+      multiKills: ks.multiKills,
+      kdRatio: Math.round((s.deaths ? s.kills / s.deaths : s.kills) * 100) / 100,
+      trs: null, // tracker.gg's own score — not available outside tracker.gg
     };
   };
 
-  const ourTeam = buildTeam(ourTeamId);
-  const theirTeam = buildTeam(otherTeamId);
+  const buildTeam = async (teamId) => {
+    const team = match.teams.find((t) => t.team_id === teamId);
+    const players = (await Promise.all(match.players.filter((p) => p.team_id === teamId).map(toPlayer))).sort(
+      (a, b) => b.acs - a.acs,
+    );
+    return {
+      roundsWon: team?.rounds?.won ?? 0,
+      hasWon: team?.won ?? false,
+      players,
+      info: await premierTeamInfo(team?.premier_roster, withStandings),
+    };
+  };
 
-  const mvp = [...ourTeam.players].sort((a, b) => (isCustom ? b.acs - a.acs : b.trs - a.trs))[0];
+  const [ourTeam, theirTeam] = await Promise.all([buildTeam(ourTeamId), buildTeam(otherTeamId)]);
+  const mvp = [...ourTeam.players].sort((a, b) => b.acs - a.acs)[0];
   const ourAvgRankTierId = averageTierId(ourTeam.players.map((p) => p.rankTierId));
   const theirAvgRankTierId = averageTierId(theirTeam.players.map((p) => p.rankTierId));
 
-  // tracker.gg's round-summary segments don't say which side a team played —
-  // that only shows up per-player, on the "player-round" segments (one per
-  // player per round, metadata.teamSide: 'attacker' | 'defender'). Any player
-  // on our team gives the same answer.
-  const ourSideByRound = new Map();
-  for (const s of raw.segments) {
-    if (s.type !== 'player-round') continue;
-    if (s.metadata.teamId === ourTeamId) {
-      ourSideByRound.set(s.attributes.round, s.metadata.teamSide);
-    }
-  }
-  const oppositeSide = (side) => (side === 'attacker' ? 'defender' : 'attacker');
-
-  const rounds = roundSummaries
-    .map((r) => {
-      const won = r.stats.winningTeam?.value === ourTeamId;
-      const ourSide = ourSideByRound.get(r.attributes.round) ?? 'attacker';
+  const rounds = [...match.rounds]
+    .sort((a, b) => a.id - b.id)
+    .map((r, i) => {
+      const roundNumber = i + 1;
+      const won = r.winning_team === ourTeamId;
+      const winnerIsAttacker = attackerTeamOf(r, roundNumber) === r.winning_team;
       return {
-        round: r.attributes.round,
+        round: roundNumber,
         won,
-        result: r.stats.roundResult?.value ?? 'Elimination',
+        result: roundResultKey(r.result),
         // Side of whichever team actually won this round — that's the row
         // the timeline renders an icon into.
-        winnerSide: won ? ourSide : oppositeSide(ourSide),
+        winnerSide: winnerIsAttacker ? 'attacker' : 'defender',
       };
-    })
-    .sort((a, b) => a.round - b.round);
+    });
 
   return {
-    matchId: raw.attributes.id,
-    playlistName: playlistLabel(raw.metadata.queueId),
+    matchId: metadata.match_id,
+    playlistName: playlistLabel(metadata.queue),
     isCustom,
-    mapName: raw.metadata.mapName,
-    mapImageUrl: raw.metadata.mapImageUrl,
-    dateStarted: raw.metadata.dateStarted,
-    durationText: formatDuration(Math.round(raw.metadata.duration / 1000)),
+    hasTrs: false,
+    mapName: metadata.map.name,
+    mapImageUrl: await mapImageUrl(metadata.map.id),
+    dateStarted: metadata.started_at,
+    durationText: formatDuration(Math.round(metadata.game_length_in_ms / 1000)),
     won: ourTeam.hasWon,
     ourScore: ourTeam.roundsWon,
     theirScore: theirTeam.roundsWon,
     ourTeam: ourTeam.players,
     ourTeamAvgRankName: rankName(ourAvgRankTierId),
     ourTeamAvgRankIconUrl: rankIconUrl(ourAvgRankTierId),
-    ourTeamName: teamsInfo.ourTeam?.name ?? 'Команда A',
-    ourTeamLogoUrl: teamsInfo.ourTeam?.logoUrl ?? null,
-    ourTeamRank: teamsInfo.ourTeam?.rank ?? null,
-    ourTeamDivision: teamsInfo.ourTeam?.divisionName ?? null,
-    ourTeamZone: teamsInfo.ourTeam?.zoneName ?? null,
+    ourTeamName: ourTeam.info?.name ?? 'Команда A',
+    ourTeamLogoUrl: ourTeam.info?.logoUrl ?? null,
+    ourTeamRank: ourTeam.info?.rank ?? null,
+    ourTeamDivision: ourTeam.info?.divisionName ?? null,
+    ourTeamZone: ourTeam.info?.zoneName ?? null,
     theirTeam: theirTeam.players,
     theirTeamAvgRankName: rankName(theirAvgRankTierId),
     theirTeamAvgRankIconUrl: rankIconUrl(theirAvgRankTierId),
-    theirTeamName: teamsInfo.theirTeam?.name ?? 'Команда B',
-    theirTeamLogoUrl: teamsInfo.theirTeam?.logoUrl ?? null,
-    theirTeamRank: teamsInfo.theirTeam?.rank ?? null,
-    theirTeamDivision: teamsInfo.theirTeam?.divisionName ?? null,
-    theirTeamZone: teamsInfo.theirTeam?.zoneName ?? null,
+    theirTeamName: theirTeam.info?.name ?? 'Команда B',
+    theirTeamLogoUrl: theirTeam.info?.logoUrl ?? null,
+    theirTeamRank: theirTeam.info?.rank ?? null,
+    theirTeamDivision: theirTeam.info?.divisionName ?? null,
+    theirTeamZone: theirTeam.info?.zoneName ?? null,
     rounds,
     mvp,
   };

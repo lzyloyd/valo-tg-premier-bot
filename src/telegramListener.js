@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 import { getBrowser } from './browser.js';
-import { fetchMatchDetail, fetchTeamStandings, openTracker } from './trackerClient.js';
+import { fetchMatch } from './henrikClient.js';
 import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
 import { sendPhotoTo, sendTextTo, sendAnimationTo, matchCaption } from './telegram.js';
@@ -56,45 +56,16 @@ async function saveOffset(offset) {
   await fs.writeFile(OFFSET_PATH, JSON.stringify({ offset }));
 }
 
-// A match to process: either a tracker.gg id the bot fetches itself, or the
-// match payload a user uploaded as a JSON file (opened from api.tracker.gg in
-// their own browser — the server's own requests there can be blocked by
-// Cloudflare). Uploads win over a link to the same match.
-function collectMatchRefs(text, uploads) {
-  const refs = new Map(uploads.map((raw) => [raw.attributes.id, { id: raw.attributes.id, raw }]));
-  for (const id of extractAllMatchIds(text)) if (!refs.has(id)) refs.set(id, { id });
-  return [...refs.values()];
-}
-
-// Uploaded payloads skip tracker.gg entirely — including the Premier team
-// lookup, which is another api.tracker.gg call — so their card falls back
-// to "Команда A/B" names. A fetched match needs a tracker.gg page first:
-// api.tracker.gg only allows fetches originating from one (CORS).
-async function loadMatch(page, ref, { withStandings = false } = {}) {
-  if (ref.raw) return { raw: ref.raw, teamsInfo: {} };
-  await openTracker(page);
-  const raw = await fetchMatchDetail(page, ref.id);
-  return { raw, teamsInfo: withStandings ? await fetchTeamStandings(page, raw) : {} };
-}
-
-// "покажи премьер матч" (Premier team standings, card pinned to "Premier"
-// whatever tracker.gg's raw queueId says), "покажи прак" (same standings
-// lookup; a custom lobby's null queueId makes buildMatchView render it as
-// "Кастомка" with no TRS on its own) and "покажи матч" (any match, no
-// standings lookup). "Our" side is whichever team a roster member played on,
-// or the first team if none of us is in the match.
-async function summarizeMatch(ref, message, { withStandings, pinPremier }) {
-  const browser = await getBrowser();
-  const page = await browser.newPage();
-  try {
-    const { raw, teamsInfo } = await loadMatch(page, ref, { withStandings });
-    const match = buildMatchView(raw, teamsInfo);
-    if (pinPremier) match.playlistName = 'Premier';
-    const png = await renderScoreboardPng(browser, match);
-    await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
-  } finally {
-    await page.close();
-  }
+// "покажи премьер матч" (Premier team standings, card pinned to "Premier"),
+// "покажи прак" (same standings lookup; a custom lobby renders as "Кастомка")
+// and "покажи матч" (any match, no standings lookup). The link is a tracker.gg
+// one, but only its match id is used — the data comes from Henrik. "Our" side
+// is whichever team a roster member played on, or the first team otherwise.
+async function summarizeMatch(matchId, message, { withStandings, pinPremier }) {
+  const match = await buildMatchView(await fetchMatch(matchId), { withStandings });
+  if (pinPremier) match.playlistName = 'Premier';
+  const png = await renderScoreboardPng(await getBrowser(), match);
+  await sendPhotoTo(message.chat.id, message.message_thread_id, matchCaption(match), png);
 }
 
 // "Резалтик, добавь в таблицу статистики следующие премьер матчи:"/"...праки:"
@@ -102,82 +73,77 @@ async function summarizeMatch(ref, message, { withStandings, pinPremier }) {
 // relevant "<Map> - <Mode>" tab of the Google Sheet, instead of rendering a
 // scoreboard. A match with none of our roster in it is rejected rather than
 // logging the other side's stats.
-async function addMatchesToStatsSheet(refs, mode, message) {
+async function addMatchesToStatsSheet(matchIds, mode, message) {
   const browser = await getBrowser();
-  const page = await browser.newPage();
   const lines = [];
-  try {
-    for (const ref of refs) {
-      const matchId = ref.id;
-      const short = matchId.slice(0, 8);
-      try {
-        const { raw } = await loadMatch(page, ref);
-        const queueId = raw.metadata.queueId?.toLowerCase() ?? null;
+  for (const matchId of matchIds) {
+    const short = matchId.slice(0, 8);
+    try {
+      const raw = await fetchMatch(matchId);
+      const queueId = raw.metadata.queue?.id?.toLowerCase() || null;
+      const isCustom = !queueId || queueId === 'custom';
 
-        // The command trusts the caller's claim about what kind of match
-        // this is (it's how the sheet decides TRS vs. no-TRS layout) — check
-        // it against tracker.gg's own record instead, so a premier link
-        // pasted into "...праки:" (or vice versa) doesn't get logged askew.
-        if (mode === 'Premier' && queueId !== 'premier') {
-          lines.push(`❌ ${short}… — это не премьер-матч (queueId: ${queueId ?? 'кастомка'}), пропущен`);
-          continue;
-        }
-        if (mode === 'Праки' && queueId !== null) {
-          lines.push(`❌ ${short}… — это не кастомка (queueId: ${queueId}), пропущен`);
-          continue;
-        }
+      // The command trusts the caller's claim about what kind of match
+      // this is (it decides which tab layout it's logged into) — check it
+      // against the match's own queue instead, so a premier link pasted
+      // into "...праки:" (or vice versa) doesn't get logged askew.
+      if (mode === 'Premier' && queueId !== 'premier') {
+        lines.push(`❌ ${short}… — это не премьер-матч (очередь: ${isCustom ? 'кастомка' : queueId}), пропущен`);
+        continue;
+      }
+      if (mode === 'Праки' && !isCustom) {
+        lines.push(`❌ ${short}… — это не кастомка (очередь: ${queueId}), пропущен`);
+        continue;
+      }
 
-        const match = buildMatchView(raw, {}, { requireOurTeam: true });
-        const { tabTitle, gameNumber, written, skipped, alreadyLogged, sheetId } = await appendMatchToStatsSheet({
+      const match = await buildMatchView(raw, { requireOurTeam: true });
+      const { tabTitle, gameNumber, written, skipped, alreadyLogged, sheetId } = await appendMatchToStatsSheet({
+        mapName: match.mapName,
+        mode,
+        players: match.ourTeam,
+        matchId,
+        matchDate: match.dateStarted,
+      });
+      if (alreadyLogged) {
+        lines.push(`↩️ ${short}… уже был записан в "${tabTitle}" (Game ${gameNumber}), пропущен`);
+        continue;
+      }
+      const skippedNote = skipped.length ? `, не найдены в таблице: ${skipped.join(', ')}` : '';
+      lines.push(`✅ ${short}… → "${tabTitle}", Game ${gameNumber} (${written.length} игроков${skippedNote})`);
+
+      // One map's Premier best-of-2 just completed — post its heatmap into
+      // the "Статистика" topic, numbered by how many maps have wrapped up
+      // so far this split.
+      if (mode === 'Premier' && gameNumber === 2) {
+        try {
+          await announceMapWeekComplete(browser, { spreadsheetId: config.statsSpreadsheetId, sheetId, tabTitle });
+          lines.push(`   📸 отправлено в топик "Статистика"`);
+        } catch (err) {
+          console.error(`[listener] failed to announce map week complete for ${tabTitle}:`, err);
+          lines.push(`   ⚠️ не удалось отправить скриншот в "Статистика": ${err.message}`);
+        }
+      }
+
+      // Every Premier map also feeds one running "overall" tab that isn't
+      // derived from the per-map tabs — it needs its own write.
+      if (mode === 'Premier') {
+        const overall = await appendMatchToStatsSheet({
           mapName: match.mapName,
           mode,
           players: match.ourTeam,
           matchId,
-          matchDate: match.dateStarted,
+          tabTitle: OVERALL_PREMIER_TAB,
         });
-        if (alreadyLogged) {
-          lines.push(`↩️ ${short}… уже был записан в "${tabTitle}" (Game ${gameNumber}), пропущен`);
-          continue;
-        }
-        const skippedNote = skipped.length ? `, не найдены в таблице: ${skipped.join(', ')}` : '';
-        lines.push(`✅ ${short}… → "${tabTitle}", Game ${gameNumber} (${written.length} игроков${skippedNote})`);
-
-        // One map's Premier best-of-2 just completed — post its heatmap into
-        // the "Статистика" topic, numbered by how many maps have wrapped up
-        // so far this split.
-        if (mode === 'Premier' && gameNumber === 2) {
-          try {
-            await announceMapWeekComplete(browser, { spreadsheetId: config.statsSpreadsheetId, sheetId, tabTitle });
-            lines.push(`   📸 отправлено в топик "Статистика"`);
-          } catch (err) {
-            console.error(`[listener] failed to announce map week complete for ${tabTitle}:`, err);
-            lines.push(`   ⚠️ не удалось отправить скриншот в "Статистика": ${err.message}`);
-          }
-        }
-
-        // Every Premier map also feeds one running "overall" tab that isn't
-        // derived from the per-map tabs — it needs its own write.
-        if (mode === 'Premier') {
-          const overall = await appendMatchToStatsSheet({
-            mapName: match.mapName,
-            mode,
-            players: match.ourTeam,
-            matchId,
-            tabTitle: OVERALL_PREMIER_TAB,
-          });
-          lines.push(
-            overall.alreadyLogged
-              ? `   ↳ уже был записан в "${OVERALL_PREMIER_TAB}" (Game ${overall.gameNumber})`
-              : `   ↳ "${OVERALL_PREMIER_TAB}", Game ${overall.gameNumber}`,
-          );
-        }
-      } catch (err) {
-        console.error(`[listener] failed to log match ${matchId} to stats sheet:`, err);
-        lines.push(`❌ ${short}… — ${err.message}`);
+        lines.push(
+          overall.alreadyLogged
+            ? `   ↳ уже был записан в "${OVERALL_PREMIER_TAB}" (Game ${overall.gameNumber})`
+            : `   ↳ "${OVERALL_PREMIER_TAB}", Game ${overall.gameNumber}`,
+        );
       }
+    } catch (err) {
+      console.error(`[listener] failed to log match ${matchId} to stats sheet:`, err);
+      lines.push(`❌ ${short}… — ${err.message}`);
     }
-  } finally {
-    await page.close();
   }
   await sendTextTo(message.chat.id, message.message_thread_id, lines.join('\n'));
 }
@@ -225,33 +191,9 @@ function healthcheckReply() {
   return `✅ На связи, вижу сообщения. Аптайм процесса: ${uptimeMin} мин.`;
 }
 
-const NEED_MATCH = 'Нужна ссылка на матч tracker.gg или JSON-файл матча.';
+const NEED_MATCH = 'Нужна ссылка на матч tracker.gg.';
 
-// A match JSON the user saved from api.tracker.gg/.../matches/<id> in their
-// own browser and attached to the command (Bot API downloads cap at 20 MB;
-// a match is ~1-2 MB).
-async function downloadMatchFiles(documents) {
-  const out = [];
-  for (const doc of documents) {
-    const meta = await (await fetch(`${API_BASE}/getFile?file_id=${encodeURIComponent(doc.file_id)}`)).json();
-    if (!meta.ok) throw new Error(`не удалось скачать ${doc.file_name}: ${meta.description}`);
-    const res = await fetch(`https://api.telegram.org/file/bot${config.telegramBotToken}/${meta.result.file_path}`);
-    let json;
-    try {
-      json = JSON.parse(await res.text());
-    } catch {
-      throw new Error(`${doc.file_name} — не JSON`);
-    }
-    const data = json.data ?? json;
-    if (!data?.attributes?.id || !Array.isArray(data.segments)) {
-      throw new Error(`${doc.file_name} — это не данные матча tracker.gg`);
-    }
-    out.push(data);
-  }
-  return out;
-}
-
-async function handleCommand(commandText, message, documents = []) {
+async function handleCommand(commandText, message) {
   const trimmed = commandText.trim();
   try {
     if (HEALTHCHECK_RE.test(trimmed)) {
@@ -292,12 +234,12 @@ async function handleCommand(commandText, message, documents = []) {
           ? { withStandings: false, pinPremier: false }
           : null;
     if (matchCommand) {
-      const [ref] = collectMatchRefs(commandText, await downloadMatchFiles(documents));
-      if (!ref) {
+      const [matchId] = extractAllMatchIds(commandText);
+      if (!matchId) {
         await sendTextTo(message.chat.id, message.message_thread_id, NEED_MATCH);
         return;
       }
-      await summarizeMatch(ref, message, matchCommand);
+      await summarizeMatch(matchId, message, matchCommand);
       return;
     }
     if (SEASON_STATS_RE.test(trimmed)) {
@@ -310,13 +252,13 @@ async function handleCommand(commandText, message, documents = []) {
       return;
     }
     if (STATS_PREMIER_RE.test(trimmed) || STATS_PRACTICE_RE.test(trimmed)) {
-      const refs = collectMatchRefs(commandText, await downloadMatchFiles(documents));
-      if (refs.length === 0) {
+      const matchIds = [...new Set(extractAllMatchIds(commandText))];
+      if (matchIds.length === 0) {
         await sendTextTo(message.chat.id, message.message_thread_id, NEED_MATCH);
         return;
       }
       const mode = STATS_PREMIER_RE.test(trimmed) ? 'Premier' : 'Праки';
-      await addMatchesToStatsSheet(refs, mode, message);
+      await addMatchesToStatsSheet(matchIds, mode, message);
       return;
     }
     await sendTextTo(message.chat.id, message.message_thread_id, 'Не знаю такой команды пока.');
@@ -330,35 +272,6 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Several files sent as one album arrive as separate messages sharing a
-// media_group_id, with the caption (the command) on only one of them —
-// gather them until the album goes quiet, then handle it as one command.
-const ALBUM_SETTLE_MS = 2000;
-const pendingAlbums = new Map();
-
-function bufferAlbumPart(message) {
-  const album = pendingAlbums.get(message.media_group_id) ?? { messages: [], timer: null };
-  album.messages.push(message);
-  clearTimeout(album.timer);
-  album.timer = setTimeout(() => {
-    pendingAlbums.delete(message.media_group_id);
-    dispatch(album.messages);
-  }, ALBUM_SETTLE_MS);
-  pendingAlbums.set(message.media_group_id, album);
-}
-
-// The command is a message's text, or a file's caption; attached .json files
-// ride along as match payloads.
-function dispatch(messages) {
-  const head = messages.find((m) => m.text ?? m.caption);
-  const text = head?.text ?? head?.caption;
-  if (!text) return;
-  const triggerMatch = TRIGGER.exec(text);
-  if (!triggerMatch) return;
-  const commandText = text.slice(triggerMatch[0].length).trim();
-  const documents = messages.map((m) => m.document).filter((d) => d && /\.json$/i.test(d.file_name ?? ''));
-  handleCommand(commandText, head, documents).catch((err) => console.error('[listener] unhandled command error:', err));
-}
 
 /**
  * Long-polls Telegram for new messages and reacts to ones addressed to the
@@ -388,10 +301,14 @@ export async function runTelegramListener() {
 
     for (const update of updates) {
       offset = update.update_id + 1;
-      const message = update.message;
-      if (!message) continue;
-      if (message.media_group_id) bufferAlbumPart(message);
-      else dispatch([message]);
+      const text = update.message?.text;
+      if (!text) continue;
+      const triggerMatch = TRIGGER.exec(text);
+      if (!triggerMatch) continue;
+      const commandText = text.slice(triggerMatch[0].length).trim();
+      handleCommand(commandText, update.message).catch((err) =>
+        console.error('[listener] unhandled command error:', err),
+      );
     }
 
     if (updates.length > 0) await saveOffset(offset);

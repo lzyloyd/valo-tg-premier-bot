@@ -1,5 +1,5 @@
 import { getBrowser, closeBrowser } from '../src/browser.js';
-import { openTracker, fetchMatchDetail, fetchTeamStandings } from '../src/trackerClient.js';
+import { fetchMatch } from '../src/henrikClient.js';
 import { buildMatchView } from '../src/matchModel.js';
 import { renderScoreboardPng } from '../src/render/renderCard.js';
 import { sendMatchReport } from '../src/telegram.js';
@@ -14,17 +14,12 @@ if (!matchId) {
   process.exit(1);
 }
 
-const browser = await getBrowser();
-const page = await browser.newPage();
 try {
-  await openTracker(page);
-  const raw = await fetchMatchDetail(page, matchId);
-  const teamsInfo = await fetchTeamStandings(page, raw);
-  const match = buildMatchView(raw, teamsInfo);
-  const png = await renderScoreboardPng(browser, match);
+  const match = await buildMatchView(await fetchMatch(matchId), { withStandings: true });
+  match.playlistName = 'Premier';
+  const png = await renderScoreboardPng(await getBrowser(), match);
   await sendMatchReport(match, png);
   console.log('sent to', config.telegramChatId, config.telegramMessageThreadId);
 } finally {
-  await page.close();
   await closeBrowser();
 }

@@ -1,25 +1,11 @@
-import { getBrowser, closeBrowser } from '../src/browser.js';
-import { fetchRecentMatches } from '../src/trackerClient.js';
+import { fetchPremierHistory } from '../src/henrikClient.js';
 import { loadSeenMatchIds } from '../src/state.js';
 
-// Read-only dry run of the poller's own new-match check — shows exactly what
-// the next scheduled poll would post, without sending anything or touching
-// the seen-matches state. Safe to run any time, as often as you like.
-const browser = await getBrowser();
-const page = await browser.newPage();
-try {
-  const seen = await loadSeenMatchIds();
-  const recentMatches = await fetchRecentMatches(page);
-  const newMatches = recentMatches.filter((m) => !seen.has(m.id));
-
-  console.log(`${recentMatches.length} matches on profile, ${seen.size} already marked seen.`);
-  if (newMatches.length === 0) {
-    console.log('Nothing new — next scheduled poll would post 0 matches.');
-  } else {
-    console.log(`Next scheduled poll would post ${newMatches.length} match(es):`);
-    console.log(newMatches.map((m) => `  ${m.id}  ${m.mapName}  ${m.timestamp}`).join('\n'));
-  }
-} finally {
-  await page.close();
-  await closeBrowser();
-}
+// Read-only dry run of the poller's own new-match check — lists the team's
+// Premier matches and which ones the next poll would treat as unseen (the
+// poller itself additionally ignores anything older than 3 days). Posts
+// nothing, touches no state.
+const seen = await loadSeenMatchIds();
+const history = await fetchPremierHistory();
+console.log(`${history.length} Premier matches in the team's history, ${seen.size} ids marked seen.`);
+for (const m of history.slice(-10)) console.log(`  ${seen.has(m.id) ? 'seen' : 'NEW '}  ${m.id}  ${m.startedAt}`);

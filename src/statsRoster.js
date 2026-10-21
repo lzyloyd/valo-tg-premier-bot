@@ -19,7 +19,7 @@ export const ROSTER = [
 ];
 
 // The team's current Riot IDs — the one source of truth for "which side is
-// ours" in a match and whose profiles the Premier poller checks.
+// ours" in a match.
 export const TEAM_RIOT_IDS = ROSTER.map((r) => r.riotId);
 
 /** "Name#tag" -> "Name" — how players are labelled in the sheet. */
@@ -42,9 +42,8 @@ export const LABEL_TO_RIOT_ID = new Map(
   ),
 );
 
-/** The teamId of the side any of our roster members played on, or null. */
-export function findOurTeamId(playerSummaries) {
+/** The teamId of the side any of our roster members played on, or null. Players: [{ riotId, teamId }]. */
+export function findOurTeamId(players) {
   const ours = new Set(TEAM_RIOT_IDS.map((id) => id.toLowerCase()));
-  const member = playerSummaries.find((p) => ours.has(p.attributes.platformUserIdentifier.toLowerCase()));
-  return member?.metadata.teamId ?? null;
+  return players.find((p) => ours.has(p.riotId.toLowerCase()))?.teamId ?? null;
 }

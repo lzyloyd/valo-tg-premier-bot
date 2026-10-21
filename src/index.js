@@ -13,7 +13,7 @@ if (once) {
   await closeBrowser();
   process.exit(0);
 } else {
-  console.log('[index] tg-results-bot started. Polling tracker.gg only Saturdays at 21:00 and 23:00 MSK.');
+  console.log('[index] tg-results-bot started. Polling Premier matches only Saturdays at 21:00 and 23:00 MSK.');
   scheduleNext(runPollCycle);
   if (config.scheduleChatId && config.scheduleThreadId) {
     scheduleWeeklyReset(resetWeekAndAnnounce);

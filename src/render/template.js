@@ -135,15 +135,15 @@ function trsRatingIconUrl(trs) {
   return `https://trackercdn.com/cdn/tracker.gg/img/tracker-score/trn-rating-${tier}.svg`;
 }
 
-function playerRow(p, isCustom) {
-  const trsCells = isCustom
+function playerRow(p, noTrs) {
+  const trsCells = noTrs
     ? ''
     : `
       <div class="sb-trs-badge"><img src="${trsRatingIconUrl(p.trs)}" alt="" /></div>
       <div class="sb-trs">${p.trs}</div>
       <div></div>`;
   return `
-    <div class="sb-row${isCustom ? ' no-trs' : ''}">
+    <div class="sb-row${noTrs ? ' no-trs' : ''}">
       <div class="sb-avatar-wrap">
         <img class="sb-avatar" src="${escapeHtml(p.agentImageUrl)}" style="background:${escapeHtml(p.agentColor)}" alt="" />
         <img class="sb-rank-badge" src="${escapeHtml(p.rankIconUrl)}" title="${escapeHtml(p.rankName)}" alt="" />
@@ -163,11 +163,11 @@ function playerRow(p, isCustom) {
     </div>`;
 }
 
-function teamBlock({ side, teamName, logoUrl, rank, divisionName, zoneName, players, avgRankName, avgRankIconUrl, isCustom }) {
+function teamBlock({ side, teamName, logoUrl, rank, divisionName, zoneName, players, avgRankName, avgRankIconUrl, noTrs }) {
   const standing = rank
     ? `#${rank}${divisionName ? ` · ${escapeHtml(divisionName)}` : ''}${zoneName ? ` · ${escapeHtml(zoneName)}` : ''}`
     : '';
-  const trsHeaderCells = isCustom ? '' : '<span></span><span class="sb-trs">TRS</span><span></span>';
+  const trsHeaderCells = noTrs ? '' : '<span></span><span class="sb-trs">TRS</span><span></span>';
   return `
     <div class="sb-team ${side}">
       <div class="sb-team-label">
@@ -186,18 +186,17 @@ function teamBlock({ side, teamName, logoUrl, rank, divisionName, zoneName, play
           <img src="${escapeHtml(avgRankIconUrl)}" alt="" />
         </div>
       </div>
-      <div class="sb-row sb-hd${isCustom ? ' no-trs' : ''}"><span></span><span>Игрок</span>${trsHeaderCells}<span class="sb-acs">ACS</span><span class="sb-num">K</span><span class="sb-num">D</span><span class="sb-num">A</span><span class="sb-num">+/-</span><span class="sb-num">ADR</span><span class="sb-num">DDΔ</span><span class="sb-num">HS%</span><span class="sb-num">KAST</span><span class="sb-num">FK</span><span class="sb-num">FD</span></div>
-      ${players.map((p) => playerRow(p, isCustom)).join('')}
+      <div class="sb-row sb-hd${noTrs ? ' no-trs' : ''}"><span></span><span>Игрок</span>${trsHeaderCells}<span class="sb-acs">ACS</span><span class="sb-num">K</span><span class="sb-num">D</span><span class="sb-num">A</span><span class="sb-num">+/-</span><span class="sb-num">ADR</span><span class="sb-num">DDΔ</span><span class="sb-num">HS%</span><span class="sb-num">KAST</span><span class="sb-num">FK</span><span class="sb-num">FD</span></div>
+      ${players.map((p) => playerRow(p, noTrs)).join('')}
     </div>`;
 }
 
-function mvpBlock(mvp, isCustom) {
-  // Custom matches don't have a meaningful TRS (always 0, no ranked queue to
-  // score it against) — MVP is picked by ACS instead, and shown as the
-  // headline stat instead of repeating it in the sub-line too.
-  const statValue = isCustom ? mvp.acs : mvp.trs;
-  const statLabel = isCustom ? 'ACS' : 'TRS';
-  const subLine = isCustom
+function mvpBlock(mvp, noTrs) {
+  // Without TRS (tracker.gg-only; match data now comes from Henrik) the MVP
+  // is picked by ACS, shown as the headline stat instead of in the sub-line.
+  const statValue = noTrs ? mvp.acs : mvp.trs;
+  const statLabel = noTrs ? 'ACS' : 'TRS';
+  const subLine = noTrs
     ? `${escapeHtml(mvp.agentName)} · ${mvp.kills}/${mvp.deaths}/${mvp.assists} · KAST ${mvp.kast}%`
     : `${escapeHtml(mvp.agentName)} · ACS ${mvp.acs} · ${mvp.kills}/${mvp.deaths}/${mvp.assists} · KAST ${mvp.kast}%`;
   return `
@@ -311,7 +310,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
     players: match.ourTeam,
     avgRankName: match.ourTeamAvgRankName,
     avgRankIconUrl: match.ourTeamAvgRankIconUrl,
-    isCustom: match.isCustom,
+    noTrs: !match.hasTrs,
   })}
   ${teamBlock({
     side: match.won ? 'loser' : 'winner',
@@ -323,9 +322,9 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
     players: match.theirTeam,
     avgRankName: match.theirTeamAvgRankName,
     avgRankIconUrl: match.theirTeamAvgRankIconUrl,
-    isCustom: match.isCustom,
+    noTrs: !match.hasTrs,
   })}
-  ${mvpBlock(match.mvp, match.isCustom)}
+  ${mvpBlock(match.mvp, !match.hasTrs)}
 </div>
 </body></html>`;
 }

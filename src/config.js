@@ -14,6 +14,12 @@ export const config = {
   telegramChatId: required('TELEGRAM_CHAT_ID'),
   // Only needed when posting into one topic of a forum-mode supergroup.
   telegramMessageThreadId: process.env.TELEGRAM_MESSAGE_THREAD_ID || null,
+  // HenrikDev VALORANT API — where match data comes from (see henrikClient.js).
+  henrikApiKey: process.env.HENRIK_API_KEY || null,
+  henrikRegion: process.env.HENRIK_REGION || 'eu',
+  // Our Premier roster's id (same UUID tracker.gg/Riot use) — the Saturday
+  // poller reads this team's league-match history.
+  premierRosterId: process.env.PREMIER_ROSTER_ID || 'a5561de0-11c4-43d6-a2dc-35a7fad3322f',
   headless: process.env.HEADLESS !== 'false',
   dataDir,
   statePath: path.join(dataDir, 'state.json'),

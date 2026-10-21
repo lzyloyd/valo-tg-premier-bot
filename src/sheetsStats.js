@@ -134,7 +134,7 @@ async function formatGameColumn(spreadsheetId, sheetId, colIndex, matchId) {
 
 function valueForStatKey(p, key) {
   switch (key) {
-    case 'trs': return p.trs;
+    case 'trs': return p.trs ?? ''; // null since match data moved off tracker.gg
     case 'acs': return p.acs;
     case 'kills': return p.kills;
     case 'deaths': return p.deaths;
@@ -414,8 +414,13 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
     // (idempotent: re-writing an already-live formula is harmless).
     const playerIndex = (anchorRow - ANCHOR_FIRST_ROW) / BLOCK_SIZE;
     const t1Row = TABLE1_FIRST_ROW + playerIndex;
+    // No TRS to average (tracker.gg-only stat) — keep its heatmap cells at "-"
+    // instead of an AVERAGE over empty cells, which would show #DIV/0!.
+    const noTrs = p.trs == null;
     const t1Values = layout.table1Columns.map((_, k) =>
-      averageFormula(layout.firstGameColumn, anchorRow + k + layout.firstStatOffset, endColLetter),
+      noTrs && layout.statRows[k + layout.firstStatOffset] === 'trs'
+        ? '-'
+        : averageFormula(layout.firstGameColumn, anchorRow + k + layout.firstStatOffset, endColLetter),
     );
     data.push({
       range: `'${tabTitle}'!${layout.table1Columns[0]}${t1Row}:${layout.table1Columns[layout.table1Columns.length - 1]}${t1Row}`,
@@ -424,7 +429,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
 
     const t2Row = TABLE2_FIRST_ROW + playerIndex;
     const t2Values = layout.table2Stats.map((key) =>
-      averageFormula(layout.firstGameColumn, anchorRow + statOffset(mode, key), endColLetter),
+      noTrs && key === 'trs' ? '-' : averageFormula(layout.firstGameColumn, anchorRow + statOffset(mode, key), endColLetter),
     );
     data.push({
       range: `'${tabTitle}'!${layout.table2Columns[0]}${t2Row}:${layout.table2Columns[layout.table2Columns.length - 1]}${t2Row}`,

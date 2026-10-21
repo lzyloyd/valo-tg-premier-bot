@@ -1,34 +1,26 @@
+import fs from 'node:fs';
 import { getBrowser, closeBrowser } from '../src/browser.js';
-import { openTracker, fetchMatchDetail, fetchTeamStandings } from '../src/trackerClient.js';
+import { fetchMatch } from '../src/henrikClient.js';
 import { buildMatchView } from '../src/matchModel.js';
 import { renderScoreboardPng } from '../src/render/renderCard.js';
-import { config } from '../src/config.js';
-import fs from 'node:fs';
 
-// Exercises the exact same code path as poller.js's runPollCycle (matchModel's
-// tracked-player branch), but renders to a local file instead of posting to
-// the team chat — for verifying the poller still works after a matchModel.js
-// change, without spamming the group.
+// Same path as poller.js's runPollCycle, but renders to a local file instead
+// of posting to the team chat.
+//   node scripts/debug-poller-once.mjs <matchId> [out.png]
 const matchId = process.argv[2];
+const outPath = process.argv[3] || '/tmp/debug-poller-once.png';
 if (!matchId) {
-  console.error('usage: node scripts/debug-poller-once.mjs <matchId>');
+  console.error('usage: node scripts/debug-poller-once.mjs <matchId> [out.png]');
   process.exit(1);
 }
 
-const browser = await getBrowser();
-const page = await browser.newPage();
 try {
-  await openTracker(page);
-  const raw = await fetchMatchDetail(page, matchId);
-  const teamsInfo = await fetchTeamStandings(page, raw);
-  const match = buildMatchView(raw, teamsInfo);
+  const match = await buildMatchView(await fetchMatch(matchId), { withStandings: true });
   match.playlistName = 'Premier';
   console.log('ourTeamName:', match.ourTeamName, '| theirTeamName:', match.theirTeamName);
   console.log('score:', match.ourScore, '-', match.theirScore, '| won:', match.won);
-  const png = await renderScoreboardPng(browser, match);
-  fs.writeFileSync('/tmp/debug-poller-once.png', png);
-  console.log('OK — rendered to /tmp/debug-poller-once.png');
+  fs.writeFileSync(outPath, await renderScoreboardPng(await getBrowser(), match));
+  console.log(`OK — rendered to ${outPath}`);
 } finally {
-  await page.close();
   await closeBrowser();
 }
