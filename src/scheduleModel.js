@@ -4,8 +4,8 @@ export const ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'kitkatfn', 'bonrik1',
 
 // The 5 starters and their substitutes — who actually plays a session is resolved
 // from these, not from raw availability (see resolveLineup below).
-export const MAIN_ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'kitkatfn', 'lzyloyd'];
-export const SUB_ROSTER = ['bonrik1', 'mania_boo']; // First available substitute wins priority.
+export const MAIN_ROSTER = ['qu1ly', 'toshir0000', 'bonrik1', 'kitkatfn', 'lzyloyd'];
+export const SUB_ROSTER = ['men4ikcs', 'mania_boo']; // First available substitute wins priority.
 
 export const QUORUM = 5;
 
