@@ -178,7 +178,8 @@ function perfBadge({ letter, color }) {
 function playerRow(p, showPerf) {
   // Riot's own per-player performance score (0-500), only in matches that
   // carry it (ranked games do, customs don't) — sits where TRS used to:
-  // a tier badge, then the number over a 0-500 bar in the tier's color.
+  // a tier badge, then the number (on the row's baseline like every other
+  // stat) with a 0-500 bar in the tier's color hanging just below it.
   let perfCells = '';
   if (showPerf) {
     const tier = p.perf == null ? null : perfTier(p.perf);
@@ -315,8 +316,8 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-name{font-family:'Manrope',sans-serif;font-weight:700;color:#e8ecf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sb-trs-badge{display:flex;align-items:center;justify-content:center;}
 .sb-trs-badge svg{width:22px;height:22px;display:block;}
-.sb-perf{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.sb-perf-bar{display:block;width:38px;height:3px;border-radius:2px;background:#232d3a;overflow:hidden;}
+.sb-perf{position:relative;text-align:center;}
+.sb-perf-bar{position:absolute;left:50%;transform:translateX(-50%);bottom:-8px;display:block;width:38px;height:3px;border-radius:2px;background:#232d3a;overflow:hidden;}
 .sb-perf-bar>span{display:block;height:100%;border-radius:2px;}
 .sb-trs{font-weight:800;color:#eef2f6;text-align:center;font-variant-numeric:tabular-nums;}
 .sb-acs{font-weight:800;color:#eef2f6;text-align:center;font-variant-numeric:tabular-nums;}
