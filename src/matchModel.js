@@ -1,7 +1,7 @@
 import { findOurTeamId } from './statsRoster.js';
 import { rankName, rankIconUrl, averageTierId } from './rankTiers.js';
 import { agentAsset, mapImageUrl } from './valorantAssets.js';
-import { fetchPremierTeam, fetchPremierTeamByPlayer, fetchCurrentTier } from './henrikClient.js';
+import { fetchPremierTeam, fetchPremierTeamV2, fetchPremierTeamByPlayer, fetchCurrentTier } from './henrikClient.js';
 
 // A death counts as traded (the "T" in KAST) if a teammate kills the killer
 // within this window — and a "multi-kill" round is one with at least this
@@ -138,10 +138,12 @@ async function findPremierTeamByPlayers(players) {
   return null;
 }
 
+// The current season's placement — only for a team actually enrolled in it;
+// an unenrolled team still reports a provisional placeholder division.
 function currentSeasonPlacement(teamV2) {
-  const seasons = teamV2?.seasons ?? [];
-  const currentId = typeof teamV2?.current_season === 'string' ? teamV2.current_season : teamV2?.current_season?.id;
-  return (seasons.find((s) => s.id === currentId) ?? seasons.at(-1))?.placement ?? null;
+  const season = teamV2?.current_season;
+  if (!season?.enrolled || season.placement?.is_provisional) return null;
+  return season.placement ?? null;
 }
 
 /**
@@ -155,8 +157,10 @@ async function premierTeamInfo(players, roster, withStandings) {
   let byPlayers = roster ? null : await findPremierTeamByPlayers(players);
   const id = roster?.id ?? byPlayers?.id;
   if (!id) return null;
+  // v1 knows the league place but doesn't resolve every team; v2 resolves
+  // them but only has division/conference.
   const standing = await fetchPremierTeam(id);
-  if (!standing?.placement) byPlayers ??= await findPremierTeamByPlayers(players);
+  if (!standing?.placement) byPlayers ??= await fetchPremierTeamV2(id);
   const placement = standing?.placement ?? currentSeasonPlacement(byPlayers);
   return {
     name: (roster?.name ?? byPlayers?.name ?? standing?.name ?? '').trim() || null,

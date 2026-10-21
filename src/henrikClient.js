@@ -101,6 +101,16 @@ export async function fetchPremierTeamByPlayer(puuid) {
   return team;
 }
 
+/** A Premier team by roster id (v2 shape, as fetchPremierTeamByPlayer) — resolves teams v1 can't. */
+export async function fetchPremierTeamV2(rosterId) {
+  try {
+    return await henrikGet(`/valorant/v2/premier/teams/${config.henrikRegion}/${encodeURIComponent(rosterId)}`);
+  } catch (err) {
+    if (!/ 404 /.test(err.message)) console.error(`[henrik] premier team (v2) lookup failed for ${rosterId}:`, err.message);
+    return null;
+  }
+}
+
 /** A Premier roster's current standing (placement + crest), or null if unavailable. */
 export async function fetchPremierTeam(rosterId) {
   const path = `/valorant/v1/premier/${encodeURIComponent(rosterId)}`;

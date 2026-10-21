@@ -1,3 +1,41 @@
+// A Premier crest from Henrik's CDN comes pre-colored but with its whole
+// background filled by the team's tertiary color. Its bare template (same
+// URL without the query) is transparent, with placeholder channels — red =
+// primary, green = secondary, blue = tertiary — so the card loads that and
+// recolors it with an SVG color matrix instead. Any other URL is used as-is.
+function crest(url) {
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return { src: url, filterId: null, filterDef: '' };
+  }
+  const colors = ['primary', 'secondary', 'tertiary'].map((k) => parsed.searchParams.get(k));
+  if (!parsed.hostname.endsWith('henrikdev.xyz') || colors.some((c) => !/^[0-9a-f]{6}$/i.test(c ?? ''))) {
+    return { src: url, filterId: null, filterDef: '' };
+  }
+  const [P, S, T] = colors.map((hex) => [0, 2, 4].map((i) => (parseInt(hex.slice(i, i + 2), 16) / 255).toFixed(4)));
+  const filterId = `crest-${colors.join('')}`;
+  const matrix = `${[0, 1, 2].map((c) => `${P[c]} ${S[c]} ${T[c]} 0 0`).join(' ')} 0 0 0 1 0`;
+  return {
+    src: `${parsed.origin}${parsed.pathname}`,
+    filterId,
+    filterDef: `<filter id="${filterId}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="${matrix}"/></filter>`,
+  };
+}
+
+function logoImg(url, className) {
+  if (!url) return '';
+  const { src, filterId } = crest(url);
+  const style = filterId ? ` style="filter:url(#${filterId})"` : '';
+  return `<img${className ? ` class="${className}"` : ''} src="${escapeHtml(src)}"${style} alt="" />`;
+}
+
+function crestFilterDefs(...urls) {
+  const defs = [...new Set(urls.filter(Boolean).map((u) => crest(u).filterDef).filter(Boolean))].join('');
+  return defs ? `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${defs}</defs></svg>` : '';
+}
+
 function escapeHtml(str) {
   return String(str)
     .replaceAll('&', '&amp;')
@@ -98,7 +136,7 @@ function roundsStrip(match) {
 
   const teamLabel = (name, logoUrl, row) => `
     <div class="sb-rounds-team" style="grid-column:1;grid-row:${row}">
-      ${logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="" />` : ''}
+      ${logoImg(logoUrl, '')}
       <span>${escapeHtml(name)}</span>
     </div>`;
 
@@ -164,15 +202,14 @@ function playerRow(p, noTrs) {
 }
 
 function teamBlock({ side, teamName, logoUrl, rank, divisionName, zoneName, players, avgRankName, avgRankIconUrl, noTrs }) {
-  const standing = rank
-    ? `#${rank}${divisionName ? ` · ${escapeHtml(divisionName)}` : ''}${zoneName ? ` · ${escapeHtml(zoneName)}` : ''}`
-    : '';
+  // "#51 · Contender · DACH" — any part may be missing (e.g. no known place).
+  const standing = [rank ? `#${rank}` : null, divisionName, zoneName].filter(Boolean).map(escapeHtml).join(' · ');
   const trsHeaderCells = noTrs ? '' : '<span></span><span class="sb-trs">TRS</span><span></span>';
   return `
     <div class="sb-team ${side}">
       <div class="sb-team-label">
         <div class="sb-team-identity">
-          ${logoUrl ? `<img class="sb-team-logo" src="${escapeHtml(logoUrl)}" alt="" />` : ''}
+          ${logoImg(logoUrl, 'sb-team-logo')}
           <div class="sb-team-name-wrap">
             <div class="sb-team-name">${escapeHtml(teamName)}</div>
             ${standing ? `<div class="sb-team-standing">${standing}</div>` : ''}
@@ -241,7 +278,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-score .b{color:#c3ccd8}
 .sb-rounds{display:grid;row-gap:8px;column-gap:4px;align-items:center;padding:16px 22px;border-bottom:1px solid #232d3a;overflow-x:auto;}
 .sb-rounds-team{display:flex;align-items:center;gap:8px;min-width:0;padding-right:10px;}
-.sb-rounds-team img{width:20px;height:20px;border-radius:4px;object-fit:contain;flex-shrink:0;}
+.sb-rounds-team img{width:20px;height:20px;object-fit:contain;flex-shrink:0;}
 .sb-rounds-team span{font-size:12px;font-weight:700;color:#c9d4e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sb-round-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;}
 .sb-round-cell img{width:88%;height:88%;object-fit:contain;}
@@ -253,7 +290,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 .sb-team.loser{border-left-color:#ff4655;}
 .sb-team-label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px 12px;}
 .sb-team-identity{display:flex;align-items:center;gap:12px;min-width:0;}
-.sb-team-logo{width:38px;height:38px;border-radius:8px;object-fit:contain;flex-shrink:0;}
+.sb-team-logo{width:38px;height:38px;object-fit:contain;flex-shrink:0;}
 .sb-team-name-wrap{min-width:0;}
 .sb-team-name{font-size:17px;font-weight:800;color:#eef2f6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sb-team-standing{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;}
@@ -289,6 +326,7 @@ body{background:#0e1621;font-family:'Manrope',sans-serif;}
 </style></head>
 <body>
 <div id="card">
+  ${crestFilterDefs(match.ourTeamLogoUrl, match.theirTeamLogoUrl)}
   <div class="sb-head" style="background-image:linear-gradient(180deg, rgba(14,22,33,.55), rgba(14,22,33,.94)), url('${escapeHtml(match.mapImageUrl)}')">
     <div>
       <div class="sb-map">${escapeHtml(match.mapName)}</div>
