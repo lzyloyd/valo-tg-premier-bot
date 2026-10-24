@@ -78,12 +78,13 @@ export function weekResetInstant(weekStart) {
   return new Date(weekStart.getTime() + 6 * DAY_MS + 20 * 60 * 60 * 1000);
 }
 
-// Filling closes Sunday 24:00 MSK = Monday 00:00, before the first playing day.
+// Filling closes Monday 14:00 MSK — still well before that day's first
+// session (20:00).
 export function weekDeadline(weekStart) {
-  return weekStart;
+  return new Date(weekStart.getTime() + 14 * 60 * 60 * 1000);
 }
 
-// Sunday 20:00 MSK — 4 hours before the deadline, also the week opening.
+// Monday 10:00 MSK — 4 hours before the deadline.
 export function reminderInstant(weekStart) {
   return new Date(weekDeadline(weekStart).getTime() - 4 * 60 * 60 * 1000);
 }
@@ -104,7 +105,7 @@ export function nextReminderInstant(now = new Date()) {
   return nextOccurrence(now, reminderInstant);
 }
 
-// The deadline itself (Sunday 24:00 MSK = Monday 00:00 MSK) — when
+// The deadline itself (Monday 14:00 MSK) — when
 // submissions close, the automatic summary goes out unprompted.
 export function nextDeadlineInstant(now = new Date()) {
   return nextOccurrence(now, weekDeadline);

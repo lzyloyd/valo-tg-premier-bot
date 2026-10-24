@@ -33,16 +33,16 @@ assert.deepEqual(weekDayDates(start).map(d => d.dateIso), [
   '2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15',
   '2026-10-16', '2026-10-17', '2026-10-18',
 ]);
-assert.equal(weekDeadline(start).toISOString(), '2026-10-11T21:00:00.000Z');
-assert.equal(reminderInstant(start).toISOString(), '2026-10-11T17:00:00.000Z');
+assert.equal(weekDeadline(start).toISOString(), '2026-10-12T11:00:00.000Z'); // Mon 14:00 MSK
+assert.equal(reminderInstant(start).toISOString(), '2026-10-12T07:00:00.000Z'); // Mon 10:00 MSK
 assert.equal(weekResetInstant(start).toISOString(), '2026-10-18T17:00:00.000Z');
 assert.equal(mskIsoDate(currentWeekStart(new Date('2026-10-18T16:59:59Z'))), '2026-10-12');
 assert.equal(mskIsoDate(currentWeekStart(new Date('2026-10-18T17:00:00Z'))), '2026-10-19');
 assert.equal(nextResetInstant(new Date('2026-10-18T17:00:00Z')).toISOString(), '2026-10-25T17:00:00.000Z');
-assert.equal(nextReminderInstant(new Date('2026-10-11T16:59:59Z')).toISOString(), '2026-10-11T17:00:00.000Z');
-assert.equal(nextReminderInstant(new Date('2026-10-11T17:00:00Z')).toISOString(), '2026-10-18T17:00:00.000Z');
-assert.equal(nextDeadlineInstant(new Date('2026-10-11T17:00:00Z')).toISOString(), '2026-10-11T21:00:00.000Z');
-assert.equal(nextDeadlineInstant(new Date('2026-10-11T21:00:00Z')).toISOString(), '2026-10-18T21:00:00.000Z');
+assert.equal(nextReminderInstant(new Date('2026-10-11T16:59:59Z')).toISOString(), '2026-10-12T07:00:00.000Z');
+assert.equal(nextReminderInstant(new Date('2026-10-12T07:00:00Z')).toISOString(), '2026-10-19T07:00:00.000Z');
+assert.equal(nextDeadlineInstant(new Date('2026-10-11T17:00:00Z')).toISOString(), '2026-10-12T11:00:00.000Z');
+assert.equal(nextDeadlineInstant(new Date('2026-10-12T11:00:00Z')).toISOString(), '2026-10-19T11:00:00.000Z');
 assert.equal(slotInstant(start, 'mon', '20:00').toISOString(), '2026-10-12T17:00:00.000Z');
 assert.equal(slotInstant(start, 'sat', '22:00').toISOString(), '2026-10-17T19:00:00.000Z');
 
@@ -77,7 +77,8 @@ try {
   assert.equal(migrated.weekStart, '2026-10-12');
   assert.deepEqual(migrated.responses, responses);
   assert.equal(migrated.summaryMessageId, 123);
-  const result = await setResponse(MAIN_ROSTER[0], 'mon', 'no', [], now);
+  assert(!(await setResponse(MAIN_ROSTER[1], 'mon', 'no', [], new Date('2026-10-12T10:59:00Z'))).isPostDeadlineEdit); // Mon 13:59 MSK
+  const result = await setResponse(MAIN_ROSTER[0], 'mon', 'no', [], new Date('2026-10-12T11:01:00Z')); // Mon 14:01 MSK
   assert(result.isPostDeadlineEdit);
   await fs.writeFile(config.attendanceDataPath, JSON.stringify({ qu1ly: { count: 1, history: [{ weekStart: '2026-10-13', dayKey: 'tue', slot: '20:00', dateIso: '2026-10-13' }] } }));
   assert.equal(await recordMiss('qu1ly', '2026-10-12', 'tue', '20:00', { dateIso: '2026-10-13' }), null);
@@ -88,4 +89,4 @@ try {
   Object.assign(config, oldPaths);
   await fs.rm(dir, { recursive: true, force: true });
 }
-console.log('PASS: Monday sessions, 7-day calendar, Sunday deadlines and rollover, preserved answers, attendance deduplication.');
+console.log('PASS: Monday sessions, 7-day calendar, Monday 14:00 deadline, Sunday rollover, preserved answers, attendance deduplication.');

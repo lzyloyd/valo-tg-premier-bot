@@ -97,11 +97,11 @@ export async function resetWeekAndAnnounce() {
   await sendTextTo(
     config.scheduleChatId,
     config.scheduleThreadId,
-    `📅 Открыли новую неделю — осталось 4 часа, чтобы заполнить расписание в мини-аппе до воскресенья 24:00 МСК.\n${mentions}`,
+    `📅 Открыли новую неделю — заполните расписание в мини-аппе до понедельника 14:00 МСК.\n${mentions}`,
   );
 }
 
-// Manual reminder using the same Sunday deadline — only nags whoever
+// Fires Monday 10:00 MSK, 4 hours before the deadline — only nags whoever
 // hasn't finished all playing days yet, and says nothing if everyone already has.
 export async function sendDeadlineReminder() {
   const week = await loadCurrentWeek();
@@ -110,11 +110,11 @@ export async function sendDeadlineReminder() {
   await sendTextTo(
     config.scheduleChatId,
     config.scheduleThreadId,
-    `⏰ Осталось 4 часа до дедлайна (Вс 24:00 МСК) — ещё не заполнил(и) расписание: ${missing.map((u) => `@${u}`).join(', ')}`,
+    `⏰ Осталось 4 часа до дедлайна (Пн 14:00 МСК) — ещё не заполнил(и) расписание: ${missing.map((u) => `@${u}`).join(', ')}`,
   );
 }
 
-// Fires right at the deadline (Sunday 24:00 / Monday 00:00 MSK) — the same
+// Fires right at the deadline (Monday 14:00 MSK) — the same
 // summary the admin can send by hand from the app, just automatic so it
 // doesn't get missed if nobody presses the button in time. This is also the
 // point the week's lineups are considered final, so the session reminders

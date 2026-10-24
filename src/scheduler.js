@@ -61,13 +61,12 @@ export function scheduleWeeklyReset(runReset) {
   scheduleRecurring('weekly schedule reset', nextResetInstant, runReset);
 }
 
-// Sunday 20:00 MSK — 4 hours before the Monday 00:00 deadline.
-// The running bot combines this with resetWeekAndAnnounce instead.
+// Monday 10:00 MSK — 4 hours before the Monday 14:00 deadline.
 export function scheduleDeadlineReminder(runReminder) {
   scheduleRecurring('schedule deadline reminder', nextReminderInstant, runReminder);
 }
 
-// Sunday 24:00 / Monday 00:00 MSK — submissions close, the summary that
+// Monday 14:00 MSK — submissions close, the summary that
 // would otherwise need a manual button press goes out on its own.
 export function scheduleAutoSummary(runAutoSummary) {
   scheduleRecurring('schedule auto-summary', nextDeadlineInstant, runAutoSummary);

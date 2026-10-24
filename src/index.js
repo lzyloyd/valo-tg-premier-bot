@@ -1,9 +1,9 @@
 import { runPollCycle } from './poller.js';
-import { scheduleNext, scheduleWeeklyReset, scheduleAutoSummary } from './scheduler.js';
+import { scheduleNext, scheduleWeeklyReset, scheduleDeadlineReminder, scheduleAutoSummary } from './scheduler.js';
 import { runTelegramListener } from './telegramListener.js';
 import { closeBrowser } from './browser.js';
 import { startMiniAppServer } from './miniappServer.js';
-import { resetWeekAndAnnounce, sendAutoSummary, scheduleUpcomingSessionReminders } from './scheduleNotifications.js';
+import { resetWeekAndAnnounce, sendDeadlineReminder, sendAutoSummary, scheduleUpcomingSessionReminders } from './scheduleNotifications.js';
 import { config } from './config.js';
 
 const once = process.argv.includes('--once');
@@ -17,8 +17,7 @@ if (once) {
   scheduleNext(runPollCycle);
   if (config.scheduleChatId && config.scheduleThreadId) {
     scheduleWeeklyReset(resetWeekAndAnnounce);
-    // The four-hour reminder is part of the reset announcement now: both
-    // happen Sunday 20:00, so don't send a duplicate or race the reset.
+    scheduleDeadlineReminder(sendDeadlineReminder);
     scheduleAutoSummary(sendAutoSummary);
     // Recomputes from scratch on every boot — a mid-week restart would
     // otherwise silently lose the rest of that week's session reminders,
