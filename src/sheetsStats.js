@@ -8,6 +8,7 @@ import {
   batchUpdateValues,
   clearValues,
   batchUpdate,
+  getFormulaArgSeparator,
 } from './sheetsClient.js';
 
 // Every "<Map> - <Mode>" tab is cloned from the same single master tab (the
@@ -365,6 +366,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
   const spreadsheetId = config.statsSpreadsheetId;
   if (!spreadsheetId) throw new Error('STATS_SPREADSHEET_ID is not configured');
   const layout = LAYOUT[mode];
+  const argSep = await getFormulaArgSeparator(spreadsheetId);
 
   const sheet = await findOrCreateTab(spreadsheetId, tabTitle, mode);
   if (await hasHeatmapErrors(spreadsheetId, tabTitle, mode)) {
@@ -418,7 +420,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
     // average shows "-" rather than #DIV/0! until there's at least one.
     const formulaFor = (key, rawRow) => {
       const f = averageFormula(layout.firstGameColumn, rawRow, endColLetter);
-      return key === 'perf' ? `=IFERROR(${f.slice(1)},"-")` : f;
+      return key === 'perf' ? `=IFERROR(${f.slice(1)}${argSep}"-")` : f;
     };
     const t1Values = layout.table1Columns.map((_, k) =>
       formulaFor(layout.statRows[k + layout.firstStatOffset], anchorRow + k + layout.firstStatOffset),

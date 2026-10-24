@@ -43,6 +43,28 @@ async function authedFetch(url, options = {}, attempt = 1) {
 }
 
 /** {sheets: [{properties: {sheetId, title, gridProperties: {rowCount, columnCount}}}]} */
+const argSeparatorCache = new Map();
+
+/**
+ * The function-argument separator formulas written with USER_ENTERED must
+ * use: Sheets parses them in the spreadsheet's own locale, where a comma
+ * decimal mark (ru_RU, de_DE, ...) makes ";" the separator.
+ */
+export async function getFormulaArgSeparator(spreadsheetId) {
+  if (!argSeparatorCache.has(spreadsheetId)) {
+    const json = await authedFetch(`${BASE}/${spreadsheetId}?fields=properties.locale`);
+    const locale = (json.properties?.locale ?? 'en_US').replace('_', '-');
+    let commaDecimal = false;
+    try {
+      commaDecimal = new Intl.NumberFormat(locale).format(1.5).includes(',');
+    } catch {
+      // unknown locale tag — keep the English default
+    }
+    argSeparatorCache.set(spreadsheetId, commaDecimal ? ';' : ',');
+  }
+  return argSeparatorCache.get(spreadsheetId);
+}
+
 export async function getSpreadsheetMeta(spreadsheetId) {
   const json = await authedFetch(`${BASE}/${spreadsheetId}?fields=sheets.properties`);
   return json.sheets.map((s) => s.properties);
