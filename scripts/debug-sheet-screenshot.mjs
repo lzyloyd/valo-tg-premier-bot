@@ -1,31 +1,22 @@
+import fs from 'node:fs';
 import { getBrowser, closeBrowser } from '../src/browser.js';
 import { getTabSheetId } from '../src/sheetsStats.js';
+import { screenshotSheetRange } from '../src/sheetsAnnounce.js';
 import { config } from '../src/config.js';
-import fs from 'node:fs';
 
-// Renders the same "heatmap range" screenshot sheetsAnnounce.js posts to
-// Telegram, but saves it locally instead — for checking the crop/rendering
-// before risking an actual send to the real "Статистика" topic.
+// Renders the same heatmap screenshot sheetsAnnounce.js posts to Telegram,
+// but saves it locally instead — for checking the crop before an actual send.
 const tabTitle = process.argv[2] || 'Статистика за V26A5';
+const outPath = process.argv[3] || '/tmp/sheet-screenshot.png';
 
 const sheetId = await getTabSheetId(config.statsSpreadsheetId, tabTitle);
 if (sheetId === null) {
   console.error('tab not found:', tabTitle);
   process.exit(1);
 }
-
-const browser = await getBrowser();
-const page = await browser.newPage();
 try {
-  await page.setViewport({ width: 1750, height: 820 });
-  const url = `https://docs.google.com/spreadsheets/d/${config.statsSpreadsheetId}/edit?gid=${sheetId}&rm=minimal`;
-  console.log('navigating to', url);
-  await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
-  await new Promise((r) => setTimeout(r, 1500));
-  const png = await page.screenshot({ type: 'png', clip: { x: 148, y: 26, width: 1520, height: 650 } });
-  fs.writeFileSync('/tmp/sheet-screenshot.png', png);
-  console.log('saved to /tmp/sheet-screenshot.png');
+  fs.writeFileSync(outPath, await screenshotSheetRange(await getBrowser(), config.statsSpreadsheetId, sheetId));
+  console.log('saved to', outPath);
 } finally {
-  await page.close();
   await closeBrowser();
 }

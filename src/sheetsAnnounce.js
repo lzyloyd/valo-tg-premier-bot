@@ -10,17 +10,18 @@ function sheetRangeUrl(spreadsheetId, gid, range) {
   return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit?gid=${gid}#gid=${gid}&range=${range}`;
 }
 
-// Both heatmap tables (rows 1-20, columns B-P covers every stat column
-// either mode uses) — same crop the team already takes by hand.
-const HEATMAP_RANGE = 'B1:P20';
+// Both heatmap tables (rows 1-22 with 8 players, columns B-P covers every
+// stat column either mode uses) — same crop the team already takes by hand.
+const HEATMAP_RANGE = 'B1:P22';
 
 // Calibrated against a fresh (default A1, no range= param) load at this
 // exact viewport size: skips the row-number/column-A gutter on the left and
 // the column-letter band on top, and stops right at column P / row 20 with
-// no sliver of column Q bleeding in on the right.
-const CROP = { x: 148, y: 26, width: 1520, height: 650 };
+// no sliver of column Q bleeding in on the right; the bottom edge sits right
+// under row 22 ("Целевой показатель") — re-measure if rows are added again.
+const CROP = { x: 148, y: 26, width: 1520, height: 709 };
 
-async function screenshotSheetRange(browser, spreadsheetId, gid) {
+export async function screenshotSheetRange(browser, spreadsheetId, gid) {
   const page = await browser.newPage();
   try {
     await page.setViewport({ width: 1750, height: 820 });
