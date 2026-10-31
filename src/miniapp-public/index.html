@@ -18,6 +18,15 @@
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;}
 #app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
 .app-header{padding:14px 16px 2px;background:var(--surface);}
+.team-switch{display:flex;gap:4px;padding:4px;margin-top:12px;background:var(--bg);border:1px solid var(--border);border-radius:13px;}
+.team-switch-btn{flex:1;min-width:0;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--text-muted);font:700 12px 'Manrope',sans-serif;cursor:pointer;transition:background .15s,color .15s,border-color .15s;-webkit-tap-highlight-color:transparent;}
+.team-switch-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.team-switch-btn::before{content:'';width:6px;height:6px;flex-shrink:0;border-radius:50%;background:currentColor;opacity:.35;}
+.team-switch-btn.active{background:rgba(255,90,104,.12);border-color:rgba(255,90,104,.25);color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.team-switch-btn.active::before{opacity:1;}
+.team-switch-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+@media(hover:hover){.team-switch-btn:not(.active):hover{background:var(--surface-2);color:var(--text);}}
+@media(prefers-reduced-motion:reduce){.team-switch-btn{transition:none;}}
 .app-header-title{font-weight:800;font-size:16px;}
 .app-header-sub{font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-top:2px;}
 .tabs{display:flex;gap:4px;padding:10px 12px 0;background:var(--surface);position:sticky;top:0;z-index:2;}
@@ -213,7 +222,7 @@ function escapeHtml(value) {
 function renderHeader() {
   return `<div class="app-header">
     <div class="app-header-title">${escapeHtml(state.team.name)}</div>
-    ${state.teams.length > 1 ? '<select id="teamSelect" aria-label="Команда">' + state.teams.map(t => '<option value="' + escapeHtml(t.id) + '"' + (t.id === state.team.id ? ' selected' : '') + '>' + escapeHtml(t.name) + '</option>').join('') + '</select>' : ''}
+    ${state.teams.length > 1 ? '<div class="team-switch" role="group" aria-label="Выбор команды">' + state.teams.map(t => '<button type="button" class="team-switch-btn' + (t.id === state.team.id ? ' active' : '') + '" data-team-id="' + escapeHtml(t.id) + '" aria-pressed="' + (t.id === state.team.id) + '"><span>' + escapeHtml(t.name) + '</span></button>').join('') + '</div>' : ''}
     <div class="app-header-sub">${weekLabel(state.days)}</div>
   </div>`;
 }
@@ -369,11 +378,12 @@ function render() {
 }
 
 function bindEvents() {
-  document.getElementById('teamSelect')?.addEventListener('change', e => {
+  document.querySelectorAll('[data-team-id]').forEach(btn => btn.addEventListener('click', () => {
+    if (btn.dataset.teamId === state.team.id) return;
     const url = new URL(location.href);
-    url.searchParams.set('team', e.target.value);
+    url.searchParams.set('team', btn.dataset.teamId);
     location.assign(url.href);
-  });
+  }));
   document.querySelectorAll('.tab').forEach((btn) => btn.addEventListener('click', () => { activeTab = btn.dataset.tab; render(); }));
   document.querySelectorAll('[data-teammode]').forEach((btn) => btn.addEventListener('click', () => { teamMode = btn.dataset.teammode; render(); }));
 
