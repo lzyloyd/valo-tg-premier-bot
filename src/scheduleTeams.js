@@ -15,7 +15,7 @@ export const teams = [
   { id: 'ovt', name: 'Overthinkers', roster, mains: ['qu1ly', 'toshir0000', 'bonrik1', 'kitkatfn', 'lzyloyd'], subs: ['deadqq', 'men4ikcs', 'mania_boo'],
     members: [], adminIds: [config.adminUserId].filter(Boolean), chatId: config.scheduleChatId, threadId: config.scheduleThreadId,
     get schedulePath() { return config.scheduleDataPath; }, get attendancePath() { return config.attendanceDataPath; }, enabled: true },
-  { id: 'team2', name: process.env.TEAM2_NAME || 'Вторая команда', roster: members.map(m => m.username.toLowerCase()),
+  { id: 'team2', name: process.env.TEAM2_NAME || 'Clarity', roster: members.map(m => m.username.toLowerCase()),
     mains: members.filter(m => m.role === 'main').map(m => m.username.toLowerCase()), subs: members.filter(m => m.role === 'sub').map(m => m.username.toLowerCase()),
     members, adminIds: [config.adminUserId, secondAdmin].filter(Boolean), chatId: '-1004419192416', threadId: '11',
     schedulePath: path.join(config.dataDir, 'schedule-team2.json'), attendancePath: path.join(config.dataDir, 'attendance-team2.json'),
