@@ -496,7 +496,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       <button class="menu-btn" onclick="openSidebar()" aria-label="Меню">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.72</span></h1></div>
+      <div class="app-title" onclick="goToTierList()" role="button"><img class="mark" src="/wuwa-assets/app/icon.webp" alt=""><h1>Вувочка <span class="app-version">v4.82</span></h1></div>
       <button class="search-btn" onclick="openSearch()" aria-label="Поиск">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>Поиск</span>
@@ -790,53 +790,7 @@ table.stat-table td:first-child{font-family:'PT Sans',sans-serif;color:var(--tex
       </div>
 
       <!-- KIT -->
-      <div class="subview" id="sub-kit">
-        <div class="card">
-          <h3>Навыки</h3>
-          <div class="skill-kind-tabs">
-            <div class="skill-kind active" data-kind="active" onclick="setKitSkillKind(this,'active')">Активные</div>
-            <div class="skill-kind" data-kind="passive" onclick="setKitSkillKind(this,'passive')">Пассивные</div>
-            <div class="skill-kind" data-kind="concerto" onclick="setKitSkillKind(this,'concerto')">Концерто</div>
-          </div>
-          <div class="skill-item" data-kind="active">
-            <div class="sname">Базовая атака — Infinity Calibration</div>
-            <div class="sdesc">До 4 ударов подряд, урон Fusion. Заряженная тяжёлая атака переходит в усиленную версию при удержании.</div>
-          </div>
-          <div class="skill-item" data-kind="active">
-            <div class="sname">Навык резонанса — Form Switch</div>
-            <div class="sdesc">Переключение между Aemeath и её механическим доспехом; характеристики наследуются между формами.</div>
-          </div>
-          <div class="skill-item" data-kind="active">
-            <div class="sname">Ультимативный навык — Heavenfall Edict</div>
-            <div class="sdesc">Урон Fusion + переход в усиленное состояние, открывающее финальную атаку при заполнении шкалы резонанса.</div>
-          </div>
-          <div class="skill-item" data-kind="passive" style="display:none">
-            <div class="sname">Врождённый навык — Overclocked Frame</div>
-            <div class="sdesc">При смене формы Aemeath получает +15% бонус Fusion на 10 секунд; при повторной смене эффект обновляется, не суммируясь.</div>
-          </div>
-          <div class="skill-item" data-kind="passive" style="display:none">
-            <div class="sname">Врождённый навык — Kinetic Memory</div>
-            <div class="sdesc">Часть урона, нанесённого в одной форме, повышает АТК другой формы на 8 секунд после переключения между ними.</div>
-          </div>
-          <div class="skill-item" data-kind="concerto" style="display:none">
-            <div class="sname">Интро-навык — Vanguard Ignition</div>
-            <div class="sdesc">Активируется при выходе Aemeath на поле: наносит урон Fusion по области и накладывает резонансный бафф на 5 секунд.</div>
-          </div>
-          <div class="skill-item" data-kind="concerto" style="display:none">
-            <div class="sname">Аутро-навык — Edict Discharge</div>
-            <div class="sdesc">Расходует всю накопленную энергию концерто при смене персонажа: чем больше энергии накоплено, тем мощнее взрыв урона Fusion.</div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Малые пассивки (Minor Fortes)</h3>
-          <div class="pill-list">
-            <div class="pill">Крит. урон <b>+12%</b></div>
-            <div class="pill">Бонус Fusion <b>+10%</b></div>
-            <div class="pill">АТК <b>+50</b></div>
-            <div class="pill">Урон Liberation <b>+10%</b></div>
-          </div>
-        </div>
-      </div>
+      <div class="subview" id="sub-kit"><div class="kit-dynamic" data-char-id="1210"></div></div>
 
       <!-- BUILD -->
       <div class="subview" id="sub-build">
@@ -1326,13 +1280,16 @@ function teammatesRowsHtml(teammates){
   return teammates.map((t) => {
     const tc = CHARACTERS.find((x) => x.id === t.charId);
     const tw = WEAPONS.find((x) => x.id === t.weaponId);
-    const tSet = ECHOES.find((x) => x.name === t.echoSet);
-    const tSetAttr = t.echoSet.replace(/'/g, "\\'");
+    const setsHtml = (t.echoSets || [t.echoSet]).map((name) => {
+      const set = ECHOES.find((x) => x.name === name);
+      const attr = name.replace(/'/g, "\\'");
+      return '<span class="buff-pair clickable" onclick="openEcho(\'' + attr + '\')">' + (set ? '<img class="buff-set-icon" src="' + set.badge + '" alt="">' : '') + '<span>' + name + '</span></span>';
+    }).join(' + ');
     const tItemAttr = t.echoItemName.replace(/'/g, "\\'");
     return '<div class="buff-row">'
       + (tc ? '<span class="buff-pair clickable" onclick="openChar(' + tc.id + ')"><img class="buff-avatar" src="/wuwa-assets/characters/' + tc.id + '.webp" alt=""><span class="buff-name">' + tc.name + '</span></span>' : '')
       + ' + <span class="buff-weapon clickable" onclick="openWeapon(' + t.weaponId + ')">' + (tw ? tw.name : t.weaponId) + '</span>'
-      + ' + <span class="buff-pair clickable" onclick="openEcho(\'' + tSetAttr + '\')"><img class="buff-set-icon" src="' + (tSet ? tSet.badge : '') + '" alt=""><span>' + t.echoSet + '</span></span>'
+      + ' + ' + setsHtml
       + ' + <span class="buff-pair clickable" onclick="openEchoItem(\'' + tItemAttr + '\')"><img class="buff-echo-icon" src="' + t.echoItemIcon + '" alt=""><span>' + t.echoItemName + '</span></span>'
       + '</div>';
   }).join('');
@@ -1350,7 +1307,9 @@ function teamCardHtml(title, slots){
   const mainChar = CHARACTERS.find((x) => x.id === mainId);
   const elClass = mainChar ? 'el-' + mainChar.element.toLowerCase() : '';
   const heroHtml = mainChar
-    ? '<div class="team-hero" onclick="openChar(' + mainId + ')"><img src="/wuwa-assets/characters/' + mainId + '.webp" alt=""><span>' + mainChar.name + '</span></div>'
+    ? (slots[0].length > 1
+      ? '<div class="team-hero">' + slotPicksHtml(slots[0]) + '</div>'
+      : '<div class="team-hero" onclick="openChar(' + mainId + ')"><img src="/wuwa-assets/characters/' + mainId + '.webp" alt=""><span>' + mainChar.name + '</span></div>')
     : '<div class="team-hero"></div>';
   const columnsHtml = slots.slice(1).map((slot) => '<div class="team-column">' + slotPicksHtml(slot) + '</div>').join('');
   return '<div class="team-card"><div class="team-card-header ' + elClass + '">' + title + '</div><div class="team-card-body">' + heroHtml + '<div class="team-columns">' + columnsHtml + '</div></div></div>';
@@ -1450,7 +1409,7 @@ function renderBuildTab(rootEl, charId){
       return '<div class="item-card clickable" onclick="openWeapon(' + w.id + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + w.id + '.webp" alt=""></div><div class="item-info"><div class="iname">' + base.name + '</div><div class="irole">' + w.note + '</div></div></div>';
     }
     const tier = tierFromScore(score);
-    const scoreLabel = score.toFixed(1) + '%';
+    const scoreLabel = score.toFixed(2) + '%';
     return '<div class="item-card clickable" onclick="openWeapon(' + w.id + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + w.id + '.webp" alt=""></div><div class="item-info"><div class="iname">' + base.name + ' · <span class="weapon-score tier-' + tier + '">' + scoreLabel + '</span></div><div class="irole">' + w.note + '</div></div><div class="rank-badge tier-' + tier + '">' + tier + '</div></div>';
   }).join('') + '</div>';
   const setBase = ECHOES.find((x) => x.name === data.echoSet);
@@ -1523,22 +1482,26 @@ function renderCalcTab(rootEl, charId){
     }).join('') + '</div></div>';
   }
   if (variant) {
+    if (variant.rotationTime != null) html += '<div class="card"><div class="review-text">Время ротации: ' + variant.rotationTime + 'с</div></div>';
     const buildVariant = BUILDS[charId] && BUILDS[charId].variants && BUILDS[charId].variants.find((v) => v.id === variantId);
     if (buildVariant && buildVariant.teammates && buildVariant.teammates.length) {
       html += '<div class="card"><h3>Расчёт с учётом баффов от</h3>' + teammatesRowsHtml(buildVariant.teammates) + '</div>';
     }
     html += '<div class="card"><h3>Урон по константам (S0—S6)</h3><table class="stat-table seq-table"><tr><th>Конст</th><th>Урон</th><th>DPS</th><th>%</th></tr>'
-      + variant.sequences.map((s) => '<tr class="' + (s.seq === 'S6' ? 'seq-highlight' : '') + '"><td>' + s.seq + '</td><td>' + s.dmg + '</td><td>' + s.dps + '</td><td>' + s.pct.toFixed(1) + '%</td></tr>').join('')
+      + variant.sequences.map((s) => '<tr class="' + (s.seq === 'S6' ? 'seq-highlight' : '') + '"><td>' + s.seq + '</td><td>' + s.dmg + '</td><td>' + s.dps + '</td><td>' + s.pct.toFixed(2) + '%</td></tr>').join('')
       + '</table></div>';
     if (variant.characterBuild) {
       const cb = variant.characterBuild;
       const w = WEAPONS.find((x) => x.id === cb.weaponId);
-      const setBase = ECHOES.find((x) => x.name === cb.echoSet);
-      const echoSetAttr = cb.echoSet.replace(/'/g, "\\'");
+      const setsHtml = (cb.echoSets || [cb.echoSet]).map((name) => {
+        const set = ECHOES.find((x) => x.name === name);
+        const attr = name.replace(/'/g, "\\'");
+        return set ? '<div class="item-card clickable" onclick="openEcho(\'' + attr + '\')"><div class="item-icon"><img class="item-icon-img" src="' + set.badge + '" alt=""></div><div class="item-info"><div class="iname">' + name + '</div></div></div>' : '';
+      }).join('');
       const mainEchoAttr = cb.mainEcho.name.replace(/'/g, "\\'");
       html += '<div class="card"><h3>Сборка на момент расчёта</h3>'
         + (w ? '<div class="item-card clickable" onclick="openWeapon(' + cb.weaponId + ')"><div class="item-icon"><img class="item-icon-img" src="/wuwa-assets/weapons/' + cb.weaponId + '.webp" alt=""></div><div class="item-info"><div class="iname">' + w.name + '</div></div></div>' : '')
-        + (setBase ? '<div class="item-card clickable" onclick="openEcho(\'' + echoSetAttr + '\')"><div class="item-icon"><img class="item-icon-img" src="' + setBase.badge + '" alt=""></div><div class="item-info"><div class="iname">' + cb.echoSet + '</div></div></div>' : '')
+        + setsHtml
         + '<div class="item-card clickable" onclick="openEchoItem(\'' + mainEchoAttr + '\')"><div class="item-icon"><img class="item-icon-img" src="' + cb.mainEcho.icon + '" alt=""></div><div class="item-info"><div class="iname">' + cb.mainEcho.name + '</div></div></div>'
         + '<div class="pill-list" style="margin-top:10px">' + cb.costSlots.map((s) => '<div class="pill">' + s.slot + ': ' + s.stat + '</div>').join('') + '</div>'
         + '<div class="calc-variant-note" style="margin-top:8px">Сабстаты: ' + cb.substats + '</div></div>';
@@ -2181,6 +2144,7 @@ Promise.all([loadGameData(), loadProfile()]).then(() => {
   renderModesView();
   buildSearchIndex();
   updateAccountAvatar();
+  document.querySelectorAll('.kit-dynamic[data-char-id]').forEach((el) => renderKitTab(el, Number(el.dataset.charId)));
   document.querySelectorAll('.review-dynamic[data-char-id]').forEach((el) => renderReviewTab(el, Number(el.dataset.charId)));
   document.querySelectorAll('.build-dynamic[data-char-id]').forEach((el) => renderBuildTab(el, Number(el.dataset.charId)));
   document.querySelectorAll('.gameplay-dynamic[data-char-id]').forEach((el) => renderGameplayTab(el, Number(el.dataset.charId)));

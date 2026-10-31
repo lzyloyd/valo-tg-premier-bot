@@ -611,6 +611,18 @@
     "subStatName": "Крит. шанс",
     "subStatValue": "36.00%"
   },
+  "21020107": {
+    "name": "Unspoken Rue",
+    "weaponType": "Sword",
+    "rarity": 5,
+    "passiveName": "Locked Thunder, Trapped Rain",
+    "passiveDesc": "АТК +12%/15%/18%/21%/24%. Получение Unison даёт владельцу 30%/37.5%/45%/52.5%/60% бонуса Electro на 30с и снимает Yearning Mind. Команда получает Binding Mind: 24%/30%/36%/42%/48% бонуса Electro на 30с; одинаковые эффекты не суммируются. Когда владелец расходует Концерто, Binding Mind снимается со всей команды, а владелец получает Yearning Mind: ещё 40%/50%/60%/70%/80% бонуса Electro на 14с или до смены персонажа.",
+    "flavor": "Зонт, которым она укрывала живых и сдерживала губительную скверну; под его поверхностью остались отголоски дождя и грома.",
+    "mainStatName": "АТК",
+    "mainStatValue": "587.50",
+    "subStatName": "Крит. шанс",
+    "subStatValue": "24.30%"
+  },
   "21030011": {
     "name": "Training Pistols",
     "weaponType": "Pistols",
@@ -1462,5 +1474,17 @@
     "mainStatValue": "412.50",
     "subStatName": "Крит. урон",
     "subStatValue": "40.50%"
+  },
+  "21050116": {
+    "name": "Blooming Jadehaven",
+    "weaponType": "Rectifier",
+    "rarity": 5,
+    "passiveName": "Hundredfold Artifice",
+    "passiveDesc": "Бонус урона всех стихий +12%/15%/18%/21%/24%. После наложения Electro Flare или активации Unison Response урон навыка резонанса усилен на 36%/45%/54%/63%/72% и игнорирует 10%/13.5%/17%/20.5%/24% Electro-сопротивления цели. Пока владелец на поле, получаемый ближайшими врагами урон Electro Flare усилен на 30%/37.5%/45%/52.5%/60% на 30с; срабатывает раз в 0.1с. Из одинаковых эффектов действует сильнейший.",
+    "flavor": "",
+    "mainStatName": "АТК",
+    "mainStatValue": "587.50",
+    "subStatName": "Крит. шанс",
+    "subStatValue": "24.30%"
   }
 }

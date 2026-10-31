@@ -551,6 +551,22 @@
           "text": "При наложении резонатором Electro Flare на врагов: +10% урона Electro на 15с; пока эффект активен, применение Аутро-навыка даёт вышедшему резонатору +25% урона Electro на 15с."
         }
       ]
+    },
+    {
+      "name": "Flower of Tinged Yearning",
+      "element": "Physical",
+      "badge": "/wuwa-assets/echo-sets/set_38.webp",
+      "bg": "/wuwa-assets/echoes/6000223.webp",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "text": "Бонус лечения +10%."
+        },
+        {
+          "pieces": 5,
+          "text": "Лечение союзника повышает АТК всех персонажей команды на 10% на 30с; одинаковые эффекты не суммируются. Пока эффект действует, получение Unison или активация Unison Response дополнительно повышает АТК соответствующего персонажа на 15%."
+        }
+      ]
     }
   ],
   "items": [
@@ -649,7 +665,7 @@
         "Celestial Light",
         "Freezing Frost"
       ],
-      "icon": "/wuwa-assets/echoes/6020023.webp"
+      "icon": "/wuwa-assets/echoes/6000049.webp"
     },
     {
       "name": "Baby Viridblaze Saurian",
@@ -954,7 +970,7 @@
       "sets": [
         "Havoc Eclipse"
       ],
-      "icon": "/wuwa-assets/echoes/6020063.webp"
+      "icon": "/wuwa-assets/echoes/6000053.webp"
     },
     {
       "name": "Dwarf Cassowary",
@@ -1137,7 +1153,7 @@
         "Heart of Evil's Purge",
         "Lamp of Nether Road"
       ],
-      "icon": "/wuwa-assets/echoes/391090205.webp"
+      "icon": "/wuwa-assets/echoes/6000216.webp"
     },
     {
       "name": "Frostbite Coleoid",
@@ -1176,7 +1192,7 @@
       "icon": "/wuwa-assets/echoes/6000107.webp"
     },
     {
-      "name": "Fusion Dreamane",
+      "name": "Fusion Dreadmane",
       "class": "Common",
       "classRu": "Обычный",
       "cost": 1,
@@ -1185,7 +1201,7 @@
         "Rejuvenating Glow",
         "Molten Rift"
       ],
-      "icon": null
+      "icon": "/wuwa-assets/echoes/390070100.webp"
     },
     {
       "name": "Fusion Prism",
@@ -1475,7 +1491,7 @@
         "Reel of Spliced Memories",
         "Wishes of Quiet Snowfall"
       ],
-      "icon": "/wuwa-assets/echoes/60200702.webp"
+      "icon": "/wuwa-assets/echoes/6000196.webp"
     },
     {
       "name": "Impermanence Heron",
@@ -1510,7 +1526,7 @@
         "Reel of Spliced Memories",
         "Wishes of Quiet Snowfall"
       ],
-      "icon": "/wuwa-assets/echoes/60200704.webp"
+      "icon": "/wuwa-assets/echoes/6000183.webp"
     },
     {
       "name": "Jué",
@@ -1521,7 +1537,7 @@
       "sets": [
         "Celestial Light"
       ],
-      "icon": "/wuwa-assets/echoes/6020067.webp"
+      "icon": "/wuwa-assets/echoes/6000059.webp"
     },
     {
       "name": "Kerasaur",
@@ -1534,7 +1550,7 @@
         "Windward Pilgrimage",
         "Flamewing's Shadow"
       ],
-      "icon": "/wuwa-assets/echoes/60200709.webp"
+      "icon": "/wuwa-assets/echoes/6000112.webp"
     },
     {
       "name": "Kernel Puppet: Anger",
@@ -1612,7 +1628,7 @@
         "Trailblazing Star",
         "Chromatic Foam"
       ],
-      "icon": "/wuwa-assets/echoes/391090203.webp"
+      "icon": "/wuwa-assets/echoes/6000193.webp"
     },
     {
       "name": "La Guardia",
@@ -1647,7 +1663,7 @@
       "sets": [
         "Freezing Frost"
       ],
-      "icon": "/wuwa-assets/echoes/60200707.webp"
+      "icon": "/wuwa-assets/echoes/6000044.webp"
     },
     {
       "name": "Lava Larva",
@@ -2079,7 +2095,7 @@
         "Empyrean Anthem",
         "Flamewing's Shadow"
       ],
-      "icon": "/wuwa-assets/echoes/60200703.webp"
+      "icon": "/wuwa-assets/echoes/6000068.webp"
     },
     {
       "name": "Nocturnus Knight",
@@ -2185,7 +2201,7 @@
         "Dream of the Lost",
         "Law of Harmony"
       ],
-      "icon": "/wuwa-assets/echoes/60200701.webp"
+      "icon": "/wuwa-assets/echoes/6000116.webp"
     },
     {
       "name": "Reminiscence: Fleurdelys",
@@ -2209,7 +2225,7 @@
         "Trailblazing Star",
         "Chromatic Foam"
       ],
-      "icon": "/wuwa-assets/echoes/391090204.webp"
+      "icon": "/wuwa-assets/echoes/6000194.webp"
     },
     {
       "name": "Reminiscence: Threnodian - Leviathan",
@@ -2282,7 +2298,7 @@
         "Pact of Neonlight Leap",
         "Sound of True Name"
       ],
-      "icon": "/wuwa-assets/echoes/60200705.webp"
+      "icon": "/wuwa-assets/echoes/6000185.webp"
     },
     {
       "name": "Sabyr Boar",
@@ -2308,7 +2324,7 @@
         "Windward Pilgrimage",
         "Flaming Clawprint"
       ],
-      "icon": "/wuwa-assets/echoes/60200706.webp"
+      "icon": "/wuwa-assets/echoes/6000100.webp"
     },
     {
       "name": "Sagittario",
@@ -2332,7 +2348,7 @@
       "sets": [
         "Frosty Resolve"
       ],
-      "icon": "/wuwa-assets/echoes/6020056.webp"
+      "icon": "/wuwa-assets/echoes/6000083.webp"
     },
     {
       "name": "Shadow Stepper",
@@ -2487,7 +2503,7 @@
       "sets": [
         "Void Thunder"
       ],
-      "icon": "/wuwa-assets/echoes/6020062.webp"
+      "icon": "/wuwa-assets/echoes/6000039.webp"
     },
     {
       "name": "The False Sovereign",
@@ -2584,7 +2600,7 @@
         "Rite of Gilded Revelation",
         "Chromatic Foam"
       ],
-      "icon": "/wuwa-assets/echoes/60200708.webp"
+      "icon": "/wuwa-assets/echoes/6000179.webp"
     },
     {
       "name": "Vanguard Junrock",
@@ -2684,7 +2700,7 @@
       "icon": "/wuwa-assets/echoes/6000188.webp"
     },
     {
-      "name": "Young Roseshroom",
+      "name": "Baby Roseshroom",
       "class": "Common",
       "classRu": "Обычный",
       "cost": 1,
@@ -2693,7 +2709,7 @@
         "Sierra Gale",
         "Havoc Eclipse"
       ],
-      "icon": null
+      "icon": "/wuwa-assets/echoes/390070079.webp"
     },
     {
       "name": "Zig Zag",
@@ -2744,6 +2760,52 @@
         "Flash of Electric Reflection"
       ],
       "icon": "/wuwa-assets/echoes/6000224.webp"
+    },
+    {
+      "name": "Jade Nether Serpent",
+      "class": "Common",
+      "classRu": "Обычный",
+      "cost": 1,
+      "element": "Spectro",
+      "sets": [
+        "Heart of Sworn Vigil"
+      ],
+      "icon": "/wuwa-assets/echoes/6000219.webp"
+    },
+    {
+      "name": "Skywatch Lancer",
+      "class": "Elite",
+      "classRu": "Элитный",
+      "cost": 3,
+      "element": "Spectro",
+      "sets": [
+        "Flash of Electric Reflection",
+        "Flower of Tinged Yearning"
+      ],
+      "icon": "/wuwa-assets/echoes/6000220.webp"
+    },
+    {
+      "name": "Bloomburst Puppet",
+      "class": "Common",
+      "classRu": "Обычный",
+      "cost": 1,
+      "element": "Spectro",
+      "sets": [
+        "Heart of Sworn Vigil"
+      ],
+      "icon": "/wuwa-assets/echoes/6000222.webp"
+    },
+    {
+      "name": "Formrender",
+      "class": "Elite",
+      "classRu": "Элитный",
+      "cost": 3,
+      "element": "Spectro",
+      "sets": [
+        "Heart of Sworn Vigil",
+        "Flower of Tinged Yearning"
+      ],
+      "icon": "/wuwa-assets/echoes/6000223.webp"
     }
   ]
 }

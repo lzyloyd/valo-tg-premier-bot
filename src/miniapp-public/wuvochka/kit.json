@@ -796,6 +796,60 @@
       "DEF% <b>+11%</b>"
     ]
   },
+  "1210": {
+    "skills": {
+      "active": [
+        {
+          "name": "Базовая атака — Infinity Calibration",
+          "desc": "До 4 Fusion-ударов в каждой форме. Удержание заряжает тяжёлую атаку до Charged I или II; её урон считается уроном ультимативного навыка. Instant Response ускоряет заряд Charged II. Атаки в форме меха также доступны в воздухе близко к земле."
+        },
+        {
+          "name": "Навык резонанса — Shared Voyage",
+          "desc": "Form Switch переключает Aemeath и меха, наследующего её характеристики, и автоматически начинает первую базовую атаку. После определённых базовых, тяжёлых атак или контратаки доступны Sync Strike: Armament Merge и Call of Dawn: наносят Fusion-урон и переводят в другую форму."
+        },
+        {
+          "name": "Ультимативный навык — Towards the Daybreak",
+          "desc": "Heavenfall Edict: Overdrive наносит Fusion-урон, переводит в меха, даёт Stardust Resonance на 30с и Unbound на 60с. Первое состояние усиливает два Seraphic Duet; следующее такое применение в течение 30с не расходует Rupturous/Fusion Trail. При полных Synchronization Rate и Resonance Rate доступен Heavenfall Edict: Finale: расходует обе шкалы, наносит Fusion-урон и возвращает Aemeath из меха."
+        }
+      ],
+      "passive": [
+        {
+          "name": "Forte Circuit — To Sculpt the Silence",
+          "desc": "Четвёртая базовая атака в любой форме открывает Seraphic Duo на 5с. При наличии 100 Synchronization Rate навык выполняет Seraphic Duet: Overture / Encore, наносит урон ультимативного навыка и меняет форму. Synchronization Rate вмещает 200 очков, Resonance Rate — 4, Starflux — 600. Базовые атаки, Интро и Sync Strike пополняют Synchronization; Overdrive и Duet дают Resonance Rate."
+        },
+        {
+          "name": "Resonance Mode — Tune Rupture / Fusion Burst",
+          "desc": "В Tune Rupture отклики команды на Tune Rupture — Interfered накладывают по 10 Rupturous Trail на 30с, максимум 30 стаков. В Fusion Burst наложение этого статуса даёт по одному Fusion Trail, максимум 30 на 30с. Выбор режима меняет усиления Duet и условия командных баффов."
+        },
+        {
+          "name": "Врождённый навык — Before All Sounds",
+          "desc": "В состоянии Instant Response тяжёлые атаки обеих форм получают 200% усиления урона."
+        },
+        {
+          "name": "Врождённый навык — Between the Stars",
+          "desc": "В Tune Rupture действия подходящих союзников дают по 20% крит. урона, максимум 3 стака; в Fusion Burst — по 30%, максимум 2 стака. Каждый персонаж активирует эффект один раз. При максимуме стаков урон Finale усилен на 25%. Изменение состава или режима сбрасывает эффект."
+        },
+        {
+          "name": "Forte Circuit — Unlanded Melody",
+          "desc": "При полной Off-Tune-шкале противника доступен Tune Break. Отклик на Tune Rupture — Interfered вызывает дополнительный Starburst; одна цель получает этот урон не чаще раза в 8с."
+        }
+      ],
+      "concerto": [
+        {
+          "name": "Интро — Overture of Departure",
+          "desc": "Songs Across the Universe и версия меха Debut of Meteoric Radiance наносят Fusion-урон и дают Starlume Acceleration на 15с. Следующая Overdrive дополнительно восстанавливает Resonance Rate и завершает это состояние. После Интро можно продолжить третьей базовой атакой."
+        },
+        {
+          "name": "Аутро — Silent Protection",
+          "desc": "Остальные союзники получают 10% усиления всего урона на 20с. В Tune Rupture усиление повышается до 20% для персонажей, накладывающих Tune Rupture — Shifting; в Fusion Burst — для персонажей, накладывающих Fusion Burst. Повторное Аутро обновляет эффект."
+        }
+      ]
+    },
+    "minorFortes": [
+      "Крит. шанс <b>+8%</b>",
+      "АТК% <b>+12%</b>"
+    ]
+  },
   "1211": {
     "skills": {
       "active": [
@@ -1392,6 +1446,60 @@
         {
           "name": "Аутро-навык — Herself a Thousand Lanterns",
           "desc": "Урон Electro, равный 100% АТК Hsin. Расходует Nightglow: в Unison-режиме даёт тиммейтам с Shared Light +20% усиления всего урона на 30с; в режиме Electro Flare усиливает урон Electro тиммейтов на 20% на 20с."
+        }
+      ]
+    },
+    "minorFortes": [
+      "Крит. шанс <b>+8%</b>",
+      "АТК% <b>+12%</b>"
+    ]
+  },
+  "1312": {
+    "skills": {
+      "active": [
+        {
+          "name": "Базовая атака — Furled Canopy",
+          "desc": "До 3 Electro-ударов. В Deep Mind заменяется серией Unfurled Canopy до 4 ударов; удержание после второго удара переводит её в Whirling Thunder. Воздушная атака расходует выносливость; после уворота доступна контратака."
+        },
+        {
+          "name": "Навык резонанса — Furled Canopy: Rift Cleaver",
+          "desc": "Атакует Electro. Если противник попадает в окно защиты при раскрытии зонта и рывке, Suoming блокирует урон, замедляет окружающих врагов и отвечает Crimson Gleam, временно получая иммунитет к прерыванию и снижение входящего урона на 100%. Вход в Deep Mind сбрасывает откат навыка."
+        },
+        {
+          "name": "Ультимативный навык — Umbral Canopy: Miasma Lock",
+          "desc": "Доступен в Deep Mind, наносит Electro-урон и даёт Unison на 5с. После Аутро с Unison активируются совместные атаки Thunder Crest: максимум 6 срабатываний, не чаще одного в секунду, в пределах 8с."
+        }
+      ],
+      "passive": [
+        {
+          "name": "Forte Circuit — Bound Obsession, Forged Mind",
+          "desc": "Шкала Delusion вмещает 800 очков. В Awakened Mind полная шкала открывает Sealed Delusion с переходом в Deep Mind. В Deep Mind открывает стягивающий Unforsaken Mind, затем удерживаемый Engraved Heart; оба считаются уроном базовой атаки. Во время Engraved Heart временно нельзя менять персонажа или выполнять другие действия; после финиша Suoming возвращается в Awakened Mind."
+        },
+        {
+          "name": "Unison Response / Unison Boon",
+          "desc": "При входе через Интро от персонажа с Unison команда получает 1 стак Unison Boon на 30с. Suoming может дать только один собственный стак; повтор обновляет длительность. Каждый стак увеличивает общий наносимый урон участников с Unison Response на 3%, максимум 2 стака. В кооперативе эффект не срабатывает."
+        },
+        {
+          "name": "Rain-Soaked Covenant",
+          "desc": "Интро даёт 50% бонуса Electro на 15с, до смены персонажа. Unison-версии Интро дополнительно восстанавливают 10 энергии Концерто раз в 25с."
+        },
+        {
+          "name": "Sunken Seal, Forged Lock",
+          "desc": "При выполнении условия Aligned Seals после ультимативного навыка или Engraved Heart Аутро даёт входящему персонажу 30% бонуса Electro и ещё по 20% за стак Unison Boon, до дополнительных 40%, на 8с или до его смены. Обычный навык при активном Unison вместо этого снимает Unison и собственные стаки Boon, расходует 20 Концерто и даёт Seal Master на 12с: +100% к множителям усиленных базовых атак, +5 Концерто за попадание каждой стадии и +100% крит. урона. Эффект завершается при смене, получении Unison или Aligned Seals."
+        },
+        {
+          "name": "Накопление Delusion / Tune Break",
+          "desc": "Базовые атаки, контратаки и Crimson Gleam восстанавливают Delusion, пока Suoming на поле. Ультимативный навык и Интро Thunder Rending / Whirling Thunder (Unison) дают по 200 очков. При полной Off-Tune-шкале противника доступен Tune Break."
+        }
+      ],
+      "concerto": [
+        {
+          "name": "Интро — Furled Canopy: Flash Rift",
+          "desc": "Наносит Electro-урон, считающийся базовой атакой. Из Awakened Mind переводит в Deep Mind и обнуляет Delusion. Уже в Deep Mind используется Thunder Rending; при Unison Response доступны варианты Sealed Delusion и Whirling Thunder, позволяющие продолжить усиленную серию."
+        },
+        {
+          "name": "Аутро — Canopy Rumble",
+          "desc": "Входящий персонаж получает 20% усиления Electro-урона на 8с или до смены. При наличии Unison Boon он также получает 25% усиления урона навыка резонанса."
         }
       ]
     },

@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { scrapeModeDetails, writeModeDetails } from './fetch-mode-details.mjs';
+import { modeDetailsNeedRefresh } from './wuvochka-mode-refresh.mjs';
 
 puppeteer.use(StealthPlugin());
 
@@ -127,13 +128,12 @@ async function main() {
     // separately from `previous` since that's this script's OWN output file,
     // which can already exist and match even on a fresh deploy that's never
     // run the mode-details scrape before).
-    const modeDetailsExist = await fs
-      .access(MODE_DETAILS_PATH)
-      .then(() => true)
-      .catch(() => false);
+    const existingDetails = await fs.readFile(MODE_DETAILS_PATH, 'utf8')
+      .then((text) => JSON.parse(text))
+      .catch(() => null);
     const rotated =
       !previous ||
-      !modeDetailsExist ||
+      modeDetailsNeedRefresh(existingDetails, result) ||
       previous.tower?.label !== result.tower.label ||
       previous.wastes?.label !== result.wastes.label ||
       previous.dpm?.label !== result.dpm.label;
