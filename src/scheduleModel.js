@@ -1,3 +1,4 @@
+import { currentTeam } from './scheduleTeams.js';
 // Fixed roster of Telegram usernames (lowercase, no @) allowed to use the
 // mini app — matched against Telegram WebApp initData, not self-registered.
 export const ROSTER = ['qu1ly', 'toshir0000', 'men4ikcs', 'kitkatfn', 'bonrik1', 'deadqq', 'mania_boo', 'lzyloyd'];
@@ -139,8 +140,8 @@ function formatDayDate(dateIso) {
  * Returns the 5 usernames, or null if no viable lineup.
  */
 export function resolveLineup(available) {
-  const mains = MAIN_ROSTER.filter((u) => available.includes(u));
-  const subs = SUB_ROSTER.filter((u) => available.includes(u));
+  const mains = currentTeam().mains.filter((u) => available.includes(u));
+  const subs = currentTeam().subs.filter((u) => available.includes(u));
 
   const missing = QUORUM - mains.length;
   if (subs.length < missing) return null;
@@ -148,7 +149,7 @@ export function resolveLineup(available) {
 }
 
 function mainsAvailableCount(responses, day, slot) {
-  return MAIN_ROSTER.filter((u) => responses[u]?.[day]?.avail === 'yes' && responses[u]?.[day]?.slots?.includes(slot)).length;
+  return currentTeam().mains.filter((u) => responses[u]?.[day]?.avail === 'yes' && responses[u]?.[day]?.slots?.includes(slot)).length;
 }
 
 /**
@@ -228,9 +229,9 @@ export function buildSummaryText(week) {
     lines.push('');
   }
 
-  const answered = ROSTER.filter((u) => hasFullyAnswered(week.responses, u, daysOff));
-  const missing = ROSTER.filter((u) => !hasFullyAnswered(week.responses, u, daysOff));
-  lines.push(`Ответили: ${answered.length}/${ROSTER.length}${missing.length ? ` · не ответил(и): ${missing.map((n) => `@${n}`).join(', ')}` : ''}`);
+  const answered = currentTeam().roster.filter((u) => hasFullyAnswered(week.responses, u, daysOff));
+  const missing = currentTeam().roster.filter((u) => !hasFullyAnswered(week.responses, u, daysOff));
+  lines.push(`Ответили: ${answered.length}/${currentTeam().roster.length}${missing.length ? ` · не ответил(и): ${missing.map((n) => `@${n}`).join(', ')}` : ''}`);
 
   return lines.join('\n');
 }

@@ -1,9 +1,10 @@
+import { currentTeam } from './scheduleTeams.js';
 import { promises as fs } from 'node:fs';
 import { config } from './config.js';
 
 async function readFile() {
   try {
-    const raw = await fs.readFile(config.attendanceDataPath, 'utf8');
+    const raw = await fs.readFile(currentTeam().attendancePath, 'utf8');
     return JSON.parse(raw);
   } catch (err) {
     if (err.code === 'ENOENT') return {};
@@ -13,7 +14,7 @@ async function readFile() {
 
 async function writeFile(data) {
   await fs.mkdir(config.dataDir, { recursive: true });
-  await fs.writeFile(config.attendanceDataPath, JSON.stringify(data, null, 2));
+  await fs.writeFile(currentTeam().attendancePath, JSON.stringify(data, null, 2));
 }
 
 // { [username]: { count, history: [{ weekStart, dayKey, slot, dayLabel, dateIso, at }] } }

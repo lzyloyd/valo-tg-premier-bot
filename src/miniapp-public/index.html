@@ -97,6 +97,7 @@ tg?.ready();
 tg?.expand();
 const initData = tg?.initData || '';
 
+const selectedTeamId = new URLSearchParams(location.search).get('team') || undefined;
 let state = null;
 let activeTab = 'me';
 let teamMode = 'avatars';
@@ -111,7 +112,7 @@ async function api(path, body) {
   const res = await fetch(path, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ initData, ...body }),
+    body: JSON.stringify({ initData, teamId: selectedTeamId, ...body }),
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error || 'Ошибка запроса');
@@ -158,6 +159,7 @@ function rebuildDraft() {
 
 async function loadState() {
   state = await api('/api/state');
+  if (!state.me.isPlayer) activeTab = 'team';
   rebuildDraft();
   applyLastSaved();
   render();
@@ -205,15 +207,19 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function renderHeader() {
   return `<div class="app-header">
-    <div class="app-header-title">Overthinkers</div>
+    <div class="app-header-title">${escapeHtml(state.team.name)}</div>
+    ${state.teams.length > 1 ? '<select id="teamSelect" aria-label="Команда">' + state.teams.map(t => '<option value="' + escapeHtml(t.id) + '"' + (t.id === state.team.id ? ' selected' : '') + '>' + escapeHtml(t.name) + '</option>').join('') + '</select>' : ''}
     <div class="app-header-sub">${weekLabel(state.days)}</div>
   </div>`;
 }
 
 function renderTabs() {
-  const tabs = [['me', 'Расписание'], ['team', 'Команда']];
+  const tabs = state.me.isPlayer ? [['me', 'Расписание'], ['team', 'Команда']] : [['team', 'Команда']];
   if (state.me.isAdmin) tabs.push(['admin', 'Админ']);
   return `<nav class="tabs">${tabs
     .map(([key, label]) => `<button class="tab${activeTab === key ? ' active' : ''}" data-tab="${key}">${label}</button>`)
@@ -363,6 +369,11 @@ function render() {
 }
 
 function bindEvents() {
+  document.getElementById('teamSelect')?.addEventListener('change', e => {
+    const url = new URL(location.href);
+    url.searchParams.set('team', e.target.value);
+    location.assign(url.href);
+  });
   document.querySelectorAll('.tab').forEach((btn) => btn.addEventListener('click', () => { activeTab = btn.dataset.tab; render(); }));
   document.querySelectorAll('[data-teammode]').forEach((btn) => btn.addEventListener('click', () => { teamMode = btn.dataset.teammode; render(); }));
 

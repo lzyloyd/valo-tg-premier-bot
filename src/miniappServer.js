@@ -1,3 +1,4 @@
+import { currentTeam, withTeam, accessibleTeams } from './scheduleTeams.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs/promises';
@@ -6,7 +7,6 @@ import { config } from './config.js';
 import { verifyInitData } from './telegramAuth.js';
 import {
   DAYS,
-  ROSTER,
   QUORUM,
   MAX_WARNINGS,
   weekDayDates,
@@ -27,17 +27,7 @@ import { loadProfile, toggleFavorite, toggleOwned, setAvatar } from './wuvochkaS
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function authenticate(req, res) {
-  const user = verifyInitData(req.body?.initData);
-  if (!user) {
-    res.status(401).json({ error: 'Не удалось подтвердить, что это ты — открой мини-апп заново из Telegram.' });
-    return null;
-  }
-  const username = (user.username || '').toLowerCase();
-  if (!ROSTER.includes(username)) {
-    res.status(403).json({ error: 'Тебя нет в ростере команды — обратись к @lzyloyd.' });
-    return null;
-  }
-  return { username, id: user.id, isAdmin: user.id === config.adminUserId };
+  return req.scheduleAuth;
 }
 
 function authenticateWuvochka(req, res) {
@@ -63,7 +53,7 @@ async function buildAttendanceView(week) {
   const now = new Date();
   const startedSessions = computeWeekSessions(week).filter((s) => s.startsAt <= now);
   const weekDates = new Set(weekDayDates(weekStartFromIso(week.weekStart)).map((d) => d.dateIso));
-  return ROSTER.map((username) => {
+  return currentTeam().roster.map((username) => {
     const record = attendance[username];
     const markedThisWeek = new Set(
       (record?.history ?? []).filter((h) => h.weekStart === week.weekStart || weekDates.has(h.dateIso)).map((h) => `${h.dayKey}|${h.slot}`),
@@ -81,15 +71,17 @@ async function weekView(week, auth) {
   return {
     days: weekDayDates(weekStart),
     quorum: QUORUM,
-    roster: ROSTER,
+    roster: currentTeam().roster,
+    team: { id: currentTeam().id, name: currentTeam().name },
+    teams: auth.teams,
     maxWarnings: MAX_WARNINGS,
     responses: week.responses,
     daysOff,
     edits: auth.isAdmin ? week.edits : [],
     summaryPreview: auth.isAdmin ? buildSummaryText(week) : null,
     attendance: auth.isAdmin ? await buildAttendanceView(week) : null,
-    answeredCount: ROSTER.filter((u) => hasFullyAnswered(week.responses, u, daysOff)).length,
-    me: { username: auth.username, isAdmin: auth.isAdmin, lastSaved: week.lastSaved?.[auth.username] || null },
+    answeredCount: currentTeam().roster.filter((u) => hasFullyAnswered(week.responses, u, daysOff)).length,
+    me: { username: auth.username, isAdmin: auth.isAdmin, isPlayer: currentTeam().roster.includes(auth.username), lastSaved: week.lastSaved?.[auth.username] || null },
   };
 }
 
@@ -160,6 +152,20 @@ export function startMiniAppServer() {
 
   app.use(express.static(path.join(__dirname, 'miniapp-public'), { etag: false, lastModified: false, cacheControl: false }));
 
+  app.use('/api', async (req, res, next) => {
+    try {
+      if (req.path.startsWith('/wuvochka/')) return next();
+      const user = verifyInitData(req.body?.initData);
+      if (!user) return res.status(401).json({ error: 'Открой мини-приложение заново из Telegram.' });
+      const allowed = await accessibleTeams(user);
+      const access = req.body?.teamId == null ? allowed[0] : allowed.find(t => t.team.id === req.body.teamId);
+      if (!access) return res.status(403).json({ error: 'Нет доступа к этой команде.' });
+      const { team, username, isAdmin } = access;
+      req.scheduleAuth = { id: user.id, username, isAdmin, teams: allowed.map(t => ({ id: t.team.id, name: t.team.name })) };
+      withTeam(team, next);
+    } catch (err) { console.error('[miniapp] authentication failed:', err); res.status(500).json({error: 'Не получилось проверить доступ. Попробуй ещё раз.'}); }
+  });
+
   app.post('/api/state', async (req, res) => {
     const auth = authenticate(req, res);
     if (!auth) return;
@@ -170,6 +176,7 @@ export function startMiniAppServer() {
   app.post('/api/update', async (req, res) => {
     const auth = authenticate(req, res);
     if (!auth) return;
+    if (!currentTeam().roster.includes(auth.username)) return res.status(403).json({ error: 'Заполнять расписание могут только игроки команды.' });
     const { day, avail, slots } = req.body ?? {};
     const dayDef = DAYS.find((d) => d.key === day);
     if (!dayDef || !['yes', 'no', null].includes(avail) || !Array.isArray(slots) || slots.some((s) => !dayDef.slots.includes(s))) {
@@ -228,7 +235,7 @@ export function startMiniAppServer() {
       return;
     }
     const { username, dayKey, slot } = req.body ?? {};
-    if (!ROSTER.includes(username) || !DAYS.some((d) => d.key === dayKey) || typeof slot !== 'string') {
+    if (!currentTeam().roster.includes(username) || !DAYS.some((d) => d.key === dayKey) || typeof slot !== 'string') {
       res.status(400).json({ error: 'Некорректные данные.' });
       return;
     }
@@ -250,7 +257,7 @@ export function startMiniAppServer() {
         res.status(409).json({ error: 'Уже отмечено.' });
         return;
       }
-      await sendTextTo(config.scheduleChatId, config.scheduleThreadId, buildMissWarningText(username, session, record.count));
+      await sendTextTo(currentTeam().chatId, currentTeam().threadId, buildMissWarningText(username, session, record.count));
       res.json(await weekView(week, auth));
     } catch (err) {
       console.error('[miniapp] mark-miss failed:', err);

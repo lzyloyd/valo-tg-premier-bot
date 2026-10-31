@@ -1,3 +1,4 @@
+import { teams, withTeam } from './scheduleTeams.js';
 import { runPollCycle } from './poller.js';
 import { scheduleNext, scheduleWeeklyReset, scheduleDeadlineReminder, scheduleAutoSummary } from './scheduler.js';
 import { runTelegramListener } from './telegramListener.js';
@@ -16,13 +17,15 @@ if (once) {
   console.log('[index] tg-results-bot started. Polling Premier matches only Saturdays at 21:00 and 23:00 MSK.');
   scheduleNext(runPollCycle);
   if (config.scheduleChatId && config.scheduleThreadId) {
-    scheduleWeeklyReset(resetWeekAndAnnounce);
-    scheduleDeadlineReminder(sendDeadlineReminder);
-    scheduleAutoSummary(sendAutoSummary);
-    // Recomputes from scratch on every boot — a mid-week restart would
-    // otherwise silently lose the rest of that week's session reminders,
-    // since they're plain in-memory timers, not persisted anywhere.
-    scheduleUpcomingSessionReminders().catch((err) => console.error('[index] scheduling session reminders failed:', err));
+    for (const team of teams.filter(t => t.enabled)) withTeam(team, () => {
+      scheduleWeeklyReset(resetWeekAndAnnounce);
+      scheduleDeadlineReminder(sendDeadlineReminder);
+      scheduleAutoSummary(sendAutoSummary);
+      // Recomputes from scratch on every boot — a mid-week restart would
+      // otherwise silently lose the rest of that week's session reminders,
+      // since they're plain in-memory timers, not persisted anywhere.
+      scheduleUpcomingSessionReminders().catch((err) => console.error('[index] scheduling session reminders failed:', err));
+    });
   }
   startMiniAppServer();
   runTelegramListener().catch((err) => {

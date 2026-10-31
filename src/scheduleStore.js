@@ -1,3 +1,4 @@
+import { currentTeam } from './scheduleTeams.js';
 import { promises as fs } from 'node:fs';
 import { config } from './config.js';
 import { DAYS, currentWeekStart, weekDeadline, weekStartFromIso, mskIsoDate } from './scheduleModel.js';
@@ -15,7 +16,7 @@ function emptyWeek(weekStart) {
 
 async function readFile() {
   try {
-    const raw = await fs.readFile(config.scheduleDataPath, 'utf8');
+    const raw = await fs.readFile(currentTeam().schedulePath, 'utf8');
     return JSON.parse(raw);
   } catch (err) {
     if (err.code === 'ENOENT') return null;
@@ -25,7 +26,7 @@ async function readFile() {
 
 async function writeFile(data) {
   await fs.mkdir(config.dataDir, { recursive: true });
-  await fs.writeFile(config.scheduleDataPath, JSON.stringify(data, null, 2));
+  await fs.writeFile(currentTeam().schedulePath, JSON.stringify(data, null, 2));
 }
 
 /**

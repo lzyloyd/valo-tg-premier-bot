@@ -2,12 +2,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import {
+for (const key of ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID']) process.env[key] ||= 'test';
+const {
   DAYS, ROSTER, MAIN_ROSTER, SUB_ROSTER, resolveLineup, currentWeekStart, mskIsoDate, weekDayDates,
   weekDeadline, weekResetInstant, reminderInstant, nextResetInstant,
   nextReminderInstant, nextDeadlineInstant, hasFullyAnswered,
   slotInstant, computeWeekSessions, buildSummaryText,
-} from '../src/scheduleModel.js';
+} = await import('../src/scheduleModel.js');
 
 assert.deepEqual(SUB_ROSTER, ['deadqq', 'men4ikcs', 'mania_boo']);
 assert(SUB_ROSTER.every(u => ROSTER.includes(u)) && MAIN_ROSTER.every(u => ROSTER.includes(u)));
