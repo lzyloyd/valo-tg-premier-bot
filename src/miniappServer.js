@@ -18,7 +18,7 @@ import {
   hasFullyAnswered,
   computeWeekSessions,
 } from './scheduleModel.js';
-import { loadCurrentWeek, setResponse, setDayOff, addCustomSlot } from './scheduleStore.js';
+import { loadCurrentWeek, setResponse, setDayOff, addCustomSlot, removeCustomSlot } from './scheduleStore.js';
 import { loadAttendance, recordMiss } from './attendanceStore.js';
 import { sendSummary, handlePostDeadlineEdit, scheduleUpcomingSessionReminders, syncScheduleNotifications } from './scheduleNotifications.js';
 import { sendTextTo } from './telegram.js';
@@ -210,11 +210,22 @@ export function startMiniAppServer() {
 
   app.post('/api/add-time', async (req, res) => {
     const auth = authenticate(req, res);
-    if (!auth.isAdmin && !currentTeam().roster.includes(auth.username)) return res.status(403).json({error:'Нет доступа.'});
+    if (!auth.isAdmin) return res.status(403).json({error:'Создавать сборы может только администратор этой команды.'});
     try {
       const {day, time, weekStart, name} = req.body || {};
       const week = await addCustomSlot(day, time, weekStart, name);
       await syncScheduleNotifications().catch(err => console.error('[schedule] time sync failed:', err));
+      res.json(await weekView(week, auth));
+    } catch (err) { res.status(400).json({error:err.message}); }
+  });
+
+  app.post('/api/remove-time', async (req, res) => {
+    const auth = authenticate(req, res);
+    if (!auth.isAdmin) return res.status(403).json({error:'Удалять сборы может только администратор этой команды.'});
+    try {
+      const {day, time, weekStart} = req.body || {};
+      const week = await removeCustomSlot(day, time, weekStart);
+      await syncScheduleNotifications().catch(err => console.error('[schedule] remove time sync failed:', err));
       res.json(await weekView(week, auth));
     } catch (err) { res.status(400).json({error:err.message}); }
   });

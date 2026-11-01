@@ -97,3 +97,22 @@ export function setDayOff(day, isOff, now = new Date()) {
 export function saveSummaryMessageId(messageId) {
   return mutateWeek(new Date(), week => { week.summaryMessageId = messageId; });
 }
+
+export function removeCustomSlot(day, time, expectedWeekStart, now = new Date()) {
+  return mutateWeek(now, week => {
+    if (expectedWeekStart !== week.weekStart) throw new Error('Началась новая неделя. Обнови расписание.');
+    const definition = DAYS.find(d => d.key === day);
+    if (!definition || !(week.customSlots?.[day] || []).includes(time)) throw new Error('Можно удалять только кастомные сборы.');
+    week.customSlots[day] = week.customSlots[day].filter(slot => slot !== time);
+    if (week.customSlotNames?.[day]) delete week.customSlotNames[day][time];
+    if (!definition.slots.includes(time)) {
+      for (const answers of Object.values(week.responses)) {
+        const answer = answers[day];
+        if (answer?.avail === 'yes') {
+          answer.slots = answer.slots.filter(slot => slot !== time);
+          if (!answer.slots.length) delete answers[day];
+        }
+      }
+    }
+  });
+}

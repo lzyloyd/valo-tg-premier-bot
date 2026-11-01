@@ -118,7 +118,7 @@ export function daysForWeek(week = {}) {
     const names = week.customSlotNames?.[day.key] || {};
     const activityNames = [...new Set(custom.map(time => names[time]).filter(Boolean))];
     const kinds = [...new Set([...(day.slots.length ? [day.kind] : []), ...activityNames])];
-    return {...day, kind: kinds.join(' · ') || day.kind, baseKind:day.kind,
+    return {...day, kind: kinds.join(' · ') || day.kind, baseKind:day.kind, customSlots:custom,
       slots:[...new Set([...day.slots, ...custom])].sort(),
       slotKinds:Object.fromEntries(custom.filter(time => names[time]).map(time => [time,names[time]])),
     };

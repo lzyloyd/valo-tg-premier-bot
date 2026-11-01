@@ -51,22 +51,29 @@ try {
   assert.equal((await api('/api/state',999,'outsider','team2')).status,403);
   assert.equal((await fetch(base+'/api/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:'forged',teamId:'team2'})})).status,401);
   // Custom time and roster actions must be scoped to the selected team.
+  for (const [id, username, team] of [[201,'khhhaneul','team2'],[200,'Mania_boo','ovt'],[202,'qu1ly','ovt']]) {
+    const view = await api('/api/state',id,username,team);
+    assert.equal((await api('/api/add-time',id,username,team,{day:'wed',time:'18:15',weekStart:view.body.weekStart})).status,403);
+  }
+  const ownerWeek = (await api('/api/state',100,'manager','ovt')).body.weekStart;
+  assert.equal((await api('/api/add-time',100,'manager','ovt',{day:'wed',time:'18:15',weekStart:ownerWeek})).status,200);
+  assert.equal((await api('/api/add-time',100,'manager','team2',{day:'wed',time:'18:15',weekStart:ownerWeek})).status,200);
   const before = (await api('/api/state',200,'Mania_boo','team2')).body;
   assert(before.daysOff.includes('sun'));
   assert.deepEqual(before.days.find(d=>d.key==='sun').slots,[]);
   assert.equal((await api('/api/add-time',201,'khhhaneul','ovt',{day:'sun',time:'19:30',weekStart:before.weekStart})).status,403);
-  assert.equal((await api('/api/add-time',201,'khhhaneul','team2',{day:'sun',time:'25:30',weekStart:before.weekStart})).status,400);
-  assert.equal((await api('/api/add-time',201,'khhhaneul','team2',{day:'sun',time:'19:30',weekStart:'2000-01-03'})).status,400);
-  let result = await api('/api/add-time',201,'khhhaneul','team2',{day:'sun',time:'19:30',weekStart:before.weekStart});
+  assert.equal((await api('/api/add-time',200,'Mania_boo','team2',{day:'sun',time:'25:30',weekStart:before.weekStart})).status,400);
+  assert.equal((await api('/api/add-time',200,'Mania_boo','team2',{day:'sun',time:'19:30',weekStart:'2000-01-03'})).status,400);
+  let result = await api('/api/add-time',200,'Mania_boo','team2',{day:'sun',time:'19:30',weekStart:before.weekStart});
   assert.equal(result.status,200); assert(!result.body.daysOff.includes('sun'));
   assert.deepEqual(result.body.days.find(d=>d.key==='sun').slots,['19:30']);
   assert.equal(result.body.days.find(d=>d.key==='sun').kind,'МСК турнир');
   assert((await api('/api/state',200,'Mania_boo','ovt')).body.daysOff.includes('sun'));
-  assert.equal((await api('/api/add-time',201,'khhhaneul','team2',{day:'sun',time:'19:30',weekStart:before.weekStart})).status,400);
+  assert.equal((await api('/api/add-time',200,'Mania_boo','team2',{day:'sun',time:'19:30',weekStart:before.weekStart})).status,400);
   assert.equal((await api('/api/update',201,'khhhaneul','team2',{day:'sun',avail:'yes',slots:['19:30']})).status,200);
-  assert.equal((await api('/api/add-time',201,'khhhaneul','team2',{day:'wed',time:'19:00',weekStart:before.weekStart,name:''})).status,400);
-  assert.equal((await api('/api/add-time',201,'khhhaneul','team2',{day:'wed',time:'19:00',weekStart:before.weekStart,name:'x'.repeat(61)})).status,400);
-  const concurrent = await Promise.all(['18:45','20:15'].map(time=>api('/api/add-time',201,'khhhaneul','team2',{day:'tue',time,weekStart:before.weekStart})));
+  assert.equal((await api('/api/add-time',200,'Mania_boo','team2',{day:'wed',time:'19:00',weekStart:before.weekStart,name:''})).status,400);
+  assert.equal((await api('/api/add-time',200,'Mania_boo','team2',{day:'wed',time:'19:00',weekStart:before.weekStart,name:'x'.repeat(61)})).status,400);
+  const concurrent = await Promise.all(['18:45','20:15'].map(time=>api('/api/add-time',200,'Mania_boo','team2',{day:'tue',time,weekStart:before.weekStart})));
   assert(concurrent.every(r=>r.status===200));
   const after = (await api('/api/state',201,'khhhaneul','team2')).body;
   assert(after.days.find(d=>d.key==='tue').slots.includes('18:45'));
@@ -74,6 +81,18 @@ try {
   assert.equal(after.days.find(d=>d.key==='tue').kind,'Праки · МСК турнир');
   assert.equal((await api('/api/state',200,'Mania_boo','ovt')).body.days.find(d=>d.key==='tue').kind,'Праки');
   assert.deepEqual(after.days.find(d=>d.key==='sat').slots,['21:00','23:00']);
+  for (const [id,user,team] of [[201,'khhhaneul','team2'],[200,'Mania_boo','ovt']]) {
+    assert.equal((await api('/api/remove-time',id,user,team,{day:'sun',time:'19:30',weekStart:before.weekStart})).status,403);
+  }
+  assert.equal((await api('/api/remove-time',200,'Mania_boo','team2',{day:'sat',time:'21:00',weekStart:before.weekStart})).status,400);
+  assert.equal((await api('/api/remove-time',200,'Mania_boo','team2',{day:'sun',time:'19:30',weekStart:'2000-01-03'})).status,400);
+  const removed = await api('/api/remove-time',200,'Mania_boo','team2',{day:'sun',time:'19:30',weekStart:before.weekStart});
+  assert.equal(removed.status,200);
+  assert(removed.body.daysOff.includes('sun'));
+  assert.equal(removed.body.responses.khhhaneul.sun,undefined);
+  assert.deepEqual(removed.body.days.find(d=>d.key==='sat').slots,['21:00','23:00']);
+  assert.equal((await api('/api/remove-time',100,'manager','ovt',{day:'wed',time:'18:15',weekStart:ownerWeek})).status,200);
+  assert((await api('/api/state',100,'manager','team2')).body.days.find(d=>d.key==='wed').slots.includes('18:15'));
   assert.equal((await api('/api/roster',201,'khhhaneul','team2',{action:'add',username:'no_permission',role:'sub'})).status,403);
   assert.equal((await api('/api/roster',200,'Mania_boo','ovt',{action:'remove',username:'qu1ly'})).status,403);
   for (const name of ['new_sub_one','new_sub_two']) assert.equal((await api('/api/roster',200,'Mania_boo','team2',{action:'add',username:'@'+name,role:'sub'})).status,200);

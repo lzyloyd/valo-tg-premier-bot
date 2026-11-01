@@ -253,7 +253,7 @@ function renderMeScreen() {
     const slots = d.slots.map(t => '<button class="slot-chip' + (my.avail === 'yes' && my.slots.includes(t) ? ' on' : '') + (my.avail === 'no' ? ' dim' : '') + '"' + (state.me.isPlayer ? '' : ' disabled') + ' data-day="' + d.key + '" data-slot="' + t + '">' + t + '</button>').join('');
     return '<div class="day-card">' + identity + (state.me.isPlayer ? '<div class="avail-toggle"><button class="avail-btn no' + (my.avail === 'no' ? ' active' : '') + '" data-day="' + d.key + '">не могу</button></div>' : '') + '<div class="slots">' + slots + '</div></div>';
   }).join('');
-  return '<div class="screen"><div class="screen-heading"><div><h2>' + (state.me.isPlayer ? 'Моя неделя' : 'Расписание команды') + '</h2><p>' + (state.me.isPlayer ? 'Выбери удобное время · МСК' : 'Время сборов · МСК') + '</p></div><button class="soft-btn" data-add-time="mon">＋ Добавить сбор</button></div><div class="day-list">' + cards + '</div><div class="save-status" id="saveStatus">' + saveStatusText + '</div></div>';
+  return '<div class="screen"><div class="screen-heading"><div><h2>' + (state.me.isPlayer ? 'Моя неделя' : 'Расписание команды') + '</h2><p>' + (state.me.isPlayer ? 'Выбери удобное время · МСК' : 'Время сборов · МСК') + '</p></div>' + (state.me.isAdmin ? '<button class="soft-btn" data-add-time="mon">＋ Добавить сбор</button>' : '') + '</div><div class="day-list">' + cards + '</div><div class="save-status" id="saveStatus">' + saveStatusText + '</div></div>';
 }
 
 function availableFor(day, slot) {
@@ -309,6 +309,12 @@ function renderRoster() {
   const row = (member, index, sub) => '<div class="roster-player"><div class="player-mark' + (sub ? ' reserve' : '') + '">' + (sub ? '#' + (index + 1) : initials(member.username).toUpperCase()) + '</div><div class="player-details"><div class="player-name">@' + escapeHtml(member.username) + '</div><div class="player-caption">' + (sub ? 'Приоритет ' + (index + 1) : 'Основной игрок') + '</div>' + (sub ? '<div class="priority-controls"><button class="player-btn" data-roster-action="priority" data-username="' + member.username + '" data-direction="up" aria-label="Повысить приоритет @' + member.username + '"' + (index === 0 ? ' disabled' : '') + '>↑</button><button class="player-btn" data-roster-action="priority" data-username="' + member.username + '" data-direction="down" aria-label="Понизить приоритет @' + member.username + '"' + (index === subs.length - 1 ? ' disabled' : '') + '>↓</button></div>' : '') + '</div><div class="player-actions"><button class="player-btn" data-roster-action="role" data-username="' + member.username + '" data-role="' + (sub ? 'main' : 'sub') + '">' + (sub ? 'В основу' : 'В запас') + '</button><button class="player-btn remove" data-roster-action="remove" data-username="' + member.username + '" aria-label="Удалить @' + member.username + '">×</button></div></div>';
   return '<section class="roster-section"><div class="screen-heading"><div><h2>Состав команды</h2><p>' + escapeHtml(state.team.name) + ' · ' + state.roster.length + ' игроков</p></div><button class="soft-btn" id="addPlayer">＋ Игрок</button></div><div class="roster-label">Основа <b>' + mains.length + ' / 5</b></div><div class="roster-list">' + (mains.map((m,i) => row(m,i,false)).join('') || '<div class="roster-player empty-note">Пока нет игроков в основе</div>') + '</div><div class="roster-label">Запас <b>' + subs.length + '</b></div><div class="roster-list">' + (subs.map((m,i) => row(m,i,true)).join('') || '<div class="roster-player empty-note">Запасных пока нет</div>') + '</div><p class="roster-hint">Запасные выходят в порядке приоритета. Для игрового дня нужны 5 игроков.</p></section>';
 }
+function renderCustomGatherings() {
+  const items = state.days.flatMap(day => (day.customSlots || []).map(time =>
+    '<div class="roster-player"><div class="player-details"><div class="player-name">' + escapeHtml(day.slotKinds?.[time] || 'Кастомный сбор') + '</div><div class="player-caption">' + DAY_ABBR[day.key] + ', ' + shortDate(day.dateIso) + ' · ' + time + ' МСК</div></div><button class="player-btn remove" data-remove-time="' + time + '" data-day="' + day.key + '" aria-label="Удалить кастомный сбор ' + time + '">×</button></div>'
+  ));
+  return '<section class="roster-section"><div class="roster-label">Кастомные сборы <b>' + items.length + '</b></div>' + (items.length ? '<div class="roster-list">' + items.join('') + '</div>' : '<div class="empty-note">Пока нет кастомных сборов.</div>') + '</section>';
+}
 function renderAdminScreen() {
   const edits = state.edits.length
     ? state.edits
@@ -342,7 +348,7 @@ function renderAdminScreen() {
     })
     .join('');
   return `<div class="screen">
-    ${renderRoster()}<div class="section-lbl">Настройки недели</div>
+    ${renderRoster()}${renderCustomGatherings()}<div class="section-lbl">Настройки недели</div>
     <div class="section-lbl">Выходные дни</div>
     <div class="dayoff-list">${dayoffToggles}</div>
     <div class="admin-progress">
@@ -366,6 +372,7 @@ function render() {
 }
 
 function bindEvents() {
+  document.querySelectorAll('[data-remove-time]').forEach(btn => btn.addEventListener('click', () => openEditor('remove-time', {day:btn.dataset.day,time:btn.dataset.removeTime,weekStart:state.weekStart})));
   document.querySelectorAll('[data-add-time]').forEach(btn => btn.addEventListener('click', () => openEditor('time', {day:btn.dataset.addTime})));
   document.getElementById('addPlayer')?.addEventListener('click', () => openEditor('player'));
   document.querySelectorAll('[data-roster-action]').forEach(btn => btn.addEventListener('click', async () => {
@@ -467,13 +474,14 @@ const editModal = document.getElementById('editModal');
 editModal.addEventListener('cancel', e => { if (modalBusy) e.preventDefault(); });
 editModal.addEventListener('close', () => { if (!document.hidden) startPolling(); });
 function openEditor(type, data = {}) {
+  if (!state.me.isAdmin) return;
   stopPolling();
   const team = escapeHtml(state.team.name);
-  const title = type === 'time' ? 'Добавить сбор' : type === 'player' ? 'Новый игрок' : 'Удалить игрока?';
-  const sub = type === 'time' ? team + ' · на этой неделе' : type === 'player' ? 'Добавь игрока в ' + team : '@' + escapeHtml(data.username) + ' потеряет доступ к расписанию ' + team + '.';
+  const title = type === 'time' ? 'Добавить сбор' : type === 'player' ? 'Новый игрок' : type === 'remove-time' ? 'Удалить сбор?' : 'Удалить игрока?';
+  const sub = type === 'time' ? team + ' · на этой неделе' : type === 'player' ? 'Добавь игрока в ' + team : type === 'remove-time' ? team + ' · ' + DAY_ABBR[data.day] + ' · ' + data.time + ' МСК' : '@' + escapeHtml(data.username) + ' потеряет доступ к расписанию ' + team + '.';
   const timeFields = '<label class="field-label" for="gatheringName">Название сбора</label><input class="modal-input" id="gatheringName" name="name" placeholder="Например, МСК турнир" maxlength="60" autocomplete="off" required><span class="field-label">День недели</span><div class="modal-days">' + state.days.map(d => '<button type="button" class="modal-day' + (d.key === data.day ? ' active' : '') + '" data-modal-day="' + d.key + '" aria-pressed="' + (d.key === data.day) + '"' + (state.explicitDaysOff.includes(d.key) ? ' disabled' : '') + '>' + DAY_ABBR[d.key] + '<small>' + dateParts(d.dateIso).day + '</small></button>').join('') + '</div><label class="field-label" for="customTime">Время · МСК</label><input class="modal-input time-field" id="customTime" name="time" type="time" value="20:30" step="60" required><div class="modal-note"><span>◷</span><span>Время добавится к остальным вариантам <b>только у ' + team + '</b>. Каждый игрок отметит, сможет ли прийти.</span></div>';
   const playerFields = '<label class="field-label" for="playerUsername">Telegram-ник</label><input class="modal-input" id="playerUsername" name="username" placeholder="@username" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="33"><span class="field-label">Роль в команде</span><div class="role-choices"><button type="button" class="role-choice active" data-modal-role="main" aria-pressed="true">Основа<small>Постоянный состав</small></button><button type="button" class="role-choice" data-modal-role="sub" aria-pressed="false">Запас<small>В конце очереди замен</small></button></div><div class="modal-note">Игрок получит доступ к этой команде при первом входе в мини-приложение через Telegram.</div>';
-  editModal.innerHTML = '<form id="editorForm"><div class="modal-top"><div><h2 class="modal-title" id="modalTitle">' + title + '</h2><p class="modal-sub">' + sub + '</p></div><button type="button" class="modal-close" aria-label="Закрыть">×</button></div>' + (type === 'time' ? timeFields : type === 'player' ? playerFields : '<div class="modal-note">История посещаемости сохранится. Права администратора задаются отдельно от игрового состава.</div>') + '<div class="modal-error" id="modalError" role="alert"></div><button class="modal-submit" type="submit">' + (type === 'time' ? 'Добавить время' : type === 'player' ? 'Добавить игрока' : 'Удалить из команды') + '</button></form>';
+  editModal.innerHTML = '<form id="editorForm"><div class="modal-top"><div><h2 class="modal-title" id="modalTitle">' + title + '</h2><p class="modal-sub">' + sub + '</p></div><button type="button" class="modal-close" aria-label="Закрыть">×</button></div>' + (type === 'time' ? timeFields : type === 'player' ? playerFields : type === 'remove-time' ? '<div class="modal-note">Сбор и выбранные для него отметки будут удалены. Стандартные праки и премьер сохранятся.</div>' : '<div class="modal-note">История посещаемости сохранится. Права администратора задаются отдельно от игрового состава.</div>') + '<div class="modal-error" id="modalError" role="alert"></div><button class="modal-submit" type="submit">' + (type === 'time' ? 'Добавить время' : type === 'player' ? 'Добавить игрока' : type === 'remove-time' ? 'Удалить сбор' : 'Удалить из команды') + '</button></form>';
   let day = data.day;
   let role = 'main';
   editModal.querySelector('.modal-close').onclick = () => { if (!modalBusy) editModal.close(); };
@@ -487,7 +495,7 @@ function openEditor(type, data = {}) {
     const error = editModal.querySelector('#modalError'); error.textContent = '';
     try {
       const body = type === 'time' ? {day, time:editModal.querySelector('#customTime').value, name:editModal.querySelector('#gatheringName').value, weekStart:state.weekStart} : type === 'player' ? {action:'add', username:editModal.querySelector('#playerUsername').value, role} : data;
-      state = await api(type === 'time' ? '/api/add-time' : '/api/roster', body);
+      state = await api(type === 'time' ? '/api/add-time' : type === 'remove-time' ? '/api/remove-time' : '/api/roster', body);
       rebuildDraft(); render(); editModal.close();
     } catch (err) { error.textContent = err.message; }
     finally { modalBusy = false; submit.disabled = false; }
