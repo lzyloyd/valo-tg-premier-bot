@@ -39,7 +39,7 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .day-date{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
 .day-kind{font-size:9.5px;color:var(--text-muted);margin-top:1px;white-space:nowrap;}
 .avail-toggle{display:flex;flex-direction:column;gap:4px;justify-self:center;align-items:stretch;}
-.slots{display:flex;gap:4px;flex-wrap:nowrap;justify-content:flex-end;}
+.slots{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
 .avail-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;}
 .avail-btn.yes.active{background:var(--on-bg);border-color:var(--on);color:var(--on);}
 .avail-btn.no.active{background:var(--surface-3);border-color:var(--text-muted);color:var(--text);}
@@ -96,10 +96,20 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .miss-btn{border:1px solid var(--accent);background:rgba(255,90,104,.12);color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:10.5px;padding:5px 8px;border-radius:7px;cursor:pointer;white-space:nowrap;}
 .miss-btn[disabled]{opacity:.5;cursor:not-allowed;}
 .loading{padding:40px;text-align:center;color:var(--text-muted);}
+
+.screen-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;}
+.screen-heading h2{font-size:16px;margin:0;font-weight:800;}.screen-heading p{margin:4px 0 0;color:var(--text-muted);font-size:11px;}
+.soft-btn{border:1px solid rgba(255,90,104,.25);background:rgba(255,90,104,.09);color:var(--accent);border-radius:10px;padding:10px 12px;min-height:40px;font:700 11px 'Manrope',sans-serif;cursor:pointer;white-space:nowrap;}
+.day-card{grid-template-columns:92px 1fr;gap:10px;padding:14px 12px;}.day-card .avail-toggle{grid-column:1;grid-row:2;justify-self:start;}.day-card .slots{grid-column:2;grid-row:1 / span 2;align-self:center;}
+.slot-add{color:var(--text-muted);border-style:dashed;background:transparent;min-width:32px;}.day-card.day-off{opacity:1;background:rgba(20,27,38,.55);}.day-card.day-off .day-id{opacity:.65;}.day-card.day-off .day-off-label{grid-column:2;grid-row:1;text-align:right;font-size:11px;}.day-card.day-off .soft-btn{grid-column:2;justify-self:end;padding:7px 10px;min-height:32px;font-size:10px;}
+.roster-section{margin-bottom:22px;}.roster-label{display:flex;align-items:center;justify-content:space-between;margin:16px 0 8px;color:var(--text-muted);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}.roster-label b{background:var(--surface-3);border-radius:5px;padding:3px 6px;font:600 10px 'JetBrains Mono',monospace;}
+.roster-list{border:1px solid var(--border);border-radius:13px;overflow:hidden;background:var(--surface);}.roster-player{display:flex;align-items:center;gap:8px;padding:11px 10px;border-top:1px solid var(--border);}.roster-player:first-child{border-top:0;}.player-mark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;font:700 10px 'JetBrains Mono',monospace;color:var(--text-muted);background:var(--surface-2);}.player-mark.reserve{color:var(--warn);background:var(--warn-bg);}.player-details{min-width:0;flex:1;}.player-name{font-size:11px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.player-caption{font-size:9px;color:var(--text-muted);margin-top:3px;}.player-actions{display:flex;align-items:center;gap:4px;}.player-btn{min-height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text-muted);font:700 10px 'Manrope',sans-serif;padding:6px 8px;cursor:pointer;}.player-btn.remove{font-size:18px;border-color:transparent;background:transparent;color:var(--text-muted);padding:2px 7px;}.player-btn:disabled{opacity:.25;cursor:default;}.priority-controls{display:flex;gap:3px;margin-top:6px;}.priority-controls .player-btn{min-height:28px;padding:2px 9px;font-size:14px;}.roster-hint{font-size:10px;color:var(--text-muted);line-height:1.6;margin:9px 0 0;}
+dialog{width:calc(100% - 24px);max-width:440px;max-height:90dvh;overflow-y:auto;margin:auto;border:1px solid var(--border);border-radius:22px;padding:24px 20px 20px;background:var(--surface);color:var(--text);box-shadow:0 24px 100px rgba(0,0,0,.6);font-family:'Manrope',sans-serif;}dialog::backdrop{background:rgba(4,7,12,.78);backdrop-filter:blur(5px);}.modal-top{display:flex;align-items:start;justify-content:space-between;gap:12px;}.modal-title{font-size:20px;letter-spacing:-.03em;font-weight:800;margin:0;}.modal-sub{color:var(--text-muted);font-size:11px;margin:6px 0 22px;line-height:1.6;}.modal-close{border:none;background:var(--surface-2);color:var(--text-muted);border-radius:50%;width:30px;height:30px;font-size:20px;cursor:pointer;flex-shrink:0;}.field-label{display:block;margin:18px 0 9px;color:var(--text-muted);font-size:10px;text-transform:uppercase;font-weight:800;letter-spacing:.07em;}.modal-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;}.modal-day{min-width:0;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);border-radius:10px;padding:10px 1px;font:700 11px 'Manrope',sans-serif;cursor:pointer;}.modal-day small{display:block;font:500 9px 'JetBrains Mono',monospace;margin-top:5px;opacity:.7;}.modal-day.active,.role-choice.active{border-color:rgba(255,90,104,.5);background:rgba(255,90,104,.12);color:var(--accent);}.modal-day:disabled{opacity:.25;cursor:default;}.modal-input{width:100%;min-width:0;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);padding:14px;font:600 15px 'Manrope',sans-serif;outline:none;color-scheme:dark;}.modal-input:focus{border-color:var(--accent);}.time-field{font:600 32px 'JetBrains Mono',monospace;letter-spacing:.03em;text-align:center;}.modal-note{display:flex;gap:10px;padding:12px;border:1px solid var(--border);border-radius:12px;color:var(--text-muted);font-size:11px;line-height:1.6;margin:16px 0;}.modal-note b{color:var(--text);font-weight:600;}.modal-submit{width:100%;border:none;border-radius:12px;background:var(--accent);color:#fff;min-height:46px;font:800 13px 'Manrope',sans-serif;cursor:pointer;margin-top:8px;}.modal-submit:disabled{opacity:.5;}.modal-error{font-size:11px;line-height:1.6;color:var(--accent);margin-top:12px;}.role-choices{display:flex;gap:8px;}.role-choice{flex:1;text-align:left;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);padding:13px;border-radius:12px;font:800 12px 'Manrope',sans-serif;cursor:pointer;}.role-choice small{display:block;font-size:10px;font-weight:500;opacity:.75;margin-top:5px;}.soft-btn:focus-visible,.player-btn:focus-visible,.modal-day:focus-visible,.role-choice:focus-visible,.modal-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 </style>
 </head>
 <body>
 <div id="app"><div class="loading">Загрузка…</div></div>
+<dialog id="editModal" aria-labelledby="modalTitle"></dialog>
 <script>
 const tg = window.Telegram?.WebApp;
 tg?.ready();
@@ -168,7 +178,6 @@ function rebuildDraft() {
 
 async function loadState() {
   state = await api('/api/state');
-  if (!state.me.isPlayer) activeTab = 'team';
   rebuildDraft();
   applyLastSaved();
   render();
@@ -228,7 +237,7 @@ function renderHeader() {
 }
 
 function renderTabs() {
-  const tabs = state.me.isPlayer ? [['me', 'Расписание'], ['team', 'Команда']] : [['team', 'Команда']];
+  const tabs = [['me', 'Расписание'], ['team', 'Команда']];
   if (state.me.isAdmin) tabs.push(['admin', 'Админ']);
   return `<nav class="tabs">${tabs
     .map(([key, label]) => `<button class="tab${activeTab === key ? ' active' : ''}" data-tab="${key}">${label}</button>`)
@@ -236,42 +245,16 @@ function renderTabs() {
 }
 
 function renderMeScreen() {
-  const cards = state.days
-    .map((d) => {
-      if (state.daysOff.includes(d.key)) {
-        return `<div class="day-card day-off">
-          <div class="day-id">
-            <div class="day-name">${d.label}</div>
-            <div class="day-date">${shortDate(d.dateIso)}</div>
-            <div class="day-kind">${d.kind}</div>
-          </div>
-          <div class="day-off-label">☀️ Выходной</div>
-        </div>`;
-      }
-      const my = draft[d.key];
-      const slots = d.slots
-        .map((t) => {
-          const on = my.avail === 'yes' && my.slots.includes(t);
-          return `<button class="slot-chip${on ? ' on' : ''}${my.avail === 'no' ? ' dim' : ''}" data-day="${d.key}" data-slot="${t}">${t}</button>`;
-        })
-        .join('');
-      return `<div class="day-card">
-        <div class="day-id">
-          <div class="day-name">${d.label}</div>
-          <div class="day-date">${shortDate(d.dateIso)}</div>
-          <div class="day-kind">${d.kind}</div>
-        </div>
-        <div class="avail-toggle">
-          <button class="avail-btn no${my.avail === 'no' ? ' active' : ''}" data-day="${d.key}" data-avail="no">не могу</button>
-        </div>
-        <div class="slots">${slots}</div>
-      </div>`;
-    })
-    .join('');
-  return `<div class="screen">
-    <div class="day-list">${cards}</div>
-    <div class="save-status" id="saveStatus">${saveStatusText}</div>
-  </div>`;
+  const cards = state.days.map(d => {
+    const off = state.daysOff.includes(d.key);
+    const explicitOff = state.explicitDaysOff.includes(d.key);
+    const identity = '<div class="day-id"><div class="day-name">' + d.label + '</div><div class="day-date">' + shortDate(d.dateIso) + '</div><div class="day-kind">' + (off ? 'Без сборов' : d.kind) + '</div></div>';
+    if (off) return '<div class="day-card day-off">' + identity + '<div class="day-off-label">☀️ Выходной</div>' + (!explicitOff ? '<button class="soft-btn" data-add-time="' + d.key + '">＋ Добавить сбор</button>' : '') + '</div>';
+    const my = draft[d.key] || {avail:null, slots:[]};
+    const slots = d.slots.map(t => '<button class="slot-chip' + (my.avail === 'yes' && my.slots.includes(t) ? ' on' : '') + (my.avail === 'no' ? ' dim' : '') + '"' + (state.me.isPlayer ? '' : ' disabled') + ' data-day="' + d.key + '" data-slot="' + t + '">' + t + '</button>').join('');
+    return '<div class="day-card">' + identity + (state.me.isPlayer ? '<div class="avail-toggle"><button class="avail-btn no' + (my.avail === 'no' ? ' active' : '') + '" data-day="' + d.key + '">не могу</button></div>' : '') + '<div class="slots">' + slots + '<button class="slot-chip slot-add" data-add-time="' + d.key + '" aria-label="Добавить время: ' + d.label + '">＋</button></div></div>';
+  }).join('');
+  return '<div class="screen"><div class="screen-heading"><div><h2>' + (state.me.isPlayer ? 'Моя неделя' : 'Расписание команды') + '</h2><p>' + (state.me.isPlayer ? 'Выбери удобное время · МСК' : 'Время сборов · МСК') + '</p></div><button class="soft-btn" data-add-time="mon">＋ Добавить сбор</button></div><div class="day-list">' + cards + '</div><div class="save-status" id="saveStatus">' + saveStatusText + '</div></div>';
 }
 
 function availableFor(day, slot) {
@@ -317,10 +300,16 @@ function renderTeamScreen() {
         <button class="seg-btn${teamMode === 'pips' ? ' active' : ''}" data-teammode="pips">Полоска</button>
       </div>
     </div>
-    <div class="team-grid" style="--day-count:${state.days.length}">${header}${rowFor('20:00')}${rowFor('21:00')}${rowFor('22:00')}${rowFor('18:00')}</div>
+    <div class="team-grid" style="--day-count:${state.days.length}">${header}${[...new Set(state.days.flatMap(d => d.slots))].sort().map(rowFor).join('')}</div>
   </div>`;
 }
 
+function renderRoster() {
+  const mains = state.members.filter(m => m.role === 'main');
+  const subs = state.members.filter(m => m.role === 'sub');
+  const row = (member, index, sub) => '<div class="roster-player"><div class="player-mark' + (sub ? ' reserve' : '') + '">' + (sub ? '#' + (index + 1) : initials(member.username).toUpperCase()) + '</div><div class="player-details"><div class="player-name">@' + escapeHtml(member.username) + '</div><div class="player-caption">' + (sub ? 'Приоритет ' + (index + 1) : 'Основной игрок') + '</div>' + (sub ? '<div class="priority-controls"><button class="player-btn" data-roster-action="priority" data-username="' + member.username + '" data-direction="up" aria-label="Повысить приоритет @' + member.username + '"' + (index === 0 ? ' disabled' : '') + '>↑</button><button class="player-btn" data-roster-action="priority" data-username="' + member.username + '" data-direction="down" aria-label="Понизить приоритет @' + member.username + '"' + (index === subs.length - 1 ? ' disabled' : '') + '>↓</button></div>' : '') + '</div><div class="player-actions"><button class="player-btn" data-roster-action="role" data-username="' + member.username + '" data-role="' + (sub ? 'main' : 'sub') + '">' + (sub ? 'В основу' : 'В запас') + '</button><button class="player-btn remove" data-roster-action="remove" data-username="' + member.username + '" aria-label="Удалить @' + member.username + '">×</button></div></div>';
+  return '<section class="roster-section"><div class="screen-heading"><div><h2>Состав команды</h2><p>' + escapeHtml(state.team.name) + ' · ' + state.roster.length + ' игроков</p></div><button class="soft-btn" id="addPlayer">＋ Игрок</button></div><div class="roster-label">Основа <b>' + mains.length + ' / 5</b></div><div class="roster-list">' + (mains.map((m,i) => row(m,i,false)).join('') || '<div class="roster-player empty-note">Пока нет игроков в основе</div>') + '</div><div class="roster-label">Запас <b>' + subs.length + '</b></div><div class="roster-list">' + (subs.map((m,i) => row(m,i,true)).join('') || '<div class="roster-player empty-note">Запасных пока нет</div>') + '</div><p class="roster-hint">Запасные выходят в порядке приоритета. Для игрового дня нужны 5 игроков.</p></section>';
+}
 function renderAdminScreen() {
   const edits = state.edits.length
     ? state.edits
@@ -333,7 +322,7 @@ function renderAdminScreen() {
   const dayoffToggles = state.days
     .map((d) => {
       const isOff = state.daysOff.includes(d.key);
-      return `<button class="dayoff-btn${isOff ? ' active' : ''}" data-day="${d.key}" data-off="${isOff ? '0' : '1'}">${d.label}${isOff ? ' ☀️' : ''}</button>`;
+      return `<button class="dayoff-btn${isOff ? ' active' : ''}" data-day="${d.key}" data-off="${isOff ? '0' : '1'}"${!d.slots.length ? ' disabled title="Сначала добавь время сборов"' : ''}>${d.label}${isOff ? ' ☀️' : ''}</button>`;
     })
     .join('');
   const attendanceRows = state.attendance
@@ -354,7 +343,7 @@ function renderAdminScreen() {
     })
     .join('');
   return `<div class="screen">
-    <div class="admin-lock">🔒 Видно только тебе</div>
+    ${renderRoster()}<div class="section-lbl">Настройки недели</div>
     <div class="section-lbl">Выходные дни</div>
     <div class="dayoff-list">${dayoffToggles}</div>
     <div class="admin-progress">
@@ -378,6 +367,15 @@ function render() {
 }
 
 function bindEvents() {
+  document.querySelectorAll('[data-add-time]').forEach(btn => btn.addEventListener('click', () => openEditor('time', {day:btn.dataset.addTime})));
+  document.getElementById('addPlayer')?.addEventListener('click', () => openEditor('player'));
+  document.querySelectorAll('[data-roster-action]').forEach(btn => btn.addEventListener('click', async () => {
+    const data = {action:btn.dataset.rosterAction, username:btn.dataset.username, role:btn.dataset.role, direction:btn.dataset.direction};
+    if (data.action === 'remove') return openEditor('remove', data);
+    btn.disabled = true;
+    try { state = await api('/api/roster', data); rebuildDraft(); render(); }
+    catch (err) { tg?.showAlert ? tg.showAlert(err.message) : alert(err.message); btn.disabled = false; }
+  }));
   document.querySelectorAll('[data-team-id]').forEach(btn => btn.addEventListener('click', () => {
     if (btn.dataset.teamId === state.team.id) return;
     const url = new URL(location.href);
@@ -398,7 +396,7 @@ function bindEvents() {
     }),
   );
   // Picking any time means "могу"; un-picking the last one clears the answer.
-  document.querySelectorAll('.slot-chip').forEach((btn) =>
+  document.querySelectorAll('.slot-chip[data-slot]').forEach((btn) =>
     btn.addEventListener('click', async () => {
       const day = btn.dataset.day;
       const t = btn.dataset.slot;
@@ -463,6 +461,39 @@ function bindEvents() {
       e.target.disabled = false;
     }
   });
+}
+
+let modalBusy = false;
+const editModal = document.getElementById('editModal');
+editModal.addEventListener('cancel', e => { if (modalBusy) e.preventDefault(); });
+editModal.addEventListener('close', () => { if (!document.hidden) startPolling(); });
+function openEditor(type, data = {}) {
+  stopPolling();
+  const team = escapeHtml(state.team.name);
+  const title = type === 'time' ? 'Добавить сбор' : type === 'player' ? 'Новый игрок' : 'Удалить игрока?';
+  const sub = type === 'time' ? team + ' · на этой неделе' : type === 'player' ? 'Добавь игрока в ' + team : '@' + escapeHtml(data.username) + ' потеряет доступ к расписанию ' + team + '.';
+  const timeFields = '<span class="field-label">День недели</span><div class="modal-days">' + state.days.map(d => '<button type="button" class="modal-day' + (d.key === data.day ? ' active' : '') + '" data-modal-day="' + d.key + '" aria-pressed="' + (d.key === data.day) + '"' + (state.explicitDaysOff.includes(d.key) ? ' disabled' : '') + '>' + DAY_ABBR[d.key] + '<small>' + dateParts(d.dateIso).day + '</small></button>').join('') + '</div><label class="field-label" for="customTime">Время · МСК</label><input class="modal-input time-field" id="customTime" name="time" type="time" value="20:30" step="60" required><div class="modal-note"><span>◷</span><span>Время добавится к остальным вариантам <b>только у ' + team + '</b>. Каждый игрок отметит, сможет ли прийти.</span></div>';
+  const playerFields = '<label class="field-label" for="playerUsername">Telegram-ник</label><input class="modal-input" id="playerUsername" name="username" placeholder="@username" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="33"><span class="field-label">Роль в команде</span><div class="role-choices"><button type="button" class="role-choice active" data-modal-role="main" aria-pressed="true">Основа<small>Постоянный состав</small></button><button type="button" class="role-choice" data-modal-role="sub" aria-pressed="false">Запас<small>В конце очереди замен</small></button></div><div class="modal-note">Игрок получит доступ к этой команде при первом входе в мини-приложение через Telegram.</div>';
+  editModal.innerHTML = '<form id="editorForm"><div class="modal-top"><div><h2 class="modal-title" id="modalTitle">' + title + '</h2><p class="modal-sub">' + sub + '</p></div><button type="button" class="modal-close" aria-label="Закрыть">×</button></div>' + (type === 'time' ? timeFields : type === 'player' ? playerFields : '<div class="modal-note">История посещаемости сохранится. Права администратора задаются отдельно от игрового состава.</div>') + '<div class="modal-error" id="modalError" role="alert"></div><button class="modal-submit" type="submit">' + (type === 'time' ? 'Добавить время' : type === 'player' ? 'Добавить игрока' : 'Удалить из команды') + '</button></form>';
+  let day = data.day;
+  let role = 'main';
+  editModal.querySelector('.modal-close').onclick = () => { if (!modalBusy) editModal.close(); };
+  editModal.querySelectorAll('[data-modal-day]').forEach(btn => btn.onclick = () => { day = btn.dataset.modalDay; editModal.querySelectorAll('[data-modal-day]').forEach(b => { b.classList.toggle('active', b === btn); b.setAttribute('aria-pressed', String(b === btn)); }); });
+  editModal.querySelectorAll('[data-modal-role]').forEach(btn => btn.onclick = () => { role = btn.dataset.modalRole; editModal.querySelectorAll('[data-modal-role]').forEach(b => { b.classList.toggle('active', b === btn); b.setAttribute('aria-pressed', String(b === btn)); }); });
+  editModal.querySelector('form').onsubmit = async e => {
+    e.preventDefault();
+    if (modalBusy) return;
+    modalBusy = true;
+    const submit = editModal.querySelector('.modal-submit'); submit.disabled = true;
+    const error = editModal.querySelector('#modalError'); error.textContent = '';
+    try {
+      const body = type === 'time' ? {day, time:editModal.querySelector('#customTime').value, weekStart:state.weekStart} : type === 'player' ? {action:'add', username:editModal.querySelector('#playerUsername').value, role} : data;
+      state = await api(type === 'time' ? '/api/add-time' : '/api/roster', body);
+      rebuildDraft(); render(); editModal.close();
+    } catch (err) { error.textContent = err.message; }
+    finally { modalBusy = false; submit.disabled = false; }
+  };
+  editModal.showModal();
 }
 
 async function saveDay(day) {

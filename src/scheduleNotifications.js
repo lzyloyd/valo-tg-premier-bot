@@ -1,5 +1,6 @@
+import { serial } from './schedulePersistence.js';
 import { currentTeam } from './scheduleTeams.js';
-import { hasFullyAnswered, buildSummaryText, buildEditAlertText, computeWeekSessions } from './scheduleModel.js';
+import { daysForWeek, hasFullyAnswered, buildSummaryText, buildEditAlertText, computeWeekSessions } from './scheduleModel.js';
 import { loadCurrentWeek, runWeeklyReset, saveSummaryMessageId } from './scheduleStore.js';
 import { sendTextTo, sendTextToWithId, editMessageText } from './telegram.js';
 
@@ -25,7 +26,7 @@ async function sendSessionReminder(session, minutesBefore) {
   const mentions = session.lineup.map((u) => `@${u}`).join(', ');
   await sendTextTo(
     currentTeam().chatId,
-    currentTeam().id === 'ovt' ? null : currentTeam().threadId,
+    currentTeam().reminderThreadId,
     `⏰ Через ${minutesBefore} минут — ${formatSessionTime(session)}\nИграют: ${mentions}`,
   );
 }
@@ -48,9 +49,10 @@ function clearScheduledReminders() {
  * these are plain in-memory timers, not persisted), and again whenever a
  * post-deadline edit changes a lineup.
  */
-export async function scheduleUpcomingSessionReminders() {
-  clearScheduledReminders();
+export function scheduleUpcomingSessionReminders() {
+  return serial('reminders:' + currentTeam().id, async () => {
   const week = await loadCurrentWeek();
+  clearScheduledReminders();
   const sessions = computeWeekSessions(week);
   for (const session of sessions) {
     const t60 = scheduleOneOff(new Date(session.startsAt.getTime() - 60 * MINUTE_MS), () => sendSessionReminder(session, 60));
@@ -59,6 +61,7 @@ export async function scheduleUpcomingSessionReminders() {
     if (t10) timersByTeam.get(currentTeam().id).push(t10);
   }
   console.log(`[schedule] ${sessions.length} session(s) this week, reminders (re)scheduled`);
+  });
 }
 
 // Shared by the admin's manual "Отправить сводку" button and the automatic
@@ -88,7 +91,7 @@ export async function handlePostDeadlineEdit(edit) {
   await scheduleUpcomingSessionReminders();
 }
 
-// Fires at the week's own reset (Sunday 20:00 MSK) — the fresh empty week
+// Fires at the week's own reset (Monday 00:00 MSK) — the fresh empty week
 // is created first, then everyone's told filling starts now.
 export async function resetWeekAndAnnounce() {
   await runWeeklyReset();
@@ -105,7 +108,7 @@ export async function resetWeekAndAnnounce() {
 // hasn't finished all playing days yet, and says nothing if everyone already has.
 export async function sendDeadlineReminder() {
   const week = await loadCurrentWeek();
-  const missing = currentTeam().roster.filter((u) => !hasFullyAnswered(week.responses, u, week.daysOff));
+  const missing = currentTeam().roster.filter((u) => !hasFullyAnswered(week.responses, u, week.daysOff, daysForWeek(week)));
   if (missing.length === 0) return;
   await sendTextTo(
     currentTeam().chatId,
@@ -122,4 +125,9 @@ export async function sendDeadlineReminder() {
 export async function sendAutoSummary() {
   await sendSummary();
   await scheduleUpcomingSessionReminders();
+}
+
+export async function syncScheduleNotifications() {
+  await scheduleUpcomingSessionReminders();
+  await refreshSummaryMessage();
 }

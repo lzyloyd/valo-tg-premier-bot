@@ -36,10 +36,10 @@ assert.deepEqual(weekDayDates(start).map(d => d.dateIso), [
 ]);
 assert.equal(weekDeadline(start).toISOString(), '2026-10-12T11:00:00.000Z'); // Mon 14:00 MSK
 assert.equal(reminderInstant(start).toISOString(), '2026-10-12T07:00:00.000Z'); // Mon 10:00 MSK
-assert.equal(weekResetInstant(start).toISOString(), '2026-10-18T17:00:00.000Z');
-assert.equal(mskIsoDate(currentWeekStart(new Date('2026-10-18T16:59:59Z'))), '2026-10-12');
-assert.equal(mskIsoDate(currentWeekStart(new Date('2026-10-18T17:00:00Z'))), '2026-10-19');
-assert.equal(nextResetInstant(new Date('2026-10-18T17:00:00Z')).toISOString(), '2026-10-25T17:00:00.000Z');
+assert.equal(weekResetInstant(start).toISOString(), '2026-10-18T21:00:00.000Z');
+assert.equal(mskIsoDate(currentWeekStart(new Date('2026-10-18T20:59:59Z'))), '2026-10-12');
+assert.equal(mskIsoDate(currentWeekStart(new Date('2026-10-18T21:00:00Z'))), '2026-10-19');
+assert.equal(nextResetInstant(new Date('2026-10-18T21:00:00Z')).toISOString(), '2026-10-25T21:00:00.000Z');
 assert.equal(nextReminderInstant(new Date('2026-10-11T16:59:59Z')).toISOString(), '2026-10-12T07:00:00.000Z');
 assert.equal(nextReminderInstant(new Date('2026-10-12T07:00:00Z')).toISOString(), '2026-10-19T07:00:00.000Z');
 assert.equal(nextDeadlineInstant(new Date('2026-10-11T17:00:00Z')).toISOString(), '2026-10-12T11:00:00.000Z');
@@ -56,11 +56,22 @@ for (const u of MAIN_ROSTER) responses[u].mon = { avail: 'yes', slots: ['20:00',
 assert(hasFullyAnswered(responses, MAIN_ROSTER[0]));
 const week = { weekStart: '2026-10-12', responses, daysOff: [] };
 const sessions = computeWeekSessions(week);
-assert.equal(sessions.length, 8);
+assert.equal(sessions.length, 7);
 assert.equal(sessions[0].dayKey, 'mon');
 assert.equal(sessions[0].slot, '20:00');
 assert(buildSummaryText(week).includes('12.10–18.10'));
 assert(buildSummaryText(week).includes('Понедельник 12.10'));
+
+// Sunday gatherings can run after the old 20:00 rollover.
+assert.equal(mskIsoDate(currentWeekStart(new Date('2026-10-18T19:30:00Z'))), '2026-10-12');
+const lateWeek = structuredClone(week);
+lateWeek.customSlots = {sun:['22:30']};
+for (const u of MAIN_ROSTER) lateWeek.responses[u].sun = {avail:'yes',slots:['22:30']};
+const lateSession = computeWeekSessions(lateWeek).find(s => s.dayKey === 'sun');
+assert.equal(lateSession.slot, '22:30');
+assert.equal(lateSession.startsAt.toISOString(), '2026-10-18T19:30:00.000Z');
+assert(buildSummaryText(lateWeek).includes('22:30'));
+assert(buildSummaryText(week).includes('☀️ выходной'));
 
 // Use an isolated directory: this test never touches real schedule data.
 for (const key of ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID']) {
@@ -83,11 +94,11 @@ try {
   assert(result.isPostDeadlineEdit);
   await fs.writeFile(config.attendanceDataPath, JSON.stringify({ qu1ly: { count: 1, history: [{ weekStart: '2026-10-13', dayKey: 'tue', slot: '20:00', dateIso: '2026-10-13' }] } }));
   assert.equal(await recordMiss('qu1ly', '2026-10-12', 'tue', '20:00', { dateIso: '2026-10-13' }), null);
-  const fresh = await loadCurrentWeek(new Date('2026-10-18T17:00:00Z'));
+  const fresh = await loadCurrentWeek(new Date('2026-10-18T21:00:00Z'));
   assert.equal(fresh.weekStart, '2026-10-19');
   assert.deepEqual(fresh.responses, {});
 } finally {
   Object.assign(config, oldPaths);
   await fs.rm(dir, { recursive: true, force: true });
 }
-console.log('PASS: Monday sessions, 7-day calendar, Monday 14:00 deadline, Sunday rollover, preserved answers, attendance deduplication.');
+console.log('PASS: Monday sessions, 7-day calendar, Monday 14:00 deadline, Monday rollover, preserved answers, attendance deduplication.');

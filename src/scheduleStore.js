@@ -1,124 +1,83 @@
-import { currentTeam } from './scheduleTeams.js';
-import { promises as fs } from 'node:fs';
-import { config } from './config.js';
-import { DAYS, currentWeekStart, weekDeadline, weekStartFromIso, mskIsoDate } from './scheduleModel.js';
-
+import { currentTeam, refreshTeamRoster } from './scheduleTeams.js';
+import { serial, readJson, atomicJson } from './schedulePersistence.js';
+import { DAYS, daysForWeek, currentWeekStart, weekDeadline, weekStartFromIso, mskIsoDate } from './scheduleModel.js';
 function emptyWeek(weekStart) {
-  return {
-    weekStart: mskIsoDate(weekStart),
-    responses: {},
-    daysOff: [], // day keys the admin marked as a day off this week — no session, not required to answer
-    lastSaved: {}, // username -> ISO timestamp of their last save, for the "Расписание" tab's save status
-    edits: [], // post-deadline changes, newest first — shown on the admin tab
-    summaryMessageId: null, // the sent summary message, kept in sync as post-deadline edits come in
-  };
+  return { weekStart: mskIsoDate(weekStart), responses: {}, daysOff: [], customSlots: {}, lastSaved: {}, edits: [], summaryMessageId: null };
 }
-
-async function readFile() {
-  try {
-    const raw = await fs.readFile(currentTeam().schedulePath, 'utf8');
-    return JSON.parse(raw);
-  } catch (err) {
-    if (err.code === 'ENOENT') return null;
-    throw err;
-  }
-}
-
-async function writeFile(data) {
-  await fs.mkdir(config.dataDir, { recursive: true });
-  await fs.writeFile(currentTeam().schedulePath, JSON.stringify(data, null, 2));
-}
-
-/**
- * Loads the current week, resetting to a fresh empty one if the stored week
- * has rolled past its own reset point — a lazy fallback for whenever the
- * process wasn't running exactly at Sunday 20:00 MSK, on top of the cron
- * job that normally does this on time (see scheduler.js).
- */
-export async function loadCurrentWeek(now = new Date()) {
-  const wantedWeekStart = mskIsoDate(currentWeekStart(now));
-  const stored = await readFile();
-  if (stored && stored.weekStart === wantedWeekStart) return stored;
-
-  // Preserve Tue-Sun answers when upgrading a stored Tuesday-based week.
-  if (stored && mskIsoDate(new Date(weekStartFromIso(stored.weekStart).getTime() - 24 * 60 * 60 * 1000)) === wantedWeekStart) {
-    stored.weekStart = wantedWeekStart;
-    await writeFile(stored);
+async function loadUnlocked(now) {
+  await refreshTeamRoster();
+  const wanted = mskIsoDate(currentWeekStart(now));
+  const stored = await readJson(currentTeam().schedulePath, null);
+  if (stored?.weekStart === wanted) return stored;
+  if (stored && mskIsoDate(new Date(weekStartFromIso(stored.weekStart).getTime() - 86400000)) === wanted) {
+    stored.weekStart = wanted;
+    await atomicJson(currentTeam().schedulePath, stored);
     return stored;
   }
-
   const fresh = emptyWeek(currentWeekStart(now));
-  await writeFile(fresh);
+  await atomicJson(currentTeam().schedulePath, fresh);
   return fresh;
 }
-
-export async function resetToNextWeek(nextWeekStart) {
-  const fresh = emptyWeek(nextWeekStart);
-  await writeFile(fresh);
-  return fresh;
+export function loadCurrentWeek(now = new Date()) {
+  return serial(currentTeam().schedulePath, () => loadUnlocked(now));
 }
-
-// Called by the Sunday-20:00-MSK scheduler trigger — currentWeekStart() at
-// that exact instant already resolves to the week that's just starting.
+function mutateWeek(now, work) {
+  return serial(currentTeam().schedulePath, async () => {
+    const week = await loadUnlocked(now);
+    const result = await work(week);
+    await atomicJson(currentTeam().schedulePath, week);
+    return result ?? week;
+  });
+}
+export function resetToNextWeek(nextWeekStart) {
+  return serial(currentTeam().schedulePath, async () => {
+    const week = emptyWeek(nextWeekStart);
+    await atomicJson(currentTeam().schedulePath, week);
+    return week;
+  });
+}
 export async function runWeeklyReset() {
   const week = await resetToNextWeek(currentWeekStart());
-  console.log(`[schedule] reset to new week starting ${week.weekStart}`);
+  console.log(`[schedule] ${currentTeam().id}: reset to week ${week.weekStart}`);
   return week;
 }
-
-/**
- * Sets one user's answer for one day. Returns { week, isPostDeadlineEdit }
- * so the caller can decide whether to fire off an alert.
- */
-export async function setResponse(username, day, avail, slots, now = new Date()) {
-  if (!DAYS.some((d) => d.key === day)) throw new Error(`Unknown day: ${day}`);
-
-  const week = await loadCurrentWeek(now);
-  const deadline = weekDeadline(currentWeekStart(now));
-  const isPostDeadlineEdit = now > deadline;
-
-  week.responses[username] ??= {};
-  const previous = week.responses[username][day];
-  // avail null = the user un-picked their last time slot: back to unanswered.
-  if (avail === null) delete week.responses[username][day];
-  else week.responses[username][day] = { avail, slots: avail === 'yes' ? slots : [] };
-  week.lastSaved ??= {};
-  week.lastSaved[username] = now.toISOString();
-
-  if (isPostDeadlineEdit) {
-    week.edits.unshift({
-      username,
-      day,
-      before: previous ?? null,
-      after: week.responses[username][day] ?? null,
-      at: now.toISOString(),
-    });
-    week.edits = week.edits.slice(0, 50); // keep the log from growing forever
-  }
-
-  await writeFile(week);
-  return { week, isPostDeadlineEdit };
+export function setResponse(username, day, avail, slots, now = new Date()) {
+  return mutateWeek(now, week => {
+    const definition = daysForWeek(week).find(d => d.key === day);
+    if (!definition || !definition.slots.length || !['yes','no',null].includes(avail) || !Array.isArray(slots) || slots.some(s => !definition.slots.includes(s)) || (avail === 'yes' && !slots.length)) throw new Error('Некорректное время сборов. Обнови расписание.');
+    const isPostDeadlineEdit = now > weekDeadline(currentWeekStart(now));
+    week.responses[username] ??= {};
+    const previous = week.responses[username][day];
+    if (avail === null) delete week.responses[username][day];
+    else week.responses[username][day] = {avail, slots: avail === 'yes' ? [...new Set(slots)] : []};
+    week.lastSaved ??= {};
+    week.lastSaved[username] = now.toISOString();
+    week.edits ??= [];
+    if (isPostDeadlineEdit) {
+      week.edits.unshift({username, day, before: previous ?? null, after: week.responses[username][day] ?? null, at: now.toISOString()});
+      week.edits = week.edits.slice(0,50);
+    }
+    return {week, isPostDeadlineEdit};
+  });
 }
-
-// Admin-only toggle for a day this week — marks it as having no session at
-// all, regardless of anyone's availability (see computeWeekSessions /
-// buildSummaryText). Not itself logged as a post-deadline "edit" the way a
-// player's own answer change is; it's an admin action, not a roster answer.
-export async function setDayOff(day, isOff, now = new Date()) {
-  if (!DAYS.some((d) => d.key === day)) throw new Error(`Unknown day: ${day}`);
-
-  const week = await loadCurrentWeek(now);
-  week.daysOff ??= [];
-  week.daysOff = isOff ? [...new Set([...week.daysOff, day])] : week.daysOff.filter((d) => d !== day);
-
-  await writeFile(week);
-  return week;
+export function addCustomSlot(day, time, expectedWeekStart, now = new Date()) {
+  return mutateWeek(now, week => {
+    if (expectedWeekStart !== week.weekStart) throw new Error('Началась новая неделя. Обнови расписание.');
+    if (!DAYS.some(d => d.key === day) || typeof time !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) throw new Error('Укажи время в формате ЧЧ:ММ (МСК).');
+    const definition = daysForWeek(week).find(d => d.key === day);
+    if (week.daysOff?.includes(day)) throw new Error('На этот день отмечен выходной.');
+    if (definition.slots.includes(time)) throw new Error('Это время уже есть в расписании.');
+    if (definition.slots.length >= 12) throw new Error('На день можно добавить не больше 12 вариантов времени.');
+    week.customSlots ??= {};
+    week.customSlots[day] = [...(week.customSlots[day] || []), time].sort();
+  });
 }
-
-// Remembers which sent Telegram message is "the" summary for this week, so
-// a later edit can update it in place instead of only alerting separately.
-export async function saveSummaryMessageId(messageId) {
-  const week = await loadCurrentWeek();
-  week.summaryMessageId = messageId;
-  await writeFile(week);
+export function setDayOff(day, isOff, now = new Date()) {
+  return mutateWeek(now, week => {
+    if (!DAYS.some(d => d.key === day)) throw new Error('Неизвестный день.');
+    week.daysOff = isOff ? [...new Set([...(week.daysOff || []),day])] : (week.daysOff || []).filter(d => d !== day);
+  });
+}
+export function saveSummaryMessageId(messageId) {
+  return mutateWeek(new Date(), week => { week.summaryMessageId = messageId; });
 }

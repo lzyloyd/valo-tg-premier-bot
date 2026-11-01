@@ -15,8 +15,8 @@ export const MAX_WARNINGS = 3;
 
 // A week runs Mon-Sun. Practice days share the same two slots but only one
 // of them actually happens (pickOneSlot); Saturday's Premier plays both
-// times as independent sessions; Sunday's tournament is optional and only
-// ever has one slot.
+// times as independent sessions; Sunday gatherings are optional and only
+// has no default slot.
 export const DAYS = [
   { key: 'mon', label: 'Понедельник', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
   { key: 'tue', label: 'Вторник', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
@@ -24,7 +24,7 @@ export const DAYS = [
   { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
   { key: 'fri', label: 'Пятница', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
   { key: 'sat', label: 'Суббота', kind: 'Премьер', slots: ['20:00', '22:00'] },
-  { key: 'sun', label: 'Воскресенье', kind: 'МСК турнир', slots: ['18:00'] },
+  { key: 'sun', label: 'Воскресенье', kind: 'Сборы', slots: [] },
 ];
 
 const MSK_OFFSET_MS = 3 * 60 * 60 * 1000;
@@ -59,7 +59,7 @@ export function weekStartFromIso(dateIso) {
 
 /**
  * The Monday (00:00 MSK, as a UTC instant) that starts the week currently
- * open for editing. Weeks roll over at their own Sunday 20:00 MSK — the
+ * open for editing. Weeks roll over at their own Monday 00:00 MSK — the
  * data store's reset job fires exactly then, this just has to agree with it
  * so a freshly-booted server (no reset job having run yet) computes the
  * same week a live one would already be showing.
@@ -74,9 +74,9 @@ export function currentWeekStart(now = new Date()) {
 }
 
 // The instant the *next* week starts — also when the current one's data
-// gets wiped and replaced (Sunday 20:00 MSK, i.e. weekStart + 6d20h).
+// gets wiped and replaced (Monday 00:00 MSK, i.e. weekStart + 7d).
 export function weekResetInstant(weekStart) {
-  return new Date(weekStart.getTime() + 6 * DAY_MS + 20 * 60 * 60 * 1000);
+  return new Date(weekStart.getTime() + 7 * DAY_MS);
 }
 
 // Filling closes Monday 14:00 MSK — still well before that day's first
@@ -112,13 +112,17 @@ export function nextDeadlineInstant(now = new Date()) {
   return nextOccurrence(now, weekDeadline);
 }
 
-export function weekDayDates(weekStart) {
-  return DAYS.map((d, i) => ({ ...d, dateIso: mskIsoDate(new Date(weekStart.getTime() + i * DAY_MS)) }));
+export function daysForWeek(week = {}) {
+  return DAYS.map(day => ({...day, slots: [...new Set([...day.slots, ...(week.customSlots?.[day.key] || [])])].sort()}));
+}
+
+export function weekDayDates(weekStart, week = {}) {
+  return daysForWeek(week).map((d, i) => ({ ...d, dateIso: mskIsoDate(new Date(weekStart.getTime() + i * DAY_MS)) }));
 }
 
 // "Answered" means every playing day has a yes/no.
-export function hasFullyAnswered(responses, username, daysOff = []) {
-  return DAYS.filter((d) => !daysOff.includes(d.key)).every((d) => responses[username]?.[d.key]?.avail);
+export function hasFullyAnswered(responses, username, daysOff = [], days = DAYS) {
+  return days.filter((d) => d.slots.length && !daysOff.includes(d.key)).every((d) => responses[username]?.[d.key]?.avail);
 }
 
 function availableFor(responses, day, slot) {
@@ -194,7 +198,7 @@ export function computeWeekSessions(week) {
   const weekStart = weekStartFromIso(week.weekStart);
   const daysOff = week.daysOff ?? [];
   const sessions = [];
-  for (const day of DAYS) {
+  for (const day of daysForWeek(week)) {
     if (daysOff.includes(day.key)) continue;
     for (const { slot, lineup } of computeDaySessions(day, week.responses)) {
       sessions.push({ dayKey: day.key, dayLabel: day.label, slot, lineup, startsAt: slotInstant(weekStart, day.key, slot) });
@@ -208,7 +212,7 @@ export function computeWeekSessions(week) {
  * (see resolveLineup/computeDaySessions), not just raw availability.
  */
 export function buildSummaryText(week) {
-  const days = weekDayDates(weekStartFromIso(week.weekStart));
+  const days = weekDayDates(weekStartFromIso(week.weekStart), week);
   const daysOff = week.daysOff ?? [];
   const lines = [`📅 Расписание — ${formatDayDate(days[0].dateIso)}–${formatDayDate(days.at(-1).dateIso)}`, ''];
 
@@ -219,7 +223,7 @@ export function buildSummaryText(week) {
     } else {
       const sessions = computeDaySessions(day, week.responses);
       if (sessions.length === 0) {
-        lines.push('▫️ сессии не будет');
+        lines.push(day.slots.length ? '▫️ сессии не будет' : '☀️ выходной');
       } else {
         for (const s of sessions) {
           lines.push(`✅ ${s.slot} — играют: ${s.lineup.map((u) => `@${u}`).join(', ')}`);
@@ -229,8 +233,8 @@ export function buildSummaryText(week) {
     lines.push('');
   }
 
-  const answered = currentTeam().roster.filter((u) => hasFullyAnswered(week.responses, u, daysOff));
-  const missing = currentTeam().roster.filter((u) => !hasFullyAnswered(week.responses, u, daysOff));
+  const answered = currentTeam().roster.filter((u) => hasFullyAnswered(week.responses, u, daysOff, days));
+  const missing = currentTeam().roster.filter((u) => !hasFullyAnswered(week.responses, u, daysOff, days));
   lines.push(`Ответили: ${answered.length}/${currentTeam().roster.length}${missing.length ? ` · не ответил(и): ${missing.map((n) => `@${n}`).join(', ')}` : ''}`);
 
   return lines.join('\n');

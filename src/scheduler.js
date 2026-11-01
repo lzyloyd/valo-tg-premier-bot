@@ -56,7 +56,7 @@ function scheduleRecurring(label, nextInstant, runTrigger) {
   }, delayMs);
 }
 
-// Sunday 20:00 MSK — the week's data resets and the new one opens for filling.
+// Monday 00:00 MSK — the week's data resets and the new one opens for filling.
 export function scheduleWeeklyReset(runReset) {
   scheduleRecurring('weekly schedule reset', nextResetInstant, runReset);
 }

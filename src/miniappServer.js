@@ -1,4 +1,4 @@
-import { currentTeam, withTeam, accessibleTeams } from './scheduleTeams.js';
+import { currentTeam, withTeam, accessibleTeams, changeRoster } from './scheduleTeams.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs/promises';
@@ -7,6 +7,7 @@ import { config } from './config.js';
 import { verifyInitData } from './telegramAuth.js';
 import {
   DAYS,
+  daysForWeek,
   QUORUM,
   MAX_WARNINGS,
   weekDayDates,
@@ -17,9 +18,9 @@ import {
   hasFullyAnswered,
   computeWeekSessions,
 } from './scheduleModel.js';
-import { loadCurrentWeek, setResponse, setDayOff } from './scheduleStore.js';
+import { loadCurrentWeek, setResponse, setDayOff, addCustomSlot } from './scheduleStore.js';
 import { loadAttendance, recordMiss } from './attendanceStore.js';
-import { sendSummary, handlePostDeadlineEdit, scheduleUpcomingSessionReminders } from './scheduleNotifications.js';
+import { sendSummary, handlePostDeadlineEdit, scheduleUpcomingSessionReminders, syncScheduleNotifications } from './scheduleNotifications.js';
 import { sendTextTo } from './telegram.js';
 import { WUVOCHKA_ROSTER } from './wuvochkaModel.js';
 import { loadProfile, toggleFavorite, toggleOwned, setAvatar } from './wuvochkaStore.js';
@@ -67,20 +68,24 @@ async function buildAttendanceView(week) {
 
 async function weekView(week, auth) {
   const weekStart = weekStartFromIso(week.weekStart);
-  const daysOff = week.daysOff ?? [];
+  const days = weekDayDates(weekStart, week);
+  const daysOff = [...new Set([...(week.daysOff || []), ...days.filter(d => !d.slots.length).map(d => d.key)])];
   return {
-    days: weekDayDates(weekStart),
+    days,
+    weekStart: week.weekStart,
+    explicitDaysOff: week.daysOff || [],
+    members: auth.isAdmin ? currentTeam().members.map(m => ({username:m.username, role:m.role})) : [],
     quorum: QUORUM,
     roster: currentTeam().roster,
     team: { id: currentTeam().id, name: currentTeam().name },
     teams: auth.teams,
     maxWarnings: MAX_WARNINGS,
-    responses: week.responses,
+    responses: Object.fromEntries(Object.entries(week.responses).filter(([u]) => currentTeam().roster.includes(u))),
     daysOff,
     edits: auth.isAdmin ? week.edits : [],
     summaryPreview: auth.isAdmin ? buildSummaryText(week) : null,
     attendance: auth.isAdmin ? await buildAttendanceView(week) : null,
-    answeredCount: currentTeam().roster.filter((u) => hasFullyAnswered(week.responses, u, daysOff)).length,
+    answeredCount: currentTeam().roster.filter((u) => hasFullyAnswered(week.responses, u, daysOff, days)).length,
     me: { username: auth.username, isAdmin: auth.isAdmin, isPlayer: currentTeam().roster.includes(auth.username), lastSaved: week.lastSaved?.[auth.username] || null },
   };
 }
@@ -178,7 +183,8 @@ export function startMiniAppServer() {
     if (!auth) return;
     if (!currentTeam().roster.includes(auth.username)) return res.status(403).json({ error: 'Заполнять расписание могут только игроки команды.' });
     const { day, avail, slots } = req.body ?? {};
-    const dayDef = DAYS.find((d) => d.key === day);
+    const currentWeek = await loadCurrentWeek();
+    const dayDef = daysForWeek(currentWeek).find((d) => d.key === day);
     if (!dayDef || !['yes', 'no', null].includes(avail) || !Array.isArray(slots) || slots.some((s) => !dayDef.slots.includes(s))) {
       res.status(400).json({ error: 'Некорректные данные.' });
       return;
@@ -186,12 +192,12 @@ export function startMiniAppServer() {
     try {
       const { week, isPostDeadlineEdit } = await setResponse(auth.username, day, avail, slots);
       if (isPostDeadlineEdit) {
-        handlePostDeadlineEdit(week.edits[0]).catch((err) =>
+        await handlePostDeadlineEdit(week.edits[0]).catch((err) =>
           console.error('[miniapp] failed to handle post-deadline edit:', err),
         );
       } else {
         // Keep reminders in sync while players fill in availability.
-        scheduleUpcomingSessionReminders().catch((err) =>
+        await scheduleUpcomingSessionReminders().catch((err) =>
           console.error('[miniapp] failed to reschedule session reminders:', err),
         );
       }
@@ -200,6 +206,28 @@ export function startMiniAppServer() {
       console.error('[miniapp] update failed:', err);
       res.status(500).json({ error: 'Не получилось сохранить, попробуй ещё раз.' });
     }
+  });
+
+  app.post('/api/add-time', async (req, res) => {
+    const auth = authenticate(req, res);
+    if (!auth.isAdmin && !currentTeam().roster.includes(auth.username)) return res.status(403).json({error:'Нет доступа.'});
+    try {
+      const {day, time, weekStart} = req.body || {};
+      const week = await addCustomSlot(day, time, weekStart);
+      await syncScheduleNotifications().catch(err => console.error('[schedule] time sync failed:', err));
+      res.json(await weekView(week, auth));
+    } catch (err) { res.status(400).json({error:err.message}); }
+  });
+
+  app.post('/api/roster', async (req, res) => {
+    const auth = authenticate(req, res);
+    if (!auth.isAdmin) return res.status(403).json({error:'Составом может управлять только админ команды.'});
+    try {
+      await changeRoster(req.body || {});
+      const week = await loadCurrentWeek();
+      await syncScheduleNotifications().catch(err => console.error('[schedule] roster sync failed:', err));
+      res.json(await weekView(week, auth));
+    } catch (err) { res.status(400).json({error:err.message}); }
   });
 
   app.post('/api/set-day-off', async (req, res) => {
@@ -217,7 +245,7 @@ export function startMiniAppServer() {
     }
     try {
       const week = await setDayOff(day, isOff);
-      scheduleUpcomingSessionReminders().catch((err) =>
+      await scheduleUpcomingSessionReminders().catch((err) =>
         console.error('[miniapp] failed to reschedule session reminders after day-off toggle:', err),
       );
       res.json(await weekView(week, auth));
