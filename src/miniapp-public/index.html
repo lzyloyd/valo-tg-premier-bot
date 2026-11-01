@@ -37,7 +37,7 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .day-card{border:1px solid var(--border);border-radius:12px;padding:18px 12px;display:grid;grid-template-columns:84px 1fr 138px;align-items:center;gap:6px;background:var(--surface);}
 .day-name{font-weight:700;font-size:13px;}
 .day-date{font-size:10.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
-.day-kind{font-size:9.5px;color:var(--text-muted);margin-top:1px;white-space:nowrap;}
+.day-kind{font-size:9.5px;color:var(--text-muted);margin-top:3px;white-space:normal;overflow-wrap:anywhere;line-height:1.5;}
 .avail-toggle{display:flex;flex-direction:column;gap:4px;justify-self:center;align-items:stretch;}
 .slots{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
 .avail-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;}
@@ -247,7 +247,7 @@ function renderTabs() {
 function renderMeScreen() {
   const cards = state.days.map(d => {
     const off = state.daysOff.includes(d.key);
-    const identity = '<div class="day-id"><div class="day-name">' + d.label + '</div><div class="day-date">' + shortDate(d.dateIso) + '</div><div class="day-kind">' + (off ? 'Без сборов' : d.kind) + '</div></div>';
+    const identity = '<div class="day-id"><div class="day-name">' + d.label + '</div><div class="day-date">' + shortDate(d.dateIso) + '</div><div class="day-kind">' + (off ? 'Без сборов' : escapeHtml(d.kind)) + '</div></div>';
     if (off) return '<div class="day-card day-off">' + identity + '<div class="day-off-label">☀️ Выходной</div>' + '</div>';
     const my = draft[d.key] || {avail:null, slots:[]};
     const slots = d.slots.map(t => '<button class="slot-chip' + (my.avail === 'yes' && my.slots.includes(t) ? ' on' : '') + (my.avail === 'no' ? ' dim' : '') + '"' + (state.me.isPlayer ? '' : ' disabled') + ' data-day="' + d.key + '" data-slot="' + t + '">' + t + '</button>').join('');
@@ -330,7 +330,7 @@ function renderAdminScreen() {
         ? row.options
             .map(
               (o) =>
-                `<button class="miss-btn" data-username="${row.username}" data-day="${o.dayKey}" data-slot="${o.slot}" data-label="${DAY_ABBR[o.dayKey]} ${o.slot}" data-kind="${o.kind}">${DAY_ABBR[o.dayKey]} ${o.slot}</button>`,
+                `<button class="miss-btn" data-username="${row.username}" data-day="${o.dayKey}" data-slot="${o.slot}" data-label="${DAY_ABBR[o.dayKey]} ${o.slot}" data-kind="${escapeHtml(o.kind)}">${DAY_ABBR[o.dayKey]} ${o.slot}</button>`,
             )
             .join('')
         : `<span class="empty-note">нет прошедших игр</span>`;
@@ -350,7 +350,7 @@ function renderAdminScreen() {
     </div>
     <button class="send-btn" id="sendBtn">Отправить сводку в «Сборы»</button>
     <div class="section-lbl">Так выглядит сообщение</div>
-    <div class="tg-bubble-wrap"><div class="tg-bubble">${state.summaryPreview}</div></div>
+    <div class="tg-bubble-wrap"><div class="tg-bubble">${escapeHtml(state.summaryPreview)}</div></div>
     <div class="section-lbl" style="margin-top:14px">Правки после дедлайна</div>
     ${edits}
     <div class="section-lbl" style="margin-top:14px">Явка</div>
@@ -471,7 +471,7 @@ function openEditor(type, data = {}) {
   const team = escapeHtml(state.team.name);
   const title = type === 'time' ? 'Добавить сбор' : type === 'player' ? 'Новый игрок' : 'Удалить игрока?';
   const sub = type === 'time' ? team + ' · на этой неделе' : type === 'player' ? 'Добавь игрока в ' + team : '@' + escapeHtml(data.username) + ' потеряет доступ к расписанию ' + team + '.';
-  const timeFields = '<span class="field-label">День недели</span><div class="modal-days">' + state.days.map(d => '<button type="button" class="modal-day' + (d.key === data.day ? ' active' : '') + '" data-modal-day="' + d.key + '" aria-pressed="' + (d.key === data.day) + '"' + (state.explicitDaysOff.includes(d.key) ? ' disabled' : '') + '>' + DAY_ABBR[d.key] + '<small>' + dateParts(d.dateIso).day + '</small></button>').join('') + '</div><label class="field-label" for="customTime">Время · МСК</label><input class="modal-input time-field" id="customTime" name="time" type="time" value="20:30" step="60" required><div class="modal-note"><span>◷</span><span>Время добавится к остальным вариантам <b>только у ' + team + '</b>. Каждый игрок отметит, сможет ли прийти.</span></div>';
+  const timeFields = '<label class="field-label" for="gatheringName">Название сбора</label><input class="modal-input" id="gatheringName" name="name" placeholder="Например, МСК турнир" maxlength="60" autocomplete="off" required><span class="field-label">День недели</span><div class="modal-days">' + state.days.map(d => '<button type="button" class="modal-day' + (d.key === data.day ? ' active' : '') + '" data-modal-day="' + d.key + '" aria-pressed="' + (d.key === data.day) + '"' + (state.explicitDaysOff.includes(d.key) ? ' disabled' : '') + '>' + DAY_ABBR[d.key] + '<small>' + dateParts(d.dateIso).day + '</small></button>').join('') + '</div><label class="field-label" for="customTime">Время · МСК</label><input class="modal-input time-field" id="customTime" name="time" type="time" value="20:30" step="60" required><div class="modal-note"><span>◷</span><span>Время добавится к остальным вариантам <b>только у ' + team + '</b>. Каждый игрок отметит, сможет ли прийти.</span></div>';
   const playerFields = '<label class="field-label" for="playerUsername">Telegram-ник</label><input class="modal-input" id="playerUsername" name="username" placeholder="@username" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="33"><span class="field-label">Роль в команде</span><div class="role-choices"><button type="button" class="role-choice active" data-modal-role="main" aria-pressed="true">Основа<small>Постоянный состав</small></button><button type="button" class="role-choice" data-modal-role="sub" aria-pressed="false">Запас<small>В конце очереди замен</small></button></div><div class="modal-note">Игрок получит доступ к этой команде при первом входе в мини-приложение через Telegram.</div>';
   editModal.innerHTML = '<form id="editorForm"><div class="modal-top"><div><h2 class="modal-title" id="modalTitle">' + title + '</h2><p class="modal-sub">' + sub + '</p></div><button type="button" class="modal-close" aria-label="Закрыть">×</button></div>' + (type === 'time' ? timeFields : type === 'player' ? playerFields : '<div class="modal-note">История посещаемости сохранится. Права администратора задаются отдельно от игрового состава.</div>') + '<div class="modal-error" id="modalError" role="alert"></div><button class="modal-submit" type="submit">' + (type === 'time' ? 'Добавить время' : type === 'player' ? 'Добавить игрока' : 'Удалить из команды') + '</button></form>';
   let day = data.day;
@@ -486,7 +486,7 @@ function openEditor(type, data = {}) {
     const submit = editModal.querySelector('.modal-submit'); submit.disabled = true;
     const error = editModal.querySelector('#modalError'); error.textContent = '';
     try {
-      const body = type === 'time' ? {day, time:editModal.querySelector('#customTime').value, weekStart:state.weekStart} : type === 'player' ? {action:'add', username:editModal.querySelector('#playerUsername').value, role} : data;
+      const body = type === 'time' ? {day, time:editModal.querySelector('#customTime').value, name:editModal.querySelector('#gatheringName').value, weekStart:state.weekStart} : type === 'player' ? {action:'add', username:editModal.querySelector('#playerUsername').value, role} : data;
       state = await api(type === 'time' ? '/api/add-time' : '/api/roster', body);
       rebuildDraft(); render(); editModal.close();
     } catch (err) { error.textContent = err.message; }

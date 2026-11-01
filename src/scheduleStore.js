@@ -2,12 +2,23 @@ import { currentTeam, refreshTeamRoster } from './scheduleTeams.js';
 import { serial, readJson, atomicJson } from './schedulePersistence.js';
 import { DAYS, daysForWeek, currentWeekStart, weekDeadline, weekStartFromIso, mskIsoDate } from './scheduleModel.js';
 function emptyWeek(weekStart) {
-  return { weekStart: mskIsoDate(weekStart), responses: {}, daysOff: [], customSlots: {}, lastSaved: {}, edits: [], summaryMessageId: null };
+  return { weekStart: mskIsoDate(weekStart), responses: {}, daysOff: [], customSlots: {}, customSlotNames: {}, premierTimesVersion: 2, lastSaved: {}, edits: [], summaryMessageId: null };
 }
 async function loadUnlocked(now) {
   await refreshTeamRoster();
   const wanted = mskIsoDate(currentWeekStart(now));
   const stored = await readJson(currentTeam().schedulePath, null);
+  if (stored && stored.premierTimesVersion !== 2) {
+    // Availability for 20/22 does not imply availability for 21/23.
+    const allowed = daysForWeek(stored).find(d => d.key === 'sat').slots;
+    for (const answers of Object.values(stored.responses || {})) {
+      if (answers.sat?.avail !== 'yes') continue;
+      answers.sat.slots = answers.sat.slots.filter(time => allowed.includes(time));
+      if (!answers.sat.slots.length) delete answers.sat;
+    }
+    stored.premierTimesVersion = 2;
+    await atomicJson(currentTeam().schedulePath, stored);
+  }
   if (stored?.weekStart === wanted) return stored;
   if (stored && mskIsoDate(new Date(weekStartFromIso(stored.weekStart).getTime() - 86400000)) === wanted) {
     stored.weekStart = wanted;
@@ -60,16 +71,21 @@ export function setResponse(username, day, avail, slots, now = new Date()) {
     return {week, isPostDeadlineEdit};
   });
 }
-export function addCustomSlot(day, time, expectedWeekStart, now = new Date()) {
+export function addCustomSlot(day, time, expectedWeekStart, name, now = new Date()) {
   return mutateWeek(now, week => {
     if (expectedWeekStart !== week.weekStart) throw new Error('Началась новая неделя. Обнови расписание.');
     if (!DAYS.some(d => d.key === day) || typeof time !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) throw new Error('Укажи время в формате ЧЧ:ММ (МСК).');
+    name = typeof name === 'string' ? name.trim().replace(/\s+/g,' ') : '';
+    if (!name || name.length > 60 || /[\u0000-\u001f\u007f]/.test(name)) throw new Error('Укажи название сбора, до 60 символов.');
     const definition = daysForWeek(week).find(d => d.key === day);
     if (week.daysOff?.includes(day)) throw new Error('На этот день отмечен выходной.');
     if (definition.slots.includes(time)) throw new Error('Это время уже есть в расписании.');
     if (definition.slots.length >= 12) throw new Error('На день можно добавить не больше 12 вариантов времени.');
     week.customSlots ??= {};
     week.customSlots[day] = [...(week.customSlots[day] || []), time].sort();
+    week.customSlotNames ??= {};
+    week.customSlotNames[day] ??= {};
+    week.customSlotNames[day][time] = name;
   });
 }
 export function setDayOff(day, isOff, now = new Date()) {

@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 for (const key of ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID']) process.env[key] ||= 'test';
 const {
-  DAYS, ROSTER, MAIN_ROSTER, SUB_ROSTER, resolveLineup, currentWeekStart, mskIsoDate, weekDayDates,
+  DAYS, daysForWeek, ROSTER, MAIN_ROSTER, SUB_ROSTER, resolveLineup, currentWeekStart, mskIsoDate, weekDayDates,
   weekDeadline, weekResetInstant, reminderInstant, nextResetInstant,
   nextReminderInstant, nextDeadlineInstant, hasFullyAnswered,
   slotInstant, computeWeekSessions, buildSummaryText,
@@ -45,7 +45,8 @@ assert.equal(nextReminderInstant(new Date('2026-10-12T07:00:00Z')).toISOString()
 assert.equal(nextDeadlineInstant(new Date('2026-10-11T17:00:00Z')).toISOString(), '2026-10-12T11:00:00.000Z');
 assert.equal(nextDeadlineInstant(new Date('2026-10-12T11:00:00Z')).toISOString(), '2026-10-19T11:00:00.000Z');
 assert.equal(slotInstant(start, 'mon', '20:00').toISOString(), '2026-10-12T17:00:00.000Z');
-assert.equal(slotInstant(start, 'sat', '22:00').toISOString(), '2026-10-17T19:00:00.000Z');
+assert.equal(slotInstant(start, 'sat', '23:00').toISOString(), '2026-10-17T20:00:00.000Z');
+assert.deepEqual(DAYS.find(d=>d.key==='sat').slots,['21:00','23:00']);
 
 const responses = Object.fromEntries(MAIN_ROSTER.map(u => [u, Object.fromEntries(
   DAYS.filter(d => d.key !== 'mon').map(d => [d.key, { avail: 'yes', slots: d.slots }]),
@@ -73,6 +74,16 @@ assert.equal(lateSession.startsAt.toISOString(), '2026-10-18T19:30:00.000Z');
 assert(buildSummaryText(lateWeek).includes('22:30'));
 assert(buildSummaryText(week).includes('☀️ выходной'));
 
+const namedWeek = structuredClone(week);
+namedWeek.customSlots = {mon:['19:00'],sat:['19:30'],sun:['18:00']};
+namedWeek.customSlotNames = {mon:{'19:00':'Турнир'},sat:{'19:30':'Разбор'},sun:{'18:00':'МСК турнир'}};
+for (const u of MAIN_ROSTER) namedWeek.responses[u].mon.slots.push('19:00');
+assert.equal(daysForWeek(namedWeek)[0].kind,'Праки · Турнир');
+assert.equal(daysForWeek(namedWeek)[5].kind,'Премьер · Разбор');
+assert.equal(daysForWeek(namedWeek)[6].kind,'МСК турнир');
+assert.deepEqual(computeWeekSessions(namedWeek).filter(s=>s.dayKey==='mon').map(s=>[s.slot,s.kind]),[['19:00','Турнир'],['20:00','Праки']]);
+assert(buildSummaryText(namedWeek).includes('Праки · Турнир'));
+
 // Use an isolated directory: this test never touches real schedule data.
 for (const key of ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID']) {
   process.env[key] ||= 'test';
@@ -94,6 +105,13 @@ try {
   assert(result.isPostDeadlineEdit);
   await fs.writeFile(config.attendanceDataPath, JSON.stringify({ qu1ly: { count: 1, history: [{ weekStart: '2026-10-13', dayKey: 'tue', slot: '20:00', dateIso: '2026-10-13' }] } }));
   assert.equal(await recordMiss('qu1ly', '2026-10-12', 'tue', '20:00', { dateIso: '2026-10-13' }), null);
+  const oldPremierWeek = structuredClone(week);
+  oldPremierWeek.responses[MAIN_ROSTER[0]].sat = {avail:'yes',slots:['20:00','22:00']};
+  await fs.writeFile(config.scheduleDataPath,JSON.stringify(oldPremierWeek));
+  const updatedPremier = await loadCurrentWeek(now);
+  assert.equal(updatedPremier.responses[MAIN_ROSTER[0]].sat,undefined);
+  assert.deepEqual(updatedPremier.responses[MAIN_ROSTER[0]].mon,week.responses[MAIN_ROSTER[0]].mon);
+  assert.equal(updatedPremier.premierTimesVersion,2);
   const fresh = await loadCurrentWeek(new Date('2026-10-18T21:00:00Z'));
   assert.equal(fresh.weekStart, '2026-10-19');
   assert.deepEqual(fresh.responses, {});

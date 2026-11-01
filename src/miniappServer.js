@@ -61,7 +61,7 @@ async function buildAttendanceView(week) {
     );
     const options = startedSessions
       .filter((s) => s.lineup.includes(username) && !markedThisWeek.has(`${s.dayKey}|${s.slot}`))
-      .map((s) => ({ dayKey: s.dayKey, dayLabel: s.dayLabel, slot: s.slot, kind: DAYS.find((d) => d.key === s.dayKey).kind }));
+      .map((s) => ({ dayKey: s.dayKey, dayLabel: s.dayLabel, slot: s.slot, kind: s.kind }));
     return { username, count: record?.count ?? 0, options };
   });
 }
@@ -212,8 +212,8 @@ export function startMiniAppServer() {
     const auth = authenticate(req, res);
     if (!auth.isAdmin && !currentTeam().roster.includes(auth.username)) return res.status(403).json({error:'Нет доступа.'});
     try {
-      const {day, time, weekStart} = req.body || {};
-      const week = await addCustomSlot(day, time, weekStart);
+      const {day, time, weekStart, name} = req.body || {};
+      const week = await addCustomSlot(day, time, weekStart, name);
       await syncScheduleNotifications().catch(err => console.error('[schedule] time sync failed:', err));
       res.json(await weekView(week, auth));
     } catch (err) { res.status(400).json({error:err.message}); }

@@ -7,7 +7,7 @@ import { sendTextTo, sendTextToWithId, editMessageText } from './telegram.js';
 const MINUTE_MS = 60 * 1000;
 
 function formatSessionTime(session) {
-  return `${session.dayLabel}, ${session.slot} МСК`;
+  return `${session.dayLabel}, ${session.slot} МСК${session.kind ? ` · ${session.kind}` : ''}`;
 }
 
 // One-off (non-recurring) reminder, scheduled directly from a session's own

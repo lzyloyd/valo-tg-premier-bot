@@ -23,7 +23,7 @@ export const DAYS = [
   { key: 'wed', label: 'Среда', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
   { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
   { key: 'fri', label: 'Пятница', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
-  { key: 'sat', label: 'Суббота', kind: 'Премьер', slots: ['20:00', '22:00'] },
+  { key: 'sat', label: 'Суббота', kind: 'Премьер', slots: ['21:00', '23:00'] },
   { key: 'sun', label: 'Воскресенье', kind: 'Сборы', slots: [] },
 ];
 
@@ -113,7 +113,16 @@ export function nextDeadlineInstant(now = new Date()) {
 }
 
 export function daysForWeek(week = {}) {
-  return DAYS.map(day => ({...day, slots: [...new Set([...day.slots, ...(week.customSlots?.[day.key] || [])])].sort()}));
+  return DAYS.map(day => {
+    const custom = week.customSlots?.[day.key] || [];
+    const names = week.customSlotNames?.[day.key] || {};
+    const activityNames = [...new Set(custom.map(time => names[time]).filter(Boolean))];
+    const kinds = [...new Set([...(day.slots.length ? [day.kind] : []), ...activityNames])];
+    return {...day, kind: kinds.join(' · ') || day.kind, baseKind:day.kind,
+      slots:[...new Set([...day.slots, ...custom])].sort(),
+      slotKinds:Object.fromEntries(custom.filter(time => names[time]).map(time => [time,names[time]])),
+    };
+  });
 }
 
 export function weekDayDates(weekStart, week = {}) {
@@ -165,24 +174,26 @@ function mainsAvailableCount(responses, day, slot) {
  */
 export function computeDaySessions(day, responses) {
   const candidates = day.slots
-    .map((slot) => ({ slot, lineup: resolveLineup(availableFor(responses, day.key, slot)) }))
+    .map((slot) => ({ slot, kind: day.slotKinds?.[slot] || day.baseKind || day.kind, lineup: resolveLineup(availableFor(responses, day.key, slot)) }))
     .filter((c) => c.lineup);
 
   if (!day.pickOneSlot) return candidates;
-  if (candidates.length <= 1) return candidates;
+  const custom = candidates.filter(c => day.slotKinds?.[c.slot]);
+  const practices = candidates.filter(c => !day.slotKinds?.[c.slot]);
+  if (practices.length <= 1) return [...practices,...custom].sort((a,b)=>a.slot.localeCompare(b.slot));
   // Several slots are viable — pick by starter turnout, earliest time on a tie
   // (candidates keep day.slots' chronological order, and only a strictly
   // higher count replaces the current pick).
-  let winner = candidates[0];
+  let winner = practices[0];
   let bestCount = mainsAvailableCount(responses, day.key, winner.slot);
-  for (const c of candidates.slice(1)) {
+  for (const c of practices.slice(1)) {
     const count = mainsAvailableCount(responses, day.key, c.slot);
     if (count > bestCount) {
       winner = c;
       bestCount = count;
     }
   }
-  return [winner];
+  return [winner,...custom].sort((a,b)=>a.slot.localeCompare(b.slot));
 }
 
 // The absolute instant (UTC) a given day+slot within a week actually starts.
@@ -200,8 +211,8 @@ export function computeWeekSessions(week) {
   const sessions = [];
   for (const day of daysForWeek(week)) {
     if (daysOff.includes(day.key)) continue;
-    for (const { slot, lineup } of computeDaySessions(day, week.responses)) {
-      sessions.push({ dayKey: day.key, dayLabel: day.label, slot, lineup, startsAt: slotInstant(weekStart, day.key, slot) });
+    for (const { slot, lineup, kind } of computeDaySessions(day, week.responses)) {
+      sessions.push({ dayKey: day.key, dayLabel: day.label, slot, lineup, kind, startsAt: slotInstant(weekStart, day.key, slot) });
     }
   }
   return sessions;
@@ -226,7 +237,7 @@ export function buildSummaryText(week) {
         lines.push(day.slots.length ? '▫️ сессии не будет' : '☀️ выходной');
       } else {
         for (const s of sessions) {
-          lines.push(`✅ ${s.slot} — играют: ${s.lineup.map((u) => `@${u}`).join(', ')}`);
+          lines.push(`✅ ${s.slot} · ${s.kind} — играют: ${s.lineup.map((u) => `@${u}`).join(', ')}`);
         }
       }
     }
@@ -252,7 +263,7 @@ function describeAnswer(entry) {
 // (moved to reserve) instead of just another plain warning.
 export function buildMissWarningText(username, session, count) {
   const day = DAYS.find((d) => d.key === session.dayKey);
-  const label = `${day.label.toLowerCase()} ${session.slot} (${day.kind})`;
+  const label = `${day.label.toLowerCase()} ${session.slot} (${session.kind || day.kind})`;
   if (count >= MAX_WARNINGS) {
     return `🚨 @${username} не пришёл(а) на ${label} — ${count}/${MAX_WARNINGS}. Лимит предупреждений исчерпан, игрок переводится в запас.`;
   }
