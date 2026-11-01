@@ -106,6 +106,8 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',
 .roster-section{margin-bottom:22px;}.roster-label{display:flex;align-items:center;justify-content:space-between;margin:16px 0 8px;color:var(--text-muted);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}.roster-label b{background:var(--surface-3);border-radius:5px;padding:3px 6px;font:600 10px 'JetBrains Mono',monospace;}
 .roster-list{border:1px solid var(--border);border-radius:13px;overflow:hidden;background:var(--surface);}.roster-player{display:flex;align-items:center;gap:8px;padding:11px 10px;border-top:1px solid var(--border);}.roster-player:first-child{border-top:0;}.player-mark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;font:700 10px 'JetBrains Mono',monospace;color:var(--text-muted);background:var(--surface-2);}.player-mark.reserve{color:var(--warn);background:var(--warn-bg);}.player-details{min-width:0;flex:1;}.player-name{font-size:11px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.player-caption{font-size:9px;color:var(--text-muted);margin-top:3px;}.player-actions{display:flex;align-items:center;gap:4px;}.player-btn{min-height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text-muted);font:700 10px 'Manrope',sans-serif;padding:6px 8px;cursor:pointer;}.player-btn.remove{font-size:18px;border-color:transparent;background:transparent;color:var(--text-muted);padding:2px 7px;}.player-btn:disabled{opacity:.25;cursor:default;}.priority-controls{display:flex;gap:3px;margin-top:6px;}.priority-controls .player-btn{min-height:28px;padding:2px 9px;font-size:14px;}.roster-hint{font-size:10px;color:var(--text-muted);line-height:1.6;margin:9px 0 0;}
 dialog{width:calc(100% - 24px);max-width:440px;max-height:90dvh;overflow-y:auto;margin:auto;border:1px solid var(--border);border-radius:22px;padding:24px 20px 20px;background:var(--surface);color:var(--text);box-shadow:0 24px 100px rgba(0,0,0,.6);font-family:'Manrope',sans-serif;}dialog::backdrop{background:rgba(4,7,12,.78);backdrop-filter:blur(5px);}.modal-top{display:flex;align-items:start;justify-content:space-between;gap:12px;}.modal-title{font-size:20px;letter-spacing:-.03em;font-weight:800;margin:0;}.modal-sub{color:var(--text-muted);font-size:11px;margin:6px 0 22px;line-height:1.6;}.modal-close{border:none;background:var(--surface-2);color:var(--text-muted);border-radius:50%;width:30px;height:30px;font-size:20px;cursor:pointer;flex-shrink:0;}.field-label{display:block;margin:18px 0 9px;color:var(--text-muted);font-size:10px;text-transform:uppercase;font-weight:800;letter-spacing:.07em;}.modal-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;}.modal-day{min-width:0;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);border-radius:10px;padding:10px 1px;font:700 11px 'Manrope',sans-serif;cursor:pointer;}.modal-day small{display:block;font:500 9px 'JetBrains Mono',monospace;margin-top:5px;opacity:.7;}.modal-day.active,.role-choice.active{border-color:rgba(255,90,104,.5);background:rgba(255,90,104,.12);color:var(--accent);}.modal-day:disabled{opacity:.25;cursor:default;}.modal-input{width:100%;min-width:0;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);padding:14px;font:600 15px 'Manrope',sans-serif;outline:none;color-scheme:dark;}.modal-input:focus{border-color:var(--accent);}.time-field{font:600 32px 'JetBrains Mono',monospace;letter-spacing:.03em;text-align:center;}.modal-note{display:flex;gap:10px;padding:12px;border:1px solid var(--border);border-radius:12px;color:var(--text-muted);font-size:11px;line-height:1.6;margin:16px 0;}.modal-note b{color:var(--text);font-weight:600;}.modal-submit{width:100%;border:none;border-radius:12px;background:var(--accent);color:#fff;min-height:46px;font:800 13px 'Manrope',sans-serif;cursor:pointer;margin-top:8px;}.modal-submit:disabled{opacity:.5;}.modal-error{font-size:11px;line-height:1.6;color:var(--accent);margin-top:12px;}.role-choices{display:flex;gap:8px;}.role-choice{flex:1;text-align:left;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);padding:13px;border-radius:12px;font:800 12px 'Manrope',sans-serif;cursor:pointer;}.role-choice small{display:block;font-size:10px;font-weight:500;opacity:.75;margin-top:5px;}.soft-btn:focus-visible,.player-btn:focus-visible,.modal-day:focus-visible,.role-choice:focus-visible,.modal-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.time-picker{display:flex;align-items:center;justify-content:center;position:relative;gap:6px;height:134px;border:1px solid var(--border);border-radius:14px;background:var(--bg);padding:0 50px 0 12px;}.time-picker:focus-within{border-color:var(--accent);}.time-wheels{position:relative;display:flex;align-items:center;gap:4px;}.time-wheels::before{content:'';position:absolute;left:0;right:0;top:44px;height:44px;background:var(--surface-2);border-radius:9px;pointer-events:none;}.time-wheel{position:relative;width:66px;height:132px;overflow-y:auto;padding:44px 0;scroll-snap-type:y mandatory;overscroll-behavior-y:contain;touch-action:pan-y;scrollbar-width:none;outline:none;mask-image:linear-gradient(transparent,#000 32%,#000 68%,transparent);}.time-wheel::-webkit-scrollbar{display:none;}.time-wheel:focus-visible{background:rgba(255,90,104,.08);border-radius:9px;}.time-wheel-row{height:44px;display:grid;place-items:center;scroll-snap-align:center;font:600 25px 'JetBrains Mono',monospace;color:var(--text-muted);opacity:.5;cursor:pointer;user-select:none;}.time-wheel-row.selected{color:var(--text);font-size:31px;opacity:1;}.time-colon{position:relative;font:600 28px 'JetBrains Mono',monospace;margin-top:-4px;}.native-time{position:absolute;right:12px;width:36px;height:44px;}.native-time input{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;color:transparent;color-scheme:dark;cursor:pointer;outline:none;}.native-time input::-webkit-datetime-edit{display:none;}.native-time input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;cursor:pointer;}.native-time svg{position:absolute;left:5px;top:9px;width:26px;height:26px;pointer-events:none;color:var(--text);}.native-time input:focus-visible{outline:2px solid var(--accent);border-radius:8px;}
 </style>
 </head>
 <body>
@@ -470,6 +472,46 @@ function bindEvents() {
   });
 }
 
+function renderTimePicker() {
+  const column = (unit, count, label) => '<div class="time-wheel" data-time-unit="' + unit + '" tabindex="0" role="spinbutton" aria-label="' + label + '" aria-valuemin="0" aria-valuemax="' + (count - 1) + '">' + Array.from({length:count},(_,i)=>'<div class="time-wheel-row" data-value="' + i + '" aria-hidden="true">' + String(i).padStart(2,'0') + '</div>').join('') + '</div>';
+  return '<div class="time-picker"><div class="time-wheels">' + column('hour',24,'Часы') + '<span class="time-colon" aria-hidden="true">:</span>' + column('minute',60,'Минуты') + '</div><div class="native-time"><input id="customTime" name="time" type="time" value="20:30" step="60" required aria-label="Обычный выбор времени"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 5.5v7l4 2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';
+}
+function setupTimePicker() {
+  const input = editModal.querySelector('#customTime');
+  if (!input) return;
+  const wheels = [...editModal.querySelectorAll('.time-wheel')];
+  const valueOf = wheel => Math.max(0, Math.min(Number(wheel.getAttribute('aria-valuemax')), Math.round(wheel.scrollTop / 44)));
+  function mark(wheel, value) {
+    wheel.setAttribute('aria-valuenow',value);
+    wheel.setAttribute('aria-valuetext',String(value).padStart(2,'0'));
+    wheel.querySelectorAll('.time-wheel-row').forEach(row=>row.classList.toggle('selected',Number(row.dataset.value) === value));
+  }
+  function readNative() {
+    if (!input.value) return;
+    input.value.split(':').forEach((part,i)=>{ wheels[i].scrollTop=Number(part)*44; mark(wheels[i],Number(part)); });
+  }
+  wheels.forEach(wheel => {
+    wheel.addEventListener('scroll',()=>{
+      mark(wheel,valueOf(wheel));
+      input.value = wheels.map(w=>String(valueOf(w)).padStart(2,'0')).join(':');
+    },{passive:true});
+    wheel.addEventListener('click',e=>{
+      const row=e.target.closest('[data-value]');
+      if(row) wheel.scrollTo({top:Number(row.dataset.value)*44,behavior:'smooth'});
+    });
+    wheel.addEventListener('keydown',e=>{
+      const value=valueOf(wheel);
+      const targets={ArrowUp:value-1,ArrowDown:value+1,PageUp:value-5,PageDown:value+5,Home:0,End:Number(wheel.getAttribute('aria-valuemax'))};
+      if (targets[e.key] == null) return;
+      e.preventDefault();
+      wheel.scrollTop=Math.max(0,Math.min(Number(wheel.getAttribute('aria-valuemax')),targets[e.key]))*44;
+    });
+  });
+  input.addEventListener('input',readNative);
+  input.addEventListener('change',readNative);
+  readNative();
+}
+
 let modalBusy = false;
 const editModal = document.getElementById('editModal');
 editModal.addEventListener('cancel', e => { if (modalBusy) e.preventDefault(); });
@@ -480,7 +522,7 @@ function openEditor(type, data = {}) {
   const team = escapeHtml(state.team.name);
   const title = type === 'time' ? 'Добавить сбор' : type === 'player' ? 'Новый игрок' : type === 'remove-time' ? 'Удалить сбор?' : 'Удалить игрока?';
   const sub = type === 'time' ? team + ' · на этой неделе' : type === 'player' ? 'Добавь игрока в ' + team : type === 'remove-time' ? team + ' · ' + DAY_ABBR[data.day] + ' · ' + data.time + ' МСК' : '@' + escapeHtml(data.username) + ' потеряет доступ к расписанию ' + team + '.';
-  const timeFields = '<label class="field-label" for="gatheringName">Название сбора</label><input class="modal-input" id="gatheringName" name="name" placeholder="Например, МСК турнир" maxlength="60" autocomplete="off" required><span class="field-label">День недели</span><div class="modal-days">' + state.days.map(d => '<button type="button" class="modal-day' + (d.key === data.day ? ' active' : '') + '" data-modal-day="' + d.key + '" aria-pressed="' + (d.key === data.day) + '"' + (state.explicitDaysOff.includes(d.key) ? ' disabled' : '') + '>' + DAY_ABBR[d.key] + '<small>' + dateParts(d.dateIso).day + '</small></button>').join('') + '</div><label class="field-label" for="customTime">Время · МСК</label><input class="modal-input time-field" id="customTime" name="time" type="time" value="20:30" step="60" required><div class="modal-note"><span>◷</span><span>Время добавится к остальным вариантам <b>только у ' + team + '</b>. Каждый игрок отметит, сможет ли прийти.</span></div>';
+  const timeFields = '<label class="field-label" for="gatheringName">Название сбора</label><input class="modal-input" id="gatheringName" name="name" placeholder="Например, МСК турнир" maxlength="60" autocomplete="off" required><span class="field-label">День недели</span><div class="modal-days">' + state.days.map(d => '<button type="button" class="modal-day' + (d.key === data.day ? ' active' : '') + '" data-modal-day="' + d.key + '" aria-pressed="' + (d.key === data.day) + '"' + (state.explicitDaysOff.includes(d.key) ? ' disabled' : '') + '>' + DAY_ABBR[d.key] + '<small>' + dateParts(d.dateIso).day + '</small></button>').join('') + '</div><label class="field-label" for="customTime">Время · МСК</label>' + renderTimePicker() + '<div class="modal-note"><span>◷</span><span>Время добавится к остальным вариантам <b>только у ' + team + '</b>. Каждый игрок отметит, сможет ли прийти.</span></div>';
   const playerFields = '<label class="field-label" for="playerUsername">Telegram-ник</label><input class="modal-input" id="playerUsername" name="username" placeholder="@username" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="33"><span class="field-label">Роль в команде</span><div class="role-choices"><button type="button" class="role-choice active" data-modal-role="main" aria-pressed="true">Основа<small>Постоянный состав</small></button><button type="button" class="role-choice" data-modal-role="sub" aria-pressed="false">Запас<small>В конце очереди замен</small></button></div><div class="modal-note">Игрок получит доступ к этой команде при первом входе в мини-приложение через Telegram.</div>';
   editModal.innerHTML = '<form id="editorForm"><div class="modal-top"><div><h2 class="modal-title" id="modalTitle">' + title + '</h2><p class="modal-sub">' + sub + '</p></div><button type="button" class="modal-close" aria-label="Закрыть">×</button></div>' + (type === 'time' ? timeFields : type === 'player' ? playerFields : type === 'remove-time' ? '<div class="modal-note">Сбор и выбранные для него отметки будут удалены. Стандартные праки и премьер сохранятся.</div>' : '<div class="modal-note">История посещаемости сохранится. Права администратора задаются отдельно от игрового состава.</div>') + '<div class="modal-error" id="modalError" role="alert"></div><button class="modal-submit" type="submit">' + (type === 'time' ? 'Добавить время' : type === 'player' ? 'Добавить игрока' : type === 'remove-time' ? 'Удалить сбор' : 'Удалить из команды') + '</button></form>';
   let day = data.day;
@@ -502,6 +544,7 @@ function openEditor(type, data = {}) {
     finally { modalBusy = false; submit.disabled = false; }
   };
   editModal.showModal();
+  if (type === 'time') setupTimePicker();
 }
 
 async function saveDay(day) {
