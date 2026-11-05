@@ -79,7 +79,7 @@ namedWeek.customSlots = {mon:['19:00'],sat:['19:30'],sun:['18:00']};
 namedWeek.customSlotNames = {mon:{'19:00':'Турнир'},sat:{'19:30':'Разбор'},sun:{'18:00':'МСК турнир'}};
 for (const u of MAIN_ROSTER) namedWeek.responses[u].mon.slots.push('19:00');
 assert.equal(daysForWeek(namedWeek)[0].kind,'Праки · Турнир');
-assert.equal(daysForWeek(namedWeek)[5].kind,'Премьер · Разбор');
+assert.equal(daysForWeek(namedWeek)[5].kind,'Премьер (21:00, 23:00) · Разбор');
 assert.equal(daysForWeek(namedWeek)[6].kind,'МСК турнир');
 assert.deepEqual(computeWeekSessions(namedWeek).filter(s=>s.dayKey==='mon').map(s=>[s.slot,s.kind]),[['19:00','Турнир'],['20:00','Праки']]);
 assert(buildSummaryText(namedWeek).includes('Праки · Турнир'));
