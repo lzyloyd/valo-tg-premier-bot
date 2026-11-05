@@ -1,6 +1,6 @@
 import { currentTeam, refreshTeamRoster } from './scheduleTeams.js';
 import { serial, readJson, atomicJson } from './schedulePersistence.js';
-import { DAYS, daysForWeek, currentWeekStart, weekDeadline, weekStartFromIso, mskIsoDate } from './scheduleModel.js';
+import { teamDays, daysForWeek, currentWeekStart, weekDeadline, weekStartFromIso, mskIsoDate } from './scheduleModel.js';
 function emptyWeek(weekStart) {
   return { weekStart: mskIsoDate(weekStart), responses: {}, daysOff: [], customSlots: {}, customSlotNames: {}, premierTimesVersion: 2, lastSaved: {}, edits: [], summaryMessageId: null };
 }
@@ -74,7 +74,7 @@ export function setResponse(username, day, avail, slots, now = new Date()) {
 export function addCustomSlot(day, time, expectedWeekStart, name, now = new Date()) {
   return mutateWeek(now, week => {
     if (expectedWeekStart !== week.weekStart) throw new Error('Началась новая неделя. Обнови расписание.');
-    if (!DAYS.some(d => d.key === day) || typeof time !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) throw new Error('Укажи время в формате ЧЧ:ММ (МСК).');
+    if (!teamDays().some(d => d.key === day) || typeof time !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) throw new Error('Укажи время в формате ЧЧ:ММ (МСК).');
     name = typeof name === 'string' ? name.trim().replace(/\s+/g,' ') : '';
     if (!name || name.length > 60 || /[\u0000-\u001f\u007f]/.test(name)) throw new Error('Укажи название сбора, до 60 символов.');
     const definition = daysForWeek(week).find(d => d.key === day);
@@ -90,7 +90,7 @@ export function addCustomSlot(day, time, expectedWeekStart, name, now = new Date
 }
 export function setDayOff(day, isOff, now = new Date()) {
   return mutateWeek(now, week => {
-    if (!DAYS.some(d => d.key === day)) throw new Error('Неизвестный день.');
+    if (!teamDays().some(d => d.key === day)) throw new Error('Неизвестный день.');
     week.daysOff = isOff ? [...new Set([...(week.daysOff || []),day])] : (week.daysOff || []).filter(d => d !== day);
   });
 }
@@ -101,7 +101,7 @@ export function saveSummaryMessageId(messageId) {
 export function removeCustomSlot(day, time, expectedWeekStart, now = new Date()) {
   return mutateWeek(now, week => {
     if (expectedWeekStart !== week.weekStart) throw new Error('Началась новая неделя. Обнови расписание.');
-    const definition = DAYS.find(d => d.key === day);
+    const definition = teamDays().find(d => d.key === day);
     if (!definition || !(week.customSlots?.[day] || []).includes(time)) throw new Error('Можно удалять только кастомные сборы.');
     week.customSlots[day] = week.customSlots[day].filter(slot => slot !== time);
     if (week.customSlotNames?.[day]) delete week.customSlotNames[day][time];

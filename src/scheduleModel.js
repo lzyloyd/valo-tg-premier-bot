@@ -27,6 +27,9 @@ export const DAYS = [
   { key: 'sun', label: 'Воскресенье', kind: 'Сборы', slots: [] },
 ];
 
+// Per-team default week (Clarity has its own slots); falls back to OVT's.
+export function teamDays() { return currentTeam().days || DAYS; }
+
 const MSK_OFFSET_MS = 3 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -113,7 +116,7 @@ export function nextDeadlineInstant(now = new Date()) {
 }
 
 export function daysForWeek(week = {}) {
-  return DAYS.map(day => {
+  return teamDays().map(day => {
     const custom = week.customSlots?.[day.key] || [];
     const names = week.customSlotNames?.[day.key] || {};
     const activityNames = [...new Set(custom.map(time => names[time]).filter(Boolean))];
@@ -130,7 +133,7 @@ export function weekDayDates(weekStart, week = {}) {
 }
 
 // "Answered" means every playing day has a yes/no.
-export function hasFullyAnswered(responses, username, daysOff = [], days = DAYS) {
+export function hasFullyAnswered(responses, username, daysOff = [], days = teamDays()) {
   return days.filter((d) => d.slots.length && !daysOff.includes(d.key)).every((d) => responses[username]?.[d.key]?.avail);
 }
 
@@ -198,7 +201,7 @@ export function computeDaySessions(day, responses) {
 
 // The absolute instant (UTC) a given day+slot within a week actually starts.
 export function slotInstant(weekStart, dayKey, time) {
-  const dayIndex = DAYS.findIndex((d) => d.key === dayKey);
+  const dayIndex = teamDays().findIndex((d) => d.key === dayKey);
   const [hh, mm] = time.split(':').map(Number);
   return new Date(weekStart.getTime() + dayIndex * DAY_MS + hh * 60 * 60 * 1000 + mm * 60 * 1000);
 }
@@ -262,7 +265,7 @@ function describeAnswer(entry) {
 // resets. At the cap, the wording calls out the roster consequence
 // (moved to reserve) instead of just another plain warning.
 export function buildMissWarningText(username, session, count) {
-  const day = DAYS.find((d) => d.key === session.dayKey);
+  const day = teamDays().find((d) => d.key === session.dayKey);
   const label = `${day.label.toLowerCase()} ${session.slot} (${session.kind || day.kind})`;
   if (count >= MAX_WARNINGS) {
     return `🚨 @${username} не пришёл(а) на ${label} — ${count}/${MAX_WARNINGS}. Лимит предупреждений исчерпан, игрок переводится в запас.`;
@@ -271,6 +274,6 @@ export function buildMissWarningText(username, session, count) {
 }
 
 export function buildEditAlertText(edit) {
-  const day = DAYS.find((d) => d.key === edit.day);
+  const day = teamDays().find((d) => d.key === edit.day);
   return `✏️ @${edit.username} изменил(а) ответ на ${day.label.toLowerCase()}: ${describeAnswer(edit.before)} → ${describeAnswer(edit.after)}`;
 }

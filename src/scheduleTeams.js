@@ -30,7 +30,18 @@ export const teams = [
     adminMembers: [], adminIds: [config.adminUserId].filter(Boolean), chatId: config.scheduleChatId, threadId: config.scheduleThreadId, reminderThreadId: null, enabled: true }),
   makeTeam({ id: 'team2', name: process.env.TEAM2_NAME || 'Clarity', members: secondMembers.map(m=>({...m,username:m.username.toLowerCase()})),
     adminMembers: secondMembers.filter(m => m.admin === true).map(m=>({...m,username:m.username.toLowerCase()})),
-    adminIds: [config.adminUserId, Number(process.env.TEAM2_ADMIN_USER_ID) || null].filter(Boolean), chatId: '-1004419192416', threadId: '2', reminderThreadId: '1', enabled: secondMembers.length > 0 }),
+    adminIds: [config.adminUserId, Number(process.env.TEAM2_ADMIN_USER_ID) || null].filter(Boolean), chatId: '-1004419192416', threadId: '2',
+    // Topic 1 is the forum's General topic: Telegram rejects message_thread_id=1, so General = no thread id.
+    reminderThreadId: null,
+    days: [
+      { key: 'mon', label: 'Понедельник', kind: 'Сборы', slots: [] },
+      { key: 'tue', label: 'Вторник', kind: 'Сборы', slots: [] },
+      { key: 'wed', label: 'Среда', kind: 'Сборы', slots: [] },
+      { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00'] },
+      { key: 'fri', label: 'Пятница', kind: 'Сборы', slots: [] },
+      { key: 'sat', label: 'Суббота', kind: 'Премьер', slots: ['21:00'] },
+      { key: 'sun', label: 'Воскресенье', kind: 'Праки', slots: ['20:00'] },
+    ], enabled: secondMembers.length > 0 }),
 ];
 for (const team of teams) {
   Object.defineProperties(team, {

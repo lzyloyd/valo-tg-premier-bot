@@ -6,7 +6,7 @@ import express from 'express';
 import { config } from './config.js';
 import { verifyInitData } from './telegramAuth.js';
 import {
-  DAYS,
+  teamDays,
   daysForWeek,
   QUORUM,
   MAX_WARNINGS,
@@ -249,7 +249,7 @@ export function startMiniAppServer() {
       return;
     }
     const { day, isOff } = req.body ?? {};
-    const dayDef = DAYS.find((d) => d.key === day);
+    const dayDef = teamDays().find((d) => d.key === day);
     if (!dayDef || typeof isOff !== 'boolean') {
       res.status(400).json({ error: 'Некорректные данные.' });
       return;
@@ -274,7 +274,7 @@ export function startMiniAppServer() {
       return;
     }
     const { username, dayKey, slot } = req.body ?? {};
-    if (!currentTeam().roster.includes(username) || !DAYS.some((d) => d.key === dayKey) || typeof slot !== 'string') {
+    if (!currentTeam().roster.includes(username) || !teamDays().some((d) => d.key === dayKey) || typeof slot !== 'string') {
       res.status(400).json({ error: 'Некорректные данные.' });
       return;
     }
