@@ -58,6 +58,9 @@ try {
   const ownerWeek = (await api('/api/state',100,'manager','ovt')).body.weekStart;
   assert.equal((await api('/api/add-time',100,'manager','ovt',{day:'wed',time:'18:15',weekStart:ownerWeek})).status,200);
   assert.equal((await api('/api/add-time',100,'manager','team2',{day:'wed',time:'18:15',weekStart:ownerWeek})).status,200);
+  // Clarity has no slot-free weekday any more; blank Friday to exercise custom slots on an empty day.
+  const clarityDays = teams[1].days;
+  teams[1].days = clarityDays.map(d=>d.key==='fri'?{...d,slots:[],pickOneSlot:false}:d);
   const before = (await api('/api/state',200,'Mania_boo','team2')).body;
   assert(before.daysOff.includes('fri'));
   assert.deepEqual(before.days.find(d=>d.key==='fri').slots,[]);
@@ -79,7 +82,7 @@ try {
   const after = (await api('/api/state',201,'khhhaneul','team2')).body;
   assert(after.days.find(d=>d.key==='tue').slots.includes('18:45'));
   assert(after.days.find(d=>d.key==='tue').slots.includes('20:15'));
-  assert.equal(after.days.find(d=>d.key==='tue').kind,'МСК турнир');
+  assert.equal(after.days.find(d=>d.key==='tue').kind,'Праки · МСК турнир');
   assert.equal((await api('/api/state',200,'Mania_boo','ovt')).body.days.find(d=>d.key==='tue').kind,'Праки');
   assert.deepEqual(after.days.find(d=>d.key==='sat').slots,['21:00']);
   for (const [id,user,team] of [[201,'khhhaneul','team2'],[200,'Mania_boo','ovt']]) {
@@ -92,6 +95,8 @@ try {
   assert(removed.body.daysOff.includes('fri'));
   assert.equal(removed.body.responses.khhhaneul.fri,undefined);
   assert.deepEqual(removed.body.days.find(d=>d.key==='sat').slots,['21:00']);
+  teams[1].days = clarityDays;
+  assert.deepEqual(['mon','tue','wed','fri'].map(k=>(teams[1].days.find(d=>d.key===k)).slots),Array(4).fill(['20:00','21:00','22:00']));
   assert.equal((await api('/api/remove-time',100,'manager','ovt',{day:'wed',time:'18:15',weekStart:ownerWeek})).status,200);
   assert((await api('/api/state',100,'manager','team2')).body.days.find(d=>d.key==='wed').slots.includes('18:15'));
   assert.equal((await api('/api/roster',201,'khhhaneul','team2',{action:'add',username:'no_permission',role:'sub'})).status,403);

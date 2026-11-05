@@ -34,11 +34,11 @@ export const teams = [
     // Topic 1 is the forum's General topic: Telegram rejects message_thread_id=1, so General = no thread id.
     reminderThreadId: null,
     days: [
-      { key: 'mon', label: 'Понедельник', kind: 'Сборы', slots: [] },
-      { key: 'tue', label: 'Вторник', kind: 'Сборы', slots: [] },
-      { key: 'wed', label: 'Среда', kind: 'Сборы', slots: [] },
+      { key: 'mon', label: 'Понедельник', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
+      { key: 'tue', label: 'Вторник', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
+      { key: 'wed', label: 'Среда', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
       { key: 'thu', label: 'Четверг', kind: 'Праки', slots: ['20:00'] },
-      { key: 'fri', label: 'Пятница', kind: 'Сборы', slots: [] },
+      { key: 'fri', label: 'Пятница', kind: 'Праки', slots: ['20:00', '21:00', '22:00'], pickOneSlot: true },
       { key: 'sat', label: 'Суббота', kind: 'Премьер', slots: ['21:00'] },
       { key: 'sun', label: 'Воскресенье', kind: 'Праки', slots: ['20:00'] },
     ], enabled: secondMembers.length > 0 }),
