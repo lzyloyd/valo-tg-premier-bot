@@ -307,6 +307,11 @@ export async function runTelegramListener() {
 
     for (const update of updates) {
       offset = update.update_id + 1;
+      // A sticker sent to the bot in private is only logged, so its file_id can be
+      // copied into REMINDER_STICKER_FILE_ID.
+      if (update.message?.sticker && update.message.chat?.type === 'private') {
+        console.log(`[listener] sticker from ${update.message.from?.username || update.message.from?.id}: ${update.message.sticker.file_id}`);
+      }
       const text = update.message?.text;
       if (!text) continue;
       const triggerMatch = TRIGGER.exec(text);

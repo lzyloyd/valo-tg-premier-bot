@@ -2,7 +2,7 @@ import { serial } from './schedulePersistence.js';
 import { currentTeam } from './scheduleTeams.js';
 import { daysForWeek, hasFullyAnswered, buildSummaryText, buildEditAlertText, computeWeekSessions } from './scheduleModel.js';
 import { loadCurrentWeek, runWeeklyReset, saveSummaryMessageId } from './scheduleStore.js';
-import { sendTextTo, sendTextToWithId, editMessageText } from './telegram.js';
+import { sendTextTo, sendTextToWithId, editMessageText, sendStickerTo } from './telegram.js';
 
 const MINUTE_MS = 60 * 1000;
 
@@ -29,6 +29,11 @@ async function sendSessionReminder(session, minutesBefore) {
     currentTeam().reminderThreadId,
     `⏰ Через ${minutesBefore} минут — ${formatSessionTime(session)}\nИграют: ${mentions}`,
   );
+  const sticker = process.env.REMINDER_STICKER_FILE_ID;
+  if (minutesBefore === 10 && sticker) {
+    await sendStickerTo(currentTeam().chatId, currentTeam().reminderThreadId, sticker)
+      .catch((err) => console.error('[schedule] reminder sticker failed:', err));
+  }
 }
 
 // Handles for whatever's currently scheduled, so a reschedule (a

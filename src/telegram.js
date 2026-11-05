@@ -53,6 +53,14 @@ export async function sendAnimationTo(chatId, threadId, animationUrl) {
   await callApi('sendAnimation', form);
 }
 
+export async function sendStickerTo(chatId, threadId, sticker) {
+  const form = new FormData();
+  form.append('chat_id', chatId);
+  if (threadId) form.append('message_thread_id', threadId);
+  form.append('sticker', sticker);
+  await callApi('sendSticker', form);
+}
+
 export async function sendTextTo(chatId, threadId, text) {
   const form = new FormData();
   form.append('chat_id', chatId);
