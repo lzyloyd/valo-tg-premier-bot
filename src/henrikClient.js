@@ -1,3 +1,4 @@
+import { currentStatsTeam } from './statsTeams.js';
 import { config } from './config.js';
 
 // HenrikDev's unofficial VALORANT API (https://docs.henrikdev.xyz) — the
@@ -52,7 +53,7 @@ export async function fetchMatch(matchId) {
  * history — one call, independent of which players happened to play.
  */
 export async function fetchPremierHistory() {
-  const data = await henrikGet(`/valorant/v1/premier/${encodeURIComponent(config.premierRosterId)}/history`);
+  const data = await henrikGet(`/valorant/v1/premier/${encodeURIComponent(currentStatsTeam().premierRosterId)}/history`);
   return [...(data.league_matches ?? [])]
     .map((m) => ({ id: m.id, startedAt: m.started_at }))
     .sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));

@@ -1,3 +1,4 @@
+import { currentStatsTeam } from './statsTeams.js';
 import { config } from './config.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
@@ -81,7 +82,7 @@ export async function editMessageText(chatId, messageId, text) {
 }
 
 export async function sendMatchReport(match, pngBuffer) {
-  await sendPhotoTo(config.telegramChatId, config.telegramMessageThreadId, caption(match), pngBuffer);
+  await sendPhotoTo(currentStatsTeam().reportChatId, currentStatsTeam().reportThreadId, caption(match), pngBuffer);
 }
 
 export { caption as matchCaption };

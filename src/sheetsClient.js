@@ -126,3 +126,10 @@ export async function batchUpdate(spreadsheetId, requests) {
     body: JSON.stringify({ requests }),
   });
 }
+
+export async function getSpreadsheetDetails(spreadsheetId, ranges = [], fields = null) {
+  const query=new URLSearchParams();
+  if(ranges.length) {for(const range of ranges) query.append('ranges',range);query.set('includeGridData','true');}
+  if(fields)query.set('fields',fields);
+  return authedFetch(BASE + '/' + spreadsheetId + '?' + query);
+}

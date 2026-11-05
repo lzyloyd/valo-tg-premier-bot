@@ -1,3 +1,4 @@
+import { currentStatsTeam } from './statsTeams.js';
 import { promises as fs } from 'node:fs';
 import { config } from './config.js';
 
@@ -7,7 +8,7 @@ async function ensureDataDir() {
 
 export async function loadSeenMatchIds() {
   try {
-    const raw = await fs.readFile(config.statePath, 'utf8');
+    const raw = await fs.readFile(currentStatsTeam().statePath, 'utf8');
     return new Set(JSON.parse(raw).seenMatchIds ?? []);
   } catch (err) {
     if (err.code === 'ENOENT') return new Set();
@@ -20,5 +21,5 @@ export async function saveSeenMatchIds(seenMatchIds) {
   // Cap growth — we only ever need enough history to dedupe against the
   // handful of matches tracker.gg's profile page returns.
   const trimmed = [...seenMatchIds].slice(-200);
-  await fs.writeFile(config.statePath, JSON.stringify({ seenMatchIds: trimmed }, null, 2));
+  await fs.writeFile(currentStatsTeam().statePath, JSON.stringify({ seenMatchIds: trimmed }, null, 2));
 }

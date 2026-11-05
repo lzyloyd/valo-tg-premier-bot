@@ -1,3 +1,4 @@
+import { currentStatsTeam } from './statsTeams.js';
 import { config } from './config.js';
 import { sendPhotoTo } from './telegram.js';
 import { countAnnouncedPremierWeeks } from './sheetsStats.js';
@@ -47,19 +48,19 @@ export async function screenshotSheetRange(browser, spreadsheetId, gid) {
  * "Статистика" topic, numbered by how many maps have completed so far.
  */
 export async function announceMapWeekComplete(browser, { spreadsheetId, sheetId, tabTitle }) {
-  if (!config.statsChatId) return; // not configured yet — skip quietly rather than error the whole command
+  if (!currentStatsTeam().chatId) return; // not configured yet — skip quietly rather than error the whole command
   const week = await countAnnouncedPremierWeeks(spreadsheetId);
   const png = await screenshotSheetRange(browser, spreadsheetId, sheetId);
   const link = sheetRangeUrl(spreadsheetId, sheetId, HEATMAP_RANGE);
-  const caption = `${week} неделя ${escapeHtml(config.currentSplitLabel)} прем матчи (${escapeHtml(tabTitle)})\n${escapeHtml(link)}`;
-  await sendPhotoTo(config.statsChatId, config.statsThreadId, caption, png);
+  const caption = `${week} неделя ${escapeHtml(currentStatsTeam().splitLabel)} прем матчи (${escapeHtml(tabTitle)})\n${escapeHtml(link)}`;
+  await sendPhotoTo(currentStatsTeam().chatId, currentStatsTeam().threadId, caption, png);
 }
 
 /** "Резалтик, отправь статистику за сезон" */
 export async function sendSeasonStats(browser, { spreadsheetId, sheetId, tabTitle }) {
   const png = await screenshotSheetRange(browser, spreadsheetId, sheetId);
   const link = sheetRangeUrl(spreadsheetId, sheetId, HEATMAP_RANGE);
-  const caption = `Статистика за сезон ${escapeHtml(config.currentSplitLabel)}\n${escapeHtml(link)}`;
-  await sendPhotoTo(config.statsChatId ?? config.scheduleChatId, config.statsThreadId ?? config.scheduleThreadId, caption, png);
+  const caption = `Статистика за сезон ${escapeHtml(currentStatsTeam().splitLabel)}\n${escapeHtml(link)}`;
+  await sendPhotoTo(currentStatsTeam().chatId ?? config.scheduleChatId, currentStatsTeam().threadId ?? config.scheduleThreadId, caption, png);
   return { tabTitle };
 }

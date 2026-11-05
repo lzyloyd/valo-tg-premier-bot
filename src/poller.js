@@ -1,3 +1,4 @@
+import { statsTeams, withStatsTeam, currentStatsTeam } from './statsTeams.js';
 import { getBrowser } from './browser.js';
 import { fetchPremierHistory, fetchMatch } from './henrikClient.js';
 import { buildMatchView } from './matchModel.js';
@@ -10,7 +11,12 @@ import { loadSeenMatchIds, saveSeenMatchIds } from './state.js';
 const RECENT_MATCH_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000;
 
 export async function runPollCycle() {
-  console.log('[poller] checking for new Premier matches...');
+  const results=await Promise.allSettled(statsTeams.filter(team=>team.autoReports && team.reportChatId).map(team=>withStatsTeam(team,runTeamPollCycle)));
+  for(let i=0;i<results.length;i++) if(results[i].status==='rejected') console.error('[poller] team failed:',results[i].reason);
+  if(results.every(result=>result.status==='rejected')) throw new AggregateError(results.map(r=>r.reason),'All team polls failed');
+}
+async function runTeamPollCycle() {
+  console.log(`[poller] ${currentStatsTeam().name}: checking for new Premier matches...`);
   const seen = await loadSeenMatchIds();
   const recent = (await fetchPremierHistory()).filter((m) => Date.now() - new Date(m.startedAt) <= RECENT_MATCH_MAX_AGE_MS);
   const newMatches = recent.filter((m) => !seen.has(m.id));

@@ -1,3 +1,4 @@
+import { currentStatsTeam, statsTeamForChat, withStatsTeam, overallPremierTab } from './statsTeams.js';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
@@ -7,7 +8,7 @@ import { buildMatchView } from './matchModel.js';
 import { renderScoreboardPng } from './render/renderCard.js';
 import { sendPhotoTo, sendTextTo, sendAnimationTo, matchCaption } from './telegram.js';
 import { fetchRandomGifUrl } from './giphy.js';
-import { appendMatchToStatsSheet, getTabSheetId, OVERALL_PREMIER_TAB } from './sheetsStats.js';
+import { appendMatchToStatsSheet, getTabSheetId } from './sheetsStats.js';
 import { announceMapWeekComplete, sendSeasonStats } from './sheetsAnnounce.js';
 
 const API_BASE = `https://api.telegram.org/bot${config.telegramBotToken}`;
@@ -106,17 +107,16 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
       });
       if (alreadyLogged) {
         lines.push(`↩️ ${short}… уже был записан в "${tabTitle}" (Game ${gameNumber}), пропущен`);
-        continue;
       }
       const skippedNote = skipped.length ? `, не найдены в таблице: ${skipped.join(', ')}` : '';
-      lines.push(`✅ ${short}… → "${tabTitle}", Game ${gameNumber} (${written.length} игроков${skippedNote})`);
+      if (!alreadyLogged) lines.push(`✅ ${short}… → "${tabTitle}", Game ${gameNumber} (${written.length} игроков${skippedNote})`);
 
       // One map's Premier best-of-2 just completed — post its heatmap into
       // the "Статистика" topic, numbered by how many maps have wrapped up
       // so far this split.
-      if (mode === 'Premier' && gameNumber === 2) {
+      if (mode === 'Premier' && gameNumber === 2 && !alreadyLogged) {
         try {
-          await announceMapWeekComplete(browser, { spreadsheetId: config.statsSpreadsheetId, sheetId, tabTitle });
+          await announceMapWeekComplete(browser, { spreadsheetId: currentStatsTeam().spreadsheetId, sheetId, tabTitle });
           lines.push(`   📸 отправлено в топик "Статистика"`);
         } catch (err) {
           console.error(`[listener] failed to announce map week complete for ${tabTitle}:`, err);
@@ -132,12 +132,12 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
           mode,
           players: match.ourTeam,
           matchId,
-          tabTitle: OVERALL_PREMIER_TAB,
+          tabTitle: overallPremierTab(),
         });
         lines.push(
           overall.alreadyLogged
-            ? `   ↳ уже был записан в "${OVERALL_PREMIER_TAB}" (Game ${overall.gameNumber})`
-            : `   ↳ "${OVERALL_PREMIER_TAB}", Game ${overall.gameNumber}`,
+            ? `   ↳ уже был записан в "${overallPremierTab()}" (Game ${overall.gameNumber})`
+            : `   ↳ "${overallPremierTab()}", Game ${overall.gameNumber}`,
         );
       }
     } catch (err) {
@@ -152,12 +152,12 @@ async function addMatchesToStatsSheet(matchIds, mode, message) {
 // overall "Статистика за V26A5" tab's heatmap into the "Статистика" topic.
 async function sendSeasonStatsCommand(message) {
   const browser = await getBrowser();
-  const sheetId = await getTabSheetId(config.statsSpreadsheetId, OVERALL_PREMIER_TAB);
+  const sheetId = await getTabSheetId(currentStatsTeam().spreadsheetId, overallPremierTab());
   if (sheetId === null) {
-    await sendTextTo(message.chat.id, message.message_thread_id, `Вкладка "${OVERALL_PREMIER_TAB}" не найдена в таблице.`);
+    await sendTextTo(message.chat.id, message.message_thread_id, `Вкладка "${overallPremierTab()}" не найдена в таблице.`);
     return;
   }
-  await sendSeasonStats(browser, { spreadsheetId: config.statsSpreadsheetId, sheetId, tabTitle: OVERALL_PREMIER_TAB });
+  await sendSeasonStats(browser, { spreadsheetId: currentStatsTeam().spreadsheetId, sheetId, tabTitle: overallPremierTab() });
 }
 
 // "Резалтик, отправь сводку по карте <Map>" — manual version of the
@@ -166,13 +166,13 @@ async function sendSeasonStatsCommand(message) {
 // premier match and so never reached that trigger on its own.
 async function sendMapSummaryCommand(mapName, message) {
   const tabTitle = `${mapName} - Premier`;
-  const sheetId = await getTabSheetId(config.statsSpreadsheetId, tabTitle);
+  const sheetId = await getTabSheetId(currentStatsTeam().spreadsheetId, tabTitle);
   if (sheetId === null) {
     await sendTextTo(message.chat.id, message.message_thread_id, `Вкладка "${tabTitle}" не найдена в таблице.`);
     return;
   }
   const browser = await getBrowser();
-  await announceMapWeekComplete(browser, { spreadsheetId: config.statsSpreadsheetId, sheetId, tabTitle });
+  await announceMapWeekComplete(browser, { spreadsheetId: currentStatsTeam().spreadsheetId, sheetId, tabTitle });
   await sendTextTo(message.chat.id, message.message_thread_id, `Отправлено в "Статистика": "${tabTitle}".`);
 }
 
@@ -193,7 +193,13 @@ function healthcheckReply() {
 
 const NEED_MATCH = 'Нужна ссылка на матч tracker.gg.';
 
-async function handleCommand(commandText, message) {
+export function handleCommand(commandText, message) {
+  const team=statsTeamForChat(message.chat.id);
+  const statsCommand=[STATS_PREMIER_RE,STATS_PRACTICE_RE,SEASON_STATS_RE,MAP_SUMMARY_RE].some(re=>re.test(commandText.trim()));
+  if(statsCommand && !team) return sendTextTo(message.chat.id,message.message_thread_id,'Команды статистики доступны в группе вашей команды.');
+  return withStatsTeam(team || currentStatsTeam(),()=>handleTeamCommand(commandText,message));
+}
+async function handleTeamCommand(commandText, message) {
   const trimmed = commandText.trim();
   try {
     if (HEALTHCHECK_RE.test(trimmed)) {

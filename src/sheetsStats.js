@@ -1,5 +1,6 @@
-import { config } from './config.js';
-import { LABEL_TO_RIOT_ID } from './statsRoster.js';
+import { currentStatsTeam, overallPremierTab } from './statsTeams.js';
+import { serial } from './schedulePersistence.js';
+import { currentLabelMap } from './statsRoster.js';
 import {
   getSpreadsheetMeta,
   getValues,
@@ -171,10 +172,13 @@ function indexToCol(n) {
 async function findOrCreateTab(spreadsheetId, tabTitle, mode) {
   const sheets = await getSpreadsheetMeta(spreadsheetId);
   const existing = sheets.find((s) => s.title === tabTitle);
-  if (existing) return existing;
+  if (existing) {
+    if (existing.gridProperties.columnCount < 78) await batchUpdate(spreadsheetId,[{updateSheetProperties:{properties:{sheetId:existing.sheetId,gridProperties:{columnCount:78}},fields:'gridProperties.columnCount'}}]);
+    return existing;
+  }
 
-  const template = sheets.find((s) => s.title === OVERALL_PREMIER_TAB);
-  if (!template) throw new Error(`Master template tab "${OVERALL_PREMIER_TAB}" not found`);
+  const template = sheets.find((s) => s.title === overallPremierTab());
+  if (!template) throw new Error(`Master template tab "${overallPremierTab()}" not found`);
   const layout = LAYOUT[mode];
 
   // Always append at the very end — tabs are only ever created the first
@@ -292,7 +296,7 @@ async function getPlayerAnchorRows(spreadsheetId, tabTitle, mode) {
     const rowValues = values[rowNumber - ANCHOR_FIRST_ROW] ?? [];
     for (const cell of rowValues) {
       if (typeof cell !== 'string') continue;
-      const riotId = LABEL_TO_RIOT_ID.get(cell.toLowerCase());
+      const riotId = currentLabelMap().get(cell.toLowerCase());
       if (riotId) {
         map.set(riotId, rowNumber);
         break;
@@ -362,9 +366,13 @@ async function findTargetGameColumn(spreadsheetId, tabTitle, firstAnchorRow, mod
  * re-run) is detected via that note and skipped rather than added as a
  * duplicate column.
  */
-export async function appendMatchToStatsSheet({ mapName, mode, players, matchId, matchDate, tabTitle = `${mapName} - ${mode}` }) {
-  const spreadsheetId = config.statsSpreadsheetId;
+export function appendMatchToStatsSheet(options) {
+  return serial('stats:' + currentStatsTeam().spreadsheetId, () => appendMatchUnlocked(options));
+}
+async function appendMatchUnlocked({ mapName, mode, players, matchId, matchDate, tabTitle = `${mapName} - ${mode}` }) {
+  const spreadsheetId = currentStatsTeam().spreadsheetId;
   if (!spreadsheetId) throw new Error('STATS_SPREADSHEET_ID is not configured');
+  if (!players.some(p=>currentLabelMap().has(p.riotId.toLowerCase()))) throw new Error('В матче нет игроков выбранной команды.');
   const layout = LAYOUT[mode];
   const argSep = await getFormulaArgSeparator(spreadsheetId);
 
@@ -447,7 +455,7 @@ export async function appendMatchToStatsSheet({ mapName, mode, players, matchId,
   // Only per-map tabs get reordered by date — the overall summary tab stays
   // pinned first regardless, so this call (tabTitle === OVERALL_PREMIER_TAB)
   // skips it.
-  if (tabTitle !== OVERALL_PREMIER_TAB) {
+  if (tabTitle !== overallPremierTab()) {
     await updateTabLastMatchDate(spreadsheetId, sheet.sheetId, matchDate);
     await reorderStatsTabsByDate(spreadsheetId);
   }
@@ -503,7 +511,7 @@ async function updateTabLastMatchDate(spreadsheetId, sheetId, matchDateIso) {
 /** Re-sorts every "<Map> - <Mode>" tab by its stored last-match-date metadata, keeping the overall summary tab pinned first. */
 export async function reorderStatsTabsByDate(spreadsheetId) {
   const sheets = await getSpreadsheetMeta(spreadsheetId);
-  const mapTabs = sheets.filter((s) => s.title !== OVERALL_PREMIER_TAB);
+  const mapTabs = sheets.filter((s) => s.title !== overallPremierTab());
   const matches = await searchDeveloperMetadata(spreadsheetId, LAST_MATCH_DATE_KEY);
   const dateBySheetId = new Map(matches.map((m) => [m.developerMetadata.location?.sheetId, m.developerMetadata.metadataValue]));
 
@@ -528,7 +536,7 @@ export async function countAnnouncedPremierWeeks(spreadsheetId) {
   const firstGameColumn = LAYOUT.Premier.firstGameColumn;
   let count = 0;
   for (const s of sheets) {
-    if (s.title === OVERALL_PREMIER_TAB || !s.title.endsWith(' - Premier')) continue;
+    if (s.title === overallPremierTab() || !s.title.endsWith(' - Premier')) continue;
     const row1 = (await getValues(spreadsheetId, `'${s.title}'!${firstGameColumn}1:BZ1`))[0] ?? [];
     if (row1.some((cell) => /Game \d+/.test(cell ?? ''))) count += 1;
   }
