@@ -14,7 +14,7 @@ if (once) {
   await closeBrowser();
   process.exit(0);
 } else {
-  console.log('[index] tg-results-bot started. Polling Premier matches only Saturdays at 21:00 and 23:00 MSK.');
+  console.log('[index] tg-results-bot started. Polling Premier results at Saturday 22:00 and Sunday 00:00 MSK.');
   scheduleNext(runPollCycle);
   if (config.scheduleChatId && config.scheduleThreadId) {
     for (const team of teams.filter(t => t.enabled)) withTeam(team, () => {

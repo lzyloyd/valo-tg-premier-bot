@@ -1,10 +1,10 @@
 import { nextResetInstant, nextReminderInstant, nextDeadlineInstant } from './scheduleModel.js';
 
-// Premier matches only happen Saturday 21:00 and 23:00 Moscow time, so the bot
-// only ever needs to wake up twice a week — no benefit to polling more often.
+// Check Premier results twice: Saturday 22:00 and 24:00 Moscow time.
+// Both checks are still on Saturday in UTC (19:00 and 21:00).
 // Moscow has used a fixed UTC+3 offset (no DST) since 2014, so working in UTC
 // directly is safe and avoids a timezone-database dependency.
-const TRIGGER_UTC_HOURS = [18, 20]; // MSK 21:00 and 23:00
+const TRIGGER_UTC_HOURS = [19, 21]; // MSK Saturday 22:00 and Sunday 00:00
 
 function saturdayMidnightUtc(from, weeksAhead) {
   const d = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));
