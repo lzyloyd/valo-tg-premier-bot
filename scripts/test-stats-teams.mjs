@@ -18,6 +18,12 @@ const players=[...ovt.roster.filter(r=>r.riotId!=='Mania#uma').slice(0,5).map(r=
 assert.equal(withStatsTeam(ovt,()=>findOurTeamId(players)),'Red');assert.equal(withStatsTeam(clarity,()=>findOurTeamId(players)),'Blue');
 assert.equal(withStatsTeam(clarity,()=>currentLabelMap().get('solace')),'solace#0一0');
 assert.equal(withStatsTeam(clarity,()=>currentLabelMap().has('space kururugi')),false);
+assert.equal(withStatsTeam(ovt,()=>currentLabelMap().get('militantum#bonr')),'ice blue#bonr');
+assert.equal(withStatsTeam(ovt,()=>currentLabelMap().get('militantum')),'ice blue#bonr');
+assert.equal(withStatsTeam(ovt,()=>currentLabelMap().get('ice blue#bonr')),'ice blue#bonr');
+assert.equal(withStatsTeam(ovt,()=>findOurTeamId([{riotId:'Ice blue#bonr',teamId:'Red'}])),'Red');
+assert.equal(withStatsTeam(ovt,()=>findOurTeamId([{riotId:'MILITANTUM#bonr',teamId:'Red'}])),'Red');
+assert.equal(withStatsTeam(clarity,()=>findOurTeamId([{riotId:'Ice blue#bonr',teamId:'Red'}])),null);
 const fixtures=new Map();
 function col(text){return [...text].reduce((a,c)=>a*26+c.charCodeAt(0)-64,0)-1;}
 function parse(range){const m=/^'([^']+)'!([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/.exec(range);assert(m,range);return {title:m[1],c:col(m[2]),r:Number(m[3])-1,lastC:col(m[4]||m[2]),lastR:Number(m[5]||m[3])-1};}
@@ -57,6 +63,9 @@ try {
    return result;
  })));
  assert.deepEqual(results.map(r=>r.written.length),[8,5]);
+ const renamed = await withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player('MILITANTUM#bonr')],matchId:'historical-nickname'}));
+ assert.deepEqual(renamed.written,['MILITANTUM#bonr']);
+ assert.deepEqual(renamed.skipped,[]);
  for(const team of statsTeams)assert(fixtures.get(team.spreadsheetId).get(team.overallTab).cells.get('0,17').includes('Game 1'));
  await assert.rejects(withStatsTeam(clarity,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player(ovt.roster[0].riotId)],matchId:'wrong-team'})),/нет игроков/);
  const fakeBrowser={newPage:async()=>({setViewport:async()=>{},goto:async()=>{},screenshot:async()=>Buffer.from('image'),close:async()=>{}})};

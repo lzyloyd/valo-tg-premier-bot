@@ -35,7 +35,7 @@ export const LABEL_TO_RIOT_ID = currentLabelMap();
 
 /** The teamId of the side any of our roster members played on, or null. Players: [{ riotId, teamId }]. */
 export function findOurTeamId(players) {
-  const ours = new Set(currentStatsTeam().roster.map(r=>r.riotId).map((id) => id.toLowerCase()));
+  const ours = currentLabelMap();
   const counts = new Map();
   for(const player of players) if(ours.has(player.riotId.toLowerCase())) counts.set(player.teamId,(counts.get(player.teamId)||0)+1);
   const ranked = [...counts].sort((a,b)=>b[1]-a[1]);

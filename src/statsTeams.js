@@ -8,7 +8,7 @@ const ovtRoster = [
   { riotId: 'ジ lzyloyd#pivo', sheetLabels: [] }, // @lzyloyd
   { riotId: 'AHotNik#2410', sheetLabels: ['toshir0000#6666'] }, // @toshir0000
   { riotId: 'Ax1oM#6525', sheetLabels: [] }, // @KitKatFN
-  { riotId: 'MILITANTUM#bonr', sheetLabels: [] }, // @Bonrik1
+  { riotId: 'Ice blue#bonr', sheetLabels: ['MILITANTUM#bonr'] }, // @Bonrik1
   // Substitutes, by priority
   { riotId: 'speak with dead#amen', sheetLabels: [] }, // @deadqq
   { riotId: 'Mench Lamperouge#space', sheetLabels: ['Mench#space'] }, // @Men4ikcs

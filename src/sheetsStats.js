@@ -408,7 +408,8 @@ async function appendMatchUnlocked({ mapName, mode, players, matchId, matchDate,
   const percentRows = [];
 
   for (const p of players) {
-    const anchorRow = anchorRows.get(p.riotId.toLowerCase());
+    const playerId = currentLabelMap().get(p.riotId.toLowerCase()) ?? p.riotId.toLowerCase();
+    const anchorRow = anchorRows.get(playerId);
     if (!anchorRow) {
       skipped.push(p.riotId);
       continue;
