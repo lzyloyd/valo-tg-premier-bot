@@ -8,10 +8,10 @@ const {JWT}=await import('google-auth-library');JWT.prototype.getAccessToken=asy
 await fs.writeFile(path.join(dir,'google-service-account.json'),JSON.stringify({client_email:'test@example.com',private_key:'test'}));
 const {statsTeams,currentStatsTeam,withStatsTeam,statsTeamForChat,overallPremierTab}=await import('../src/statsTeams.js');
 const {currentLabelMap,findOurTeamId}=await import('../src/statsRoster.js');
-const {appendMatchToStatsSheet,countAnnouncedPremierWeeks,statsTable2FirstRow}=await import('../src/sheetsStats.js');
+const {appendMatchToStatsSheet,countAnnouncedPremierWeeks,statsTable2FirstRow,premierWeekNumber}=await import('../src/sheetsStats.js');
 const {saveSeenMatchIds,loadSeenMatchIds}=await import('../src/state.js');
 const {fetchPremierHistory}=await import('../src/henrikClient.js');
-const {sendSeasonStats}=await import('../src/sheetsAnnounce.js');
+const {sendSeasonStats,announceMapWeekComplete}=await import('../src/sheetsAnnounce.js');
 const [ovt,clarity]=statsTeams;
 assert.equal(withStatsTeam(ovt,statsTable2FirstRow),13);
 assert.equal(withStatsTeam(clarity,statsTable2FirstRow),14);
@@ -36,6 +36,7 @@ for(const team of statsTeams){const tabs=new Map();for(const [i,title] of [team.
  const cells=new Map(),notes=new Map();team.roster.forEach((p,j)=>cells.set(`${1+j*14},16`,p.riotId.split('#')[0]));
  tabs.set(title,{sheetId:i+1,title,index:i,gridProperties:{columnCount:78,rowCount:1000},cells,notes});
 }fixtures.set(team.spreadsheetId,tabs);}
+const datesBySpreadsheet=new Map();
 const calls=[];let telegramPosts=[];const originalFetch=globalThis.fetch;
 globalThis.fetch=async(url,options={})=>{
  const target=new URL(url);calls.push({url:String(url),body:options.body});
@@ -48,7 +49,7 @@ globalThis.fetch=async(url,options={})=>{
  function read(range,notes=false){const p=parse(range),sheet=tabs.get(p.title),rows=[];assert(sheet,p.title);for(let r=p.r;r<=p.lastR;r++){const row=[];for(let c=p.c;c<=p.lastC;c++)row.push((notes?sheet.notes:sheet.cells).get(`${r},${c}`)??'');while(row.at(-1)==='')row.pop();rows.push(row);}while(rows.at(-1)?.length===0)rows.pop();return rows;}
  if(suffix.startsWith('/values/'))return json({values:read(decodeURIComponent(suffix.slice(8)))});
  if(suffix==='' && target.searchParams.get('fields')==='sheets.data.rowData.values.note')return json({sheets:[{data:[{rowData:read(target.searchParams.get('ranges'),true).map(row=>({values:row.map(note=>({note}))}))}]}]});
- if(suffix==='/developerMetadata:search')return json({matchedDeveloperMetadata:[]});
+ if(suffix==='/developerMetadata:search')return json({matchedDeveloperMetadata:datesBySpreadsheet.get(id)??[]});
  const body=JSON.parse(options.body||'{}');
  if(suffix==='/values:batchUpdate'){for(const update of body.data){const p=parse(update.range),sheet=tabs.get(p.title);update.values.forEach((row,y)=>row.forEach((v,x)=>sheet.cells.set(`${p.r+y},${p.c+x}`,v)));}return json({});}
  if(suffix===':batchUpdate'){for(const request of body.requests){if(request.repeatCell?.cell?.note){const {range,cell}=request.repeatCell;const sheet=[...tabs.values()].find(s=>s.sheetId===range.sheetId);sheet.notes.set(`${range.startRowIndex},${range.startColumnIndex}`,cell.note);}}return json({replies:body.requests.map(()=>({}))});}
@@ -63,6 +64,7 @@ try {
    const duplicate=await appendMatchToStatsSheet(options);assert(duplicate.alreadyLogged);
    const overall=await appendMatchToStatsSheet({...options,tabTitle:overallPremierTab()});assert.equal(overall.written.length,team.roster.length);
    assert.equal(await countAnnouncedPremierWeeks(team.spreadsheetId),1);
+   assert.equal(await premierWeekNumber(team.spreadsheetId,2),1);
    await fetchPremierHistory();
    await saveSeenMatchIds(new Set([team.id+'-match']));assert.deepEqual([...await loadSeenMatchIds()],[team.id+'-match']);
    return result;
@@ -76,6 +78,15 @@ try {
  const renamed = await withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player('MILITANTUM#bonr')],matchId:'historical-nickname'}));
  assert.deepEqual(renamed.written,['MILITANTUM#bonr']);
  assert.deepEqual(renamed.skipped,[]);
+ const ovtTabs=fixtures.get(ovt.spreadsheetId);
+ for(const [sheetId,title,index,hasGame] of [[3,'Bind - Premier',8,true],[4,'Sunset - Premier',2,true],[5,'Empty - Premier',1,false]]) {
+   ovtTabs.set(title,{sheetId,title,index,gridProperties:{columnCount:78,rowCount:1000},cells:new Map(hasGame?[['0,17','Game 1']]:[]),notes:new Map()});
+ }
+ datesBySpreadsheet.set(ovt.spreadsheetId,[[3,'2026-10-24'],[2,'2026-10-31'],[4,'2026-11-07']].map(([sheetId,date])=>({developerMetadata:{location:{sheetId},metadataValue:date}})));
+ assert.equal(await countAnnouncedPremierWeeks(ovt.spreadsheetId),3);
+ for(const [sheetId,number] of [[3,1],[2,2],[4,3]])assert.equal(await premierWeekNumber(ovt.spreadsheetId,sheetId),number);
+ assert.equal(await premierWeekNumber(ovt.spreadsheetId,3),1,'Re-requesting week one after week three must stay week one');
+ await assert.rejects(premierWeekNumber(ovt.spreadsheetId,5),/нет записанных/);
  for(const team of statsTeams)assert(fixtures.get(team.spreadsheetId).get(team.overallTab).cells.get('0,17').includes('Game 1'));
  await assert.rejects(withStatsTeam(clarity,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player(ovt.roster[0].riotId)],matchId:'wrong-team'})),/нет игроков/);
  await assert.rejects(withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player('Mania#uma')],matchId:'departed-player'})),/нет игроков/);
@@ -86,10 +97,12 @@ try {
  try {
    await withStatsTeam(clarity,()=>sendSeasonStats(fakeBrowser,{spreadsheetId:clarity.spreadsheetId,sheetId:1,tabTitle:clarity.overallTab}));
    await withStatsTeam(ovt,()=>sendSeasonStats(fakeBrowser,{spreadsheetId:ovt.spreadsheetId,sheetId:1,tabTitle:ovt.overallTab}));
+   for(const [sheetId,tabTitle] of [[3,'Bind - Premier'],[2,'Haven - Premier'],[4,'Sunset - Premier']])await withStatsTeam(ovt,()=>announceMapWeekComplete(fakeBrowser,{spreadsheetId:ovt.spreadsheetId,sheetId,tabTitle}));
  }finally{globalThis.setTimeout=realTimeout;}
  assert.equal(telegramPosts[0].chat_id,'-1004419192416');assert.equal(telegramPosts[0].message_thread_id,'763');assert(telegramPosts[0].caption.includes('V26A6'));
  assert(telegramPosts[0].caption.includes('B1:P22'));
  assert(telegramPosts[1].caption.includes('B1:P20'));
- assert.deepEqual(clips.map(c=>c.height),[709,650]);
+ assert.deepEqual(clips.map(c=>c.height),[709,650,650,650,650]);
+ assert.deepEqual(telegramPosts.slice(2).map(p=>p.caption.match(/^\d+/)[0]),['1','2','3']);
  console.log('PASS: independent stats sheets, concurrent team contexts, Mania excluded from OVT and retained in Clarity, Unicode Riot ID, match deduplication, state files, history roster IDs and report topic.');
 } finally {globalThis.fetch=originalFetch;await fs.rm(dir,{recursive:true,force:true});}

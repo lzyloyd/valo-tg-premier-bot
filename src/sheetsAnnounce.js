@@ -1,7 +1,7 @@
 import { currentStatsTeam } from './statsTeams.js';
 import { config } from './config.js';
 import { sendPhotoTo } from './telegram.js';
-import { countAnnouncedPremierWeeks } from './sheetsStats.js';
+import { premierWeekNumber } from './sheetsStats.js';
 
 function escapeHtml(str) {
   return String(str).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -44,11 +44,11 @@ export async function screenshotSheetRange(browser, spreadsheetId, gid) {
  * "Резалтик, добавь в таблицу статистики следующие премьер матчи:" calls
  * this once a "<Map> - Premier" tab's 2nd game just got logged (one map's
  * best-of-2 = one week) — posts a screenshot of its heatmap into the
- * "Статистика" topic, numbered by how many maps have completed so far.
+ * "Статистика" topic, numbered by this map's place in the match chronology.
  */
 export async function announceMapWeekComplete(browser, { spreadsheetId, sheetId, tabTitle }) {
   if (!currentStatsTeam().chatId) return; // not configured yet — skip quietly rather than error the whole command
-  const week = await countAnnouncedPremierWeeks(spreadsheetId);
+  const week = await premierWeekNumber(spreadsheetId, sheetId);
   const png = await screenshotSheetRange(browser, spreadsheetId, sheetId);
   const link = sheetRangeUrl(spreadsheetId, sheetId, heatmapRange());
   const caption = `${week} неделя ${escapeHtml(currentStatsTeam().splitLabel)} прем матчи (${escapeHtml(tabTitle)})\n${escapeHtml(link)}`;

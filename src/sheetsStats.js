@@ -537,14 +537,31 @@ export async function reorderStatsTabsByDate(spreadsheetId) {
  * "<Map> - Premier" tab (the overall summary excluded) that has at least one
  * logged game — so a freshly rebuilt sheet naturally starts back at 1.
  */
-export async function countAnnouncedPremierWeeks(spreadsheetId) {
+async function populatedPremierTabs(spreadsheetId) {
   const sheets = await getSpreadsheetMeta(spreadsheetId);
   const firstGameColumn = LAYOUT.Premier.firstGameColumn;
-  let count = 0;
+  const populated = [];
   for (const s of sheets) {
     if (s.title === overallPremierTab() || !s.title.endsWith(' - Premier')) continue;
     const row1 = (await getValues(spreadsheetId, `'${s.title}'!${firstGameColumn}1:BZ1`))[0] ?? [];
-    if (row1.some((cell) => /Game \d+/.test(cell ?? ''))) count += 1;
+    if (row1.some((cell) => /Game \d+/.test(cell ?? ''))) populated.push(s);
   }
-  return count;
+  return populated;
+}
+
+export async function countAnnouncedPremierWeeks(spreadsheetId) {
+  return (await populatedPremierTabs(spreadsheetId)).length;
+}
+
+/** Number of this map's Premier week, stable when older reports are resent. */
+export async function premierWeekNumber(spreadsheetId, sheetId) {
+  const tabs = await populatedPremierTabs(spreadsheetId);
+  const metadata = await searchDeveloperMetadata(spreadsheetId, LAST_MATCH_DATE_KEY);
+  const dates = new Map(metadata.map(({ developerMetadata: m }) => [m.location?.sheetId, m.metadataValue]));
+  // Legacy tabs without date metadata already follow the workbook order.
+  const allDated = tabs.every(tab => dates.has(tab.sheetId));
+  tabs.sort((a, b) => (allDated ? dates.get(a.sheetId).localeCompare(dates.get(b.sheetId)) : 0) || a.index - b.index);
+  const index = tabs.findIndex(tab => tab.sheetId === sheetId);
+  if (index < 0) throw new Error('На этом листе нет записанных премьер-матчей.');
+  return index + 1;
 }
