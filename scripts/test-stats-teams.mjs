@@ -8,11 +8,13 @@ const {JWT}=await import('google-auth-library');JWT.prototype.getAccessToken=asy
 await fs.writeFile(path.join(dir,'google-service-account.json'),JSON.stringify({client_email:'test@example.com',private_key:'test'}));
 const {statsTeams,currentStatsTeam,withStatsTeam,statsTeamForChat,overallPremierTab}=await import('../src/statsTeams.js');
 const {currentLabelMap,findOurTeamId}=await import('../src/statsRoster.js');
-const {appendMatchToStatsSheet,countAnnouncedPremierWeeks}=await import('../src/sheetsStats.js');
+const {appendMatchToStatsSheet,countAnnouncedPremierWeeks,statsTable2FirstRow}=await import('../src/sheetsStats.js');
 const {saveSeenMatchIds,loadSeenMatchIds}=await import('../src/state.js');
 const {fetchPremierHistory}=await import('../src/henrikClient.js');
 const {sendSeasonStats}=await import('../src/sheetsAnnounce.js');
 const [ovt,clarity]=statsTeams;
+assert.equal(withStatsTeam(ovt,statsTable2FirstRow),13);
+assert.equal(withStatsTeam(clarity,statsTable2FirstRow),14);
 assert.equal(withStatsTeam(ovt,()=>currentLabelMap().has('mania#uma')),false);
 assert.equal(withStatsTeam(ovt,()=>findOurTeamId([{riotId:'Mania#uma',teamId:'Red'}])),null);
 assert.equal(withStatsTeam(clarity,()=>findOurTeamId([{riotId:'Mania#uma',teamId:'Blue'}])),'Blue');
@@ -66,16 +68,28 @@ try {
    return result;
  })));
  assert.deepEqual(results.map(r=>r.written.length),[7,5]);
+ for(const team of statsTeams){
+   const row=withStatsTeam(team,statsTable2FirstRow)-1;
+   assert(fixtures.get(team.spreadsheetId).get(team.overallTab).cells.get(`${row},2`).includes('$R$2'));
+   assert(fixtures.get(team.spreadsheetId).get(team.overallTab).cells.get(`${row+team.roster.length-1},2`).includes(`$R$${2+(team.roster.length-1)*14}`));
+ }
  const renamed = await withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player('MILITANTUM#bonr')],matchId:'historical-nickname'}));
  assert.deepEqual(renamed.written,['MILITANTUM#bonr']);
  assert.deepEqual(renamed.skipped,[]);
  for(const team of statsTeams)assert(fixtures.get(team.spreadsheetId).get(team.overallTab).cells.get('0,17').includes('Game 1'));
  await assert.rejects(withStatsTeam(clarity,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player(ovt.roster[0].riotId)],matchId:'wrong-team'})),/нет игроков/);
  await assert.rejects(withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player('Mania#uma')],matchId:'departed-player'})),/нет игроков/);
- const fakeBrowser={newPage:async()=>({setViewport:async()=>{},goto:async()=>{},screenshot:async()=>Buffer.from('image'),close:async()=>{}})};
+ const clips=[];
+ const fakeBrowser={newPage:async()=>({setViewport:async()=>{},goto:async()=>{},screenshot:async opts=>{clips.push(opts.clip);return Buffer.from('image');},close:async()=>{}})};
  // Screenshot render delay is shortened only inside this isolated test process.
  const realTimeout=globalThis.setTimeout;globalThis.setTimeout=(fn,delay,...args)=>realTimeout(fn,delay===1500?0:delay,...args);
- try {await withStatsTeam(clarity,()=>sendSeasonStats(fakeBrowser,{spreadsheetId:clarity.spreadsheetId,sheetId:1,tabTitle:clarity.overallTab}));}finally{globalThis.setTimeout=realTimeout;}
+ try {
+   await withStatsTeam(clarity,()=>sendSeasonStats(fakeBrowser,{spreadsheetId:clarity.spreadsheetId,sheetId:1,tabTitle:clarity.overallTab}));
+   await withStatsTeam(ovt,()=>sendSeasonStats(fakeBrowser,{spreadsheetId:ovt.spreadsheetId,sheetId:1,tabTitle:ovt.overallTab}));
+ }finally{globalThis.setTimeout=realTimeout;}
  assert.equal(telegramPosts[0].chat_id,'-1004419192416');assert.equal(telegramPosts[0].message_thread_id,'763');assert(telegramPosts[0].caption.includes('V26A6'));
+ assert(telegramPosts[0].caption.includes('B1:P22'));
+ assert(telegramPosts[1].caption.includes('B1:P20'));
+ assert.deepEqual(clips.map(c=>c.height),[709,650]);
  console.log('PASS: independent stats sheets, concurrent team contexts, Mania excluded from OVT and retained in Clarity, Unicode Riot ID, match deduplication, state files, history roster IDs and report topic.');
 } finally {globalThis.fetch=originalFetch;await fs.rm(dir,{recursive:true,force:true});}

@@ -2,7 +2,7 @@ import { config } from '../src/config.js';
 import { batchUpdate, getSpreadsheetMeta, getValues } from '../src/sheetsClient.js';
 import { ROSTER, displayName, trackerProfileUrl, LABEL_TO_RIOT_ID } from '../src/statsRoster.js';
 import {
-  OVERALL_PREMIER_TAB, ANCHOR_FIRST_ROW, BLOCK_SIZE, ROSTER_SIZE, TABLE1_FIRST_ROW, TABLE2_FIRST_ROW,
+  OVERALL_PREMIER_TAB, ANCHOR_FIRST_ROW, BLOCK_SIZE, ROSTER_SIZE, TABLE1_FIRST_ROW, statsTable2FirstRow,
 } from '../src/sheetsStats.js';
 
 // Rewrites every player label on the master stats tab (both heatmap tables'
@@ -51,7 +51,7 @@ const COL_B = 1;
 const COL_Q = 16;
 const requests = ROSTER.flatMap(({ riotId }, i) => [
   writeCell(TABLE1_FIRST_ROW + i, COL_B, riotId),
-  writeCell(TABLE2_FIRST_ROW + i, COL_B, riotId),
+  writeCell(statsTable2FirstRow() + i, COL_B, riotId),
   writeCell(ANCHOR_FIRST_ROW + i * BLOCK_SIZE, COL_Q, riotId),
 ]);
 await batchUpdate(spreadsheetId, requests);

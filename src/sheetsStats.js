@@ -26,6 +26,11 @@ export const ANCHOR_FIRST_ROW = 2;
 export const ROSTER_SIZE = statsTeams[0].roster.length;
 export const TABLE1_FIRST_ROW = 3;
 export const TABLE2_FIRST_ROW = 14;
+// OVT's seven-player heatmaps have had the two empty player rows removed.
+// Clarity retains its existing template and row positions.
+export function statsTable2FirstRow() {
+  return currentStatsTeam().id === 'ovt' ? 13 : TABLE2_FIRST_ROW;
+}
 
 const STAT_ROWS_PREMIER = [
   'perf', 'acs', 'kills', 'deaths', 'assists', 'plusMinus', 'kdRatio',
@@ -259,7 +264,7 @@ export async function resetHeatmapPlaceholders(spreadsheetId, tabTitle, mode, sh
   const percentRows = [];
   for (let i = 0; i < ROSTER_SIZE; i++) {
     const t1Row = TABLE1_FIRST_ROW + i;
-    const t2Row = TABLE2_FIRST_ROW + i;
+    const t2Row = statsTable2FirstRow() + i;
     data.push({
       range: `'${tabTitle}'!${layout.table1Columns[0]}${t1Row}:${layout.table1Columns[layout.table1Columns.length - 1]}${t1Row}`,
       values: [layout.table1Columns.map(() => '-')],
@@ -439,7 +444,7 @@ async function appendMatchUnlocked({ mapName, mode, players, matchId, matchDate,
       values: [t1Values],
     });
 
-    const t2Row = TABLE2_FIRST_ROW + playerIndex;
+    const t2Row = statsTable2FirstRow() + playerIndex;
     const t2Values = layout.table2Stats.map((key) => formulaFor(key, anchorRow + statOffset(mode, key)));
     data.push({
       range: `'${tabTitle}'!${layout.table2Columns[0]}${t2Row}:${layout.table2Columns[layout.table2Columns.length - 1]}${t2Row}`,

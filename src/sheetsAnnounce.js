@@ -11,9 +11,8 @@ function sheetRangeUrl(spreadsheetId, gid, range) {
   return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit?gid=${gid}#gid=${gid}&range=${range}`;
 }
 
-// Both heatmap tables (rows 1-22 with 8 players, columns B-P covers every
-// stat column either mode uses) — same crop the team already takes by hand.
-const HEATMAP_RANGE = 'B1:P22';
+// OVT uses the compact seven-player layout; Clarity keeps its own template.
+const heatmapRange = () => currentStatsTeam().id === 'ovt' ? 'B1:P20' : 'B1:P22';
 
 // Calibrated against a fresh (default A1, no range= param) load at this
 // exact viewport size: skips the row-number/column-A gutter on the left and
@@ -35,7 +34,7 @@ export async function screenshotSheetRange(browser, spreadsheetId, gid) {
     const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit?gid=${gid}&rm=minimal`;
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
     await new Promise((resolve) => setTimeout(resolve, 1500)); // grid/heatmap colors finish painting after load fires
-    return await page.screenshot({ type: 'png', clip: CROP });
+    return await page.screenshot({ type: 'png', clip: { ...CROP, height: currentStatsTeam().id === 'ovt' ? 650 : CROP.height } });
   } finally {
     await page.close();
   }
@@ -51,7 +50,7 @@ export async function announceMapWeekComplete(browser, { spreadsheetId, sheetId,
   if (!currentStatsTeam().chatId) return; // not configured yet — skip quietly rather than error the whole command
   const week = await countAnnouncedPremierWeeks(spreadsheetId);
   const png = await screenshotSheetRange(browser, spreadsheetId, sheetId);
-  const link = sheetRangeUrl(spreadsheetId, sheetId, HEATMAP_RANGE);
+  const link = sheetRangeUrl(spreadsheetId, sheetId, heatmapRange());
   const caption = `${week} неделя ${escapeHtml(currentStatsTeam().splitLabel)} прем матчи (${escapeHtml(tabTitle)})\n${escapeHtml(link)}`;
   await sendPhotoTo(currentStatsTeam().chatId, currentStatsTeam().threadId, caption, png);
 }
@@ -59,7 +58,7 @@ export async function announceMapWeekComplete(browser, { spreadsheetId, sheetId,
 /** "Резалтик, отправь статистику за сезон" */
 export async function sendSeasonStats(browser, { spreadsheetId, sheetId, tabTitle }) {
   const png = await screenshotSheetRange(browser, spreadsheetId, sheetId);
-  const link = sheetRangeUrl(spreadsheetId, sheetId, HEATMAP_RANGE);
+  const link = sheetRangeUrl(spreadsheetId, sheetId, heatmapRange());
   const caption = `Статистика за сезон ${escapeHtml(currentStatsTeam().splitLabel)}\n${escapeHtml(link)}`;
   await sendPhotoTo(currentStatsTeam().chatId ?? config.scheduleChatId, currentStatsTeam().threadId ?? config.scheduleThreadId, caption, png);
   return { tabTitle };
