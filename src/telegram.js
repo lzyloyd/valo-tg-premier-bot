@@ -27,7 +27,7 @@ async function callApi(method, form) {
     // Editing a message with unchanged text is a no-op, not a real failure —
     // callers that recompute-then-edit hit this constantly when nothing
     // actually changed.
-    if (method === 'editMessageText' && body.includes('message is not modified')) return null;
+    if (['editMessageText', 'editMessageCaption'].includes(method) && body.includes('message is not modified')) return null;
     throw new Error(`Telegram ${method} failed: ${res.status} ${body}`);
   }
   return JSON.parse(body).result;
@@ -87,6 +87,15 @@ export async function editMessageText(chatId, messageId, text) {
   form.append('message_id', messageId);
   form.append('text', text);
   await callApi('editMessageText', form);
+}
+
+export async function editMessageCaption(chatId, messageId, captionText) {
+  const form = new FormData();
+  form.append('chat_id', chatId);
+  form.append('message_id', messageId);
+  form.append('caption', captionText);
+  form.append('parse_mode', 'HTML');
+  return callApi('editMessageCaption', form);
 }
 
 export async function sendMatchReport(match, pngBuffer) {

@@ -46,12 +46,16 @@ export async function screenshotSheetRange(browser, spreadsheetId, gid) {
  * best-of-2 = one week) — posts a screenshot of its heatmap into the
  * "Статистика" topic, numbered by this map's place in the match chronology.
  */
+export async function mapWeekCaption({ spreadsheetId, sheetId, tabTitle }) {
+  const week = await premierWeekNumber(spreadsheetId, sheetId);
+  const link = sheetRangeUrl(spreadsheetId, sheetId, heatmapRange());
+  return `${week} неделя ${escapeHtml(currentStatsTeam().splitLabel)} прем матчи (${escapeHtml(tabTitle)})\n${escapeHtml(link)}`;
+}
+
 export async function announceMapWeekComplete(browser, { spreadsheetId, sheetId, tabTitle }) {
   if (!currentStatsTeam().chatId) return; // not configured yet — skip quietly rather than error the whole command
-  const week = await premierWeekNumber(spreadsheetId, sheetId);
+  const caption = await mapWeekCaption({ spreadsheetId, sheetId, tabTitle });
   const png = await screenshotSheetRange(browser, spreadsheetId, sheetId);
-  const link = sheetRangeUrl(spreadsheetId, sheetId, heatmapRange());
-  const caption = `${week} неделя ${escapeHtml(currentStatsTeam().splitLabel)} прем матчи (${escapeHtml(tabTitle)})\n${escapeHtml(link)}`;
   await sendPhotoTo(currentStatsTeam().chatId, currentStatsTeam().threadId, caption, png);
 }
 
