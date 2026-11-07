@@ -12,7 +12,6 @@ const ovtRoster = [
   // Substitutes, by priority
   { riotId: 'speak with dead#amen', sheetLabels: [] }, // @deadqq
   { riotId: 'Mench Lamperouge#space', sheetLabels: ['Mench#space'] }, // @Men4ikcs
-  { riotId: 'Mania#uma', sheetLabels: [] }, // @mania_boo
 ];
 export const statsTeams = [
  {id:'ovt',autoReports:true,name:'Overthinkers',roster:ovtRoster,spreadsheetId:config.statsSpreadsheetId,chatId:String(config.statsChatId || config.telegramChatId),commandChatIds:[config.telegramChatId,config.statsChatId,config.scheduleChatId].filter(Boolean).map(String),threadId:config.statsThreadId,splitLabel:config.currentSplitLabel,overallTab:'Статистика за V26A5',premierRosterId:config.premierRosterId,reportChatId:config.telegramChatId,reportThreadId:config.telegramMessageThreadId,statePath:config.statePath},

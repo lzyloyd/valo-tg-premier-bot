@@ -13,6 +13,9 @@ const {saveSeenMatchIds,loadSeenMatchIds}=await import('../src/state.js');
 const {fetchPremierHistory}=await import('../src/henrikClient.js');
 const {sendSeasonStats}=await import('../src/sheetsAnnounce.js');
 const [ovt,clarity]=statsTeams;
+assert.equal(withStatsTeam(ovt,()=>currentLabelMap().has('mania#uma')),false);
+assert.equal(withStatsTeam(ovt,()=>findOurTeamId([{riotId:'Mania#uma',teamId:'Red'}])),null);
+assert.equal(withStatsTeam(clarity,()=>findOurTeamId([{riotId:'Mania#uma',teamId:'Blue'}])),'Blue');
 assert.equal(statsTeamForChat('-1004419192416'),clarity);assert.equal(statsTeamForChat('-1001'),ovt);assert.equal(statsTeamForChat('999'),null);
 const players=[...ovt.roster.filter(r=>r.riotId!=='Mania#uma').slice(0,5).map(r=>({riotId:r.riotId,teamId:'Red'})),...clarity.roster.map(r=>({riotId:r.riotId,teamId:'Blue'}))];
 assert.equal(withStatsTeam(ovt,()=>findOurTeamId(players)),'Red');assert.equal(withStatsTeam(clarity,()=>findOurTeamId(players)),'Blue');
@@ -62,16 +65,17 @@ try {
    await saveSeenMatchIds(new Set([team.id+'-match']));assert.deepEqual([...await loadSeenMatchIds()],[team.id+'-match']);
    return result;
  })));
- assert.deepEqual(results.map(r=>r.written.length),[8,5]);
+ assert.deepEqual(results.map(r=>r.written.length),[7,5]);
  const renamed = await withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player('MILITANTUM#bonr')],matchId:'historical-nickname'}));
  assert.deepEqual(renamed.written,['MILITANTUM#bonr']);
  assert.deepEqual(renamed.skipped,[]);
  for(const team of statsTeams)assert(fixtures.get(team.spreadsheetId).get(team.overallTab).cells.get('0,17').includes('Game 1'));
  await assert.rejects(withStatsTeam(clarity,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player(ovt.roster[0].riotId)],matchId:'wrong-team'})),/нет игроков/);
+ await assert.rejects(withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player('Mania#uma')],matchId:'departed-player'})),/нет игроков/);
  const fakeBrowser={newPage:async()=>({setViewport:async()=>{},goto:async()=>{},screenshot:async()=>Buffer.from('image'),close:async()=>{}})};
  // Screenshot render delay is shortened only inside this isolated test process.
  const realTimeout=globalThis.setTimeout;globalThis.setTimeout=(fn,delay,...args)=>realTimeout(fn,delay===1500?0:delay,...args);
  try {await withStatsTeam(clarity,()=>sendSeasonStats(fakeBrowser,{spreadsheetId:clarity.spreadsheetId,sheetId:1,tabTitle:clarity.overallTab}));}finally{globalThis.setTimeout=realTimeout;}
  assert.equal(telegramPosts[0].chat_id,'-1004419192416');assert.equal(telegramPosts[0].message_thread_id,'763');assert(telegramPosts[0].caption.includes('V26A6'));
- console.log('PASS: independent stats sheets, concurrent team contexts, shared Mania identity, Unicode Riot ID, match deduplication, state files, history roster IDs and report topic.');
+ console.log('PASS: independent stats sheets, concurrent team contexts, Mania excluded from OVT and retained in Clarity, Unicode Riot ID, match deduplication, state files, history roster IDs and report topic.');
 } finally {globalThis.fetch=originalFetch;await fs.rm(dir,{recursive:true,force:true});}

@@ -1,4 +1,4 @@
-import { currentStatsTeam, overallPremierTab } from './statsTeams.js';
+import { currentStatsTeam, overallPremierTab, statsTeams } from './statsTeams.js';
 import { serial } from './schedulePersistence.js';
 import { currentLabelMap } from './statsRoster.js';
 import {
@@ -23,7 +23,7 @@ export const OVERALL_PREMIER_TAB = 'Статистика за V26A5';
 
 export const BLOCK_SIZE = 14;
 export const ANCHOR_FIRST_ROW = 2;
-export const ROSTER_SIZE = 8;
+export const ROSTER_SIZE = statsTeams[0].roster.length;
 export const TABLE1_FIRST_ROW = 3;
 export const TABLE2_FIRST_ROW = 14;
 
