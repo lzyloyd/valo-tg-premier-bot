@@ -17,7 +17,7 @@ export const statsTeams = [
  {id:'ovt',autoReports:true,name:'Overthinkers',roster:ovtRoster,spreadsheetId:config.statsSpreadsheetId,chatId:String(config.statsChatId || config.telegramChatId),commandChatIds:[config.telegramChatId,config.statsChatId,config.scheduleChatId].filter(Boolean).map(String),threadId:config.statsThreadId,splitLabel:config.currentSplitLabel,overallTab:'Статистика за V26A5',premierRosterId:config.premierRosterId,reportChatId:config.telegramChatId,reportThreadId:config.telegramMessageThreadId,statePath:config.statePath},
  {id:'clarity',autoReports:process.env.CLARITY_AUTO_REPORTS === 'true',name:'Clarity',roster:[
   {riotId:'khhhaneul#witch',sheetLabels:[]},
-  {riotId:'lizka shmakadyn#sasha',sheetLabels:[]},
+  {riotId:'lecomura#loony',sheetLabels:[]},
   {riotId:'Mania#uma',sheetLabels:[]},
   {riotId:'solace#0一0',sheetLabels:[]},
   {riotId:'arare#yanni',sheetLabels:[]},
