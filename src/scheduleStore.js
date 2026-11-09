@@ -19,7 +19,26 @@ async function loadUnlocked(now) {
     stored.premierTimesVersion = 2;
     await atomicJson(currentTeam().schedulePath, stored);
   }
-  if (stored?.weekStart === wanted) return stored;
+  if (stored?.weekStart === wanted) {
+    // A yes for the old kickoff is not consent to the new time. Keep custom
+    // slots and answers for every other day when Clarity's defaults change.
+    if (currentTeam().id === 'team2') {
+      let changed = false;
+      for (const day of daysForWeek(stored).filter(d => ['thu','sat','sun'].includes(d.key))) {
+        for (const answers of Object.values(stored.responses || {})) {
+          const answer = answers[day.key];
+          if (answer?.avail !== 'yes') continue;
+          const slots = answer.slots.filter(time => day.slots.includes(time));
+          if (slots.length === answer.slots.length) continue;
+          if (slots.length) answer.slots = slots;
+          else delete answers[day.key];
+          changed = true;
+        }
+      }
+      if (changed) await atomicJson(currentTeam().schedulePath, stored);
+    }
+    return stored;
+  }
   if (stored && mskIsoDate(new Date(weekStartFromIso(stored.weekStart).getTime() - 86400000)) === wanted) {
     stored.weekStart = wanted;
     await atomicJson(currentTeam().schedulePath, stored);

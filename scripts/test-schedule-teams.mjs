@@ -64,7 +64,7 @@ try {
   const before = (await api('/api/state',200,'Mania_boo','team2')).body;
   assert(before.daysOff.includes('fri'));
   assert.deepEqual(before.days.find(d=>d.key==='fri').slots,[]);
-  assert.deepEqual(['thu','sat','sun'].map(k=>before.days.find(d=>d.key===k).slots),[['20:00'],['21:00'],['20:00']]);
+  assert.deepEqual(['thu','sat','sun'].map(k=>before.days.find(d=>d.key===k).slots),[['21:00'],['22:00'],['21:00']]);
   assert.equal((await api('/api/add-time',201,'khhhaneul','ovt',{day:'fri',time:'19:30',weekStart:before.weekStart})).status,403);
   assert.equal((await api('/api/add-time',200,'Mania_boo','team2',{day:'fri',time:'25:30',weekStart:before.weekStart})).status,400);
   assert.equal((await api('/api/add-time',200,'Mania_boo','team2',{day:'fri',time:'19:30',weekStart:'2000-01-03'})).status,400);
@@ -84,17 +84,17 @@ try {
   assert(after.days.find(d=>d.key==='tue').slots.includes('20:15'));
   assert.equal(after.days.find(d=>d.key==='tue').kind,'Праки · МСК турнир');
   assert.equal((await api('/api/state',200,'Mania_boo','ovt')).body.days.find(d=>d.key==='tue').kind,'Праки');
-  assert.deepEqual(after.days.find(d=>d.key==='sat').slots,['21:00']);
+  assert.deepEqual(after.days.find(d=>d.key==='sat').slots,['22:00']);
   for (const [id,user,team] of [[201,'khhhaneul','team2'],[200,'Mania_boo','ovt']]) {
     assert.equal((await api('/api/remove-time',id,user,team,{day:'fri',time:'19:30',weekStart:before.weekStart})).status,403);
   }
-  assert.equal((await api('/api/remove-time',200,'Mania_boo','team2',{day:'sat',time:'21:00',weekStart:before.weekStart})).status,400);
+  assert.equal((await api('/api/remove-time',200,'Mania_boo','team2',{day:'sat',time:'22:00',weekStart:before.weekStart})).status,400);
   assert.equal((await api('/api/remove-time',200,'Mania_boo','team2',{day:'fri',time:'19:30',weekStart:'2000-01-03'})).status,400);
   const removed = await api('/api/remove-time',200,'Mania_boo','team2',{day:'fri',time:'19:30',weekStart:before.weekStart});
   assert.equal(removed.status,200);
   assert(removed.body.daysOff.includes('fri'));
   assert.equal(removed.body.responses.khhhaneul.fri,undefined);
-  assert.deepEqual(removed.body.days.find(d=>d.key==='sat').slots,['21:00']);
+  assert.deepEqual(removed.body.days.find(d=>d.key==='sat').slots,['22:00']);
   teams[1].days = clarityDays;
   assert.deepEqual(['mon','tue','wed','fri'].map(k=>(teams[1].days.find(d=>d.key===k)).slots),Array(4).fill(['20:00','21:00','22:00']));
   assert.equal((await api('/api/remove-time',100,'manager','ovt',{day:'wed',time:'18:15',weekStart:ownerWeek})).status,200);
@@ -147,7 +147,26 @@ try {
   assert.equal(teams[1].reminderThreadId,null);
   const permissions = await accessibleTeams({id:200,username:'renamed'});
   assert.deepEqual(permissions.map(p=>[p.team.id,p.isAdmin]),[['ovt',false],['team2',true]]);
-  console.log('PASS: team-scoped admin permissions, forged requests, ID binding, independent schedules and attendance.');
+  const migratedWeek = await withTeam(teams[1],()=>loadCurrentWeek(now));
+  migratedWeek.customSlots = {thu:['20:00'],sun:['19:00']};
+  migratedWeek.customSlotNames = {thu:{'20:00':'Разбор'},sun:{'19:00':'Праки'}};
+  migratedWeek.responses.mania_boo = {
+    mon:{avail:'yes',slots:['20:00']},
+    thu:{avail:'yes',slots:['20:00']},
+    sat:{avail:'yes',slots:['21:00']},
+    sun:{avail:'yes',slots:['19:00','20:00']},
+  };
+  await fs.writeFile(teams[1].schedulePath,JSON.stringify(migratedWeek));
+  const migrated = await withTeam(teams[1],()=>loadCurrentWeek(now));
+  assert.deepEqual(migrated.responses.mania_boo,{
+    mon:{avail:'yes',slots:['20:00']},
+    thu:{avail:'yes',slots:['20:00']},
+    sun:{avail:'yes',slots:['19:00']},
+  });
+  assert.deepEqual(migrated.customSlots,migratedWeek.customSlots);
+  assert.deepEqual(migrated.customSlotNames,migratedWeek.customSlotNames);
+  assert.deepEqual(await withTeam(teams[1],()=>loadCurrentWeek(now)),migrated);
+  console.log('PASS: team-scoped permissions, independent schedules, Clarity kickoff changes preserve custom gatherings.');
 } finally {
   globalThis.fetch = networkFetch;
   await new Promise(resolve=>server.close(resolve));
