@@ -21,7 +21,10 @@ export const statsTeams = [
   {riotId:'Mania#uma',sheetLabels:[]},
   {riotId:'solace#0一0',sheetLabels:[]},
   {riotId:'arare#yanni',sheetLabels:[]},
- ],spreadsheetId:process.env.CLARITY_STATS_SPREADSHEET_ID || '1VTgAUrtjwFb61pfdNo6cctoEk-drL9aA5NuZvD-fUdc',chatId:'-1004419192416',commandChatIds:['-1004419192416'],threadId:process.env.CLARITY_STATS_THREAD_ID || '763',splitLabel:process.env.CLARITY_SPLIT_LABEL || 'V26A6',overallTab:'Статистика за V26A6',premierRosterId:'95ffb4b9-dadb-49f0-b326-33018e66e072',reportChatId:'-1004419192416',reportThreadId:process.env.CLARITY_STATS_THREAD_ID || '763',get statePath(){return path.join(config.dataDir,'state-clarity.json');}}
+ ],spreadsheetId:process.env.CLARITY_STATS_SPREADSHEET_ID || '1VTgAUrtjwFb61pfdNo6cctoEk-drL9aA5NuZvD-fUdc',chatId:'-1004419192416',commandChatIds:['-1004419192416'],threadId:process.env.CLARITY_STATS_THREAD_ID || '763',splitLabel:process.env.CLARITY_SPLIT_LABEL || 'V26A6',overallTab:'Статистика за V26A6',premierRosterId:'46c0bf4a-afbb-41bf-8475-0b55c9bc2ea3',reportChatId:'-1004419192416',reportThreadId:process.env.CLARITY_REPORT_THREAD_ID || '1583',
+ // Check one and three hours after kickoff: Thu/Sun 21:00, Sat 22:00 MSK.
+ reportTriggersUTC:[{day:4,hour:19},{day:4,hour:21},{day:6,hour:20},{day:6,hour:22},{day:0,hour:19},{day:0,hour:21}],
+ get statePath(){return path.join(config.dataDir,'state-clarity.json');}}
 ];
 export function currentStatsTeam() {return context.getStore() || statsTeams[0];}
 export function withStatsTeam(team,work) {return context.run(team,work);}

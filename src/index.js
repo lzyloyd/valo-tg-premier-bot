@@ -1,5 +1,6 @@
 import { teams, withTeam } from './scheduleTeams.js';
-import { runPollCycle } from './poller.js';
+import { runPollCycle, runTeamPollCycle } from './poller.js';
+import { statsTeams, withStatsTeam } from './statsTeams.js';
 import { scheduleNext, scheduleWeeklyReset, scheduleDeadlineReminder, scheduleAutoSummary } from './scheduler.js';
 import { runTelegramListener } from './telegramListener.js';
 import { closeBrowser } from './browser.js';
@@ -14,8 +15,10 @@ if (once) {
   await closeBrowser();
   process.exit(0);
 } else {
-  console.log('[index] tg-results-bot started. Polling Premier results at Saturday 22:00 and Sunday 00:00 MSK.');
-  scheduleNext(runPollCycle);
+  console.log('[index] tg-results-bot started. Scheduling Premier results per team.');
+  for (const team of statsTeams.filter(t => t.autoReports && t.reportChatId)) {
+    scheduleNext(() => withStatsTeam(team, runTeamPollCycle), team.reportTriggersUTC, team.name);
+  }
   if (config.scheduleChatId && config.scheduleThreadId) {
     for (const team of teams.filter(t => t.enabled)) withTeam(team, () => {
       scheduleWeeklyReset(resetWeekAndAnnounce);

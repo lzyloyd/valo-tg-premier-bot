@@ -15,7 +15,7 @@ export async function runPollCycle() {
   for(let i=0;i<results.length;i++) if(results[i].status==='rejected') console.error('[poller] team failed:',results[i].reason);
   if(results.every(result=>result.status==='rejected')) throw new AggregateError(results.map(r=>r.reason),'All team polls failed');
 }
-async function runTeamPollCycle() {
+export async function runTeamPollCycle() {
   console.log(`[poller] ${currentStatsTeam().name}: checking for new Premier matches...`);
   const seen = await loadSeenMatchIds();
   const recent = (await fetchPremierHistory()).filter((m) => Date.now() - new Date(m.startedAt) <= RECENT_MATCH_MAX_AGE_MS);
