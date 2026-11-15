@@ -33,6 +33,14 @@ export function currentLabelMap() { return new Map(
 ); }
 export const LABEL_TO_RIOT_ID = currentLabelMap();
 
+/** Manager's current attribution rule, applied only when writing OVT stats. */
+export function statsWriteRiotId(riotId) {
+  const canonical = currentLabelMap().get(riotId.toLowerCase());
+  return currentStatsTeam().id === 'ovt' && canonical === 'space kururugi#mench'
+    ? 'speak with dead#amen'
+    : riotId;
+}
+
 /** The teamId of the side any of our roster members played on, or null. Players: [{ riotId, teamId }]. */
 export function findOurTeamId(players) {
   const ours = currentLabelMap();

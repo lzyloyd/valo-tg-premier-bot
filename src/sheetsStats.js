@@ -1,6 +1,6 @@
 import { currentStatsTeam, overallPremierTab, statsTeams } from './statsTeams.js';
 import { serial } from './schedulePersistence.js';
-import { currentLabelMap } from './statsRoster.js';
+import { currentLabelMap, statsWriteRiotId } from './statsRoster.js';
 import {
   getSpreadsheetMeta,
   getValues,
@@ -378,6 +378,14 @@ async function appendMatchUnlocked({ mapName, mode, players, matchId, matchDate,
   const spreadsheetId = currentStatsTeam().spreadsheetId;
   if (!spreadsheetId) throw new Error('STATS_SPREADSHEET_ID is not configured');
   if (!players.some(p=>currentLabelMap().has(p.riotId.toLowerCase()))) throw new Error('В матче нет игроков выбранной команды.');
+  const sheetPlayers = players.map(p => ({ ...p, riotId: statsWriteRiotId(p.riotId) }));
+  const destinations = new Set();
+  for (const p of sheetPlayers) {
+    const destination = currentLabelMap().get(p.riotId.toLowerCase());
+    if (!destination) continue;
+    if (destinations.has(destination)) throw new Error(`В матче два игрока для одной строки статистики (${p.riotId}). Уточни, чьи показатели записать, чтобы не перезаписать данные.`);
+    destinations.add(destination);
+  }
   const layout = LAYOUT[mode];
   const argSep = await getFormulaArgSeparator(spreadsheetId);
 
@@ -412,7 +420,7 @@ async function appendMatchUnlocked({ mapName, mode, players, matchId, matchDate,
   const data = [{ range: `'${tabTitle}'!${col}1`, values: [[`Game ${gameNumber}\n(${mapName})`]] }];
   const percentRows = [];
 
-  for (const p of players) {
+  for (const p of sheetPlayers) {
     const playerId = currentLabelMap().get(p.riotId.toLowerCase()) ?? p.riotId.toLowerCase();
     const anchorRow = anchorRows.get(playerId);
     if (!anchorRow) {

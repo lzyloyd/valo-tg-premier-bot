@@ -7,12 +7,16 @@ Object.assign(process.env,{TELEGRAM_BOT_TOKEN:'test',TELEGRAM_CHAT_ID:'-1001',ST
 const {JWT}=await import('google-auth-library');JWT.prototype.getAccessToken=async()=>({token:'test'});
 await fs.writeFile(path.join(dir,'google-service-account.json'),JSON.stringify({client_email:'test@example.com',private_key:'test'}));
 const {statsTeams,currentStatsTeam,withStatsTeam,statsTeamForChat,overallPremierTab}=await import('../src/statsTeams.js');
-const {currentLabelMap,findOurTeamId}=await import('../src/statsRoster.js');
+const {currentLabelMap,findOurTeamId,statsWriteRiotId}=await import('../src/statsRoster.js');
 const {appendMatchToStatsSheet,countAnnouncedPremierWeeks,statsTable2FirstRow,premierWeekNumber}=await import('../src/sheetsStats.js');
 const {saveSeenMatchIds,loadSeenMatchIds}=await import('../src/state.js');
 const {fetchPremierHistory}=await import('../src/henrikClient.js');
 const {sendSeasonStats,announceMapWeekComplete}=await import('../src/sheetsAnnounce.js');
 const [ovt,clarity]=statsTeams;
+for(const riotId of ['Space Kururugi#mench','SPACE KURURUGI#MENCH','Space#mench','Space#flick']) {
+  assert.equal(withStatsTeam(ovt,()=>statsWriteRiotId(riotId)),'speak with dead#amen');
+  assert.equal(withStatsTeam(clarity,()=>statsWriteRiotId(riotId)),riotId);
+}
 assert.equal(withStatsTeam(ovt,statsTable2FirstRow),13);
 assert.equal(withStatsTeam(clarity,statsTable2FirstRow),14);
 assert.equal(withStatsTeam(ovt,()=>currentLabelMap().has('mania#uma')),false);
@@ -59,25 +63,43 @@ const player=(riotId)=>({riotId,perf:200,acs:230,kills:20,deaths:15,assists:8,pl
 try {
  const results=await Promise.all(statsTeams.map(team=>withStatsTeam(team,async()=>{
    await new Promise(r=>setTimeout(r,team.id==='ovt'?3:1));assert.equal(currentStatsTeam(),team);
-   const options={mapName:'Haven',mode:'Premier',players:team.roster.map(r=>player(r.riotId)),matchId:'same-match-id'};
-   const result=await appendMatchToStatsSheet(options);assert.equal(result.written.length,team.roster.length);
+   const participants=team.roster.filter(r=>team.id!=='ovt'||r.riotId!=='speak with dead#amen').map(r=>player(r.riotId));
+   const options={mapName:'Haven',mode:'Premier',players:participants,matchId:'same-match-id'};
+   const result=await appendMatchToStatsSheet(options);assert.equal(result.written.length,participants.length);
    const duplicate=await appendMatchToStatsSheet(options);assert(duplicate.alreadyLogged);
-   const overall=await appendMatchToStatsSheet({...options,tabTitle:overallPremierTab()});assert.equal(overall.written.length,team.roster.length);
+   const overall=await appendMatchToStatsSheet({...options,tabTitle:overallPremierTab()});assert.equal(overall.written.length,participants.length);
    assert.equal(await countAnnouncedPremierWeeks(team.spreadsheetId),1);
    assert.equal(await premierWeekNumber(team.spreadsheetId,2),1);
    await fetchPremierHistory();
    await saveSeenMatchIds(new Set([team.id+'-match']));assert.deepEqual([...await loadSeenMatchIds()],[team.id+'-match']);
    return result;
  })));
- assert.deepEqual(results.map(r=>r.written.length),[7,5]);
+ assert.deepEqual(results.map(r=>r.written.length),[6,5]);
  for(const team of statsTeams){
    const row=withStatsTeam(team,statsTable2FirstRow)-1;
-   assert(fixtures.get(team.spreadsheetId).get(team.overallTab).cells.get(`${row},2`).includes('$R$2'));
+   const firstPlayerIndex=team.id==='ovt'?5:0;
+   assert(fixtures.get(team.spreadsheetId).get(team.overallTab).cells.get(`${row+firstPlayerIndex},2`).includes(`$R$${2+firstPlayerIndex*14}`));
+   if(team.id==='ovt') {
+     const cells=fixtures.get(team.spreadsheetId).get(team.overallTab).cells;
+     assert(!cells.has('1,17'),'Space raw block must not receive new stats');
+     assert.equal(cells.get('71,17'),200,'Speak raw block receives Space stats');
+   }
    assert(fixtures.get(team.spreadsheetId).get(team.overallTab).cells.get(`${row+team.roster.length-1},2`).includes(`$R$${2+(team.roster.length-1)*14}`));
  }
  const renamed = await withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player('MILITANTUM#bonr')],matchId:'historical-nickname'}));
  assert.deepEqual(renamed.written,['MILITANTUM#bonr']);
  assert.deepEqual(renamed.skipped,[]);
+ const writesBeforeConflict=calls.filter(c=>c.body).length;
+ await assert.rejects(withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Premier',players:[player('Space Kururugi#mench'),player('speak with dead#amen')],matchId:'conflicting-players'})),/два игрока для одной строки/);
+ assert.equal(calls.filter(c=>c.body).length,writesBeforeConflict,'Ambiguous attribution must not mutate sheets');
+ const practiceCells=new Map();ovt.roster.forEach((r,i)=>practiceCells.set(`${1+i*14},15`,r.riotId.split('#')[0]));
+ fixtures.get(ovt.spreadsheetId).set('Haven - Праки',{sheetId:9,title:'Haven - Праки',index:9,gridProperties:{columnCount:78,rowCount:1000},cells:practiceCells,notes:new Map()});
+ const input={...player('Space#mench'),acs:317};
+ const practice=await withStatsTeam(ovt,()=>appendMatchToStatsSheet({mapName:'Haven',mode:'Праки',players:[input],matchId:'practice-space-alias'}));
+ assert.deepEqual(practice.written,['speak with dead#amen']);
+ assert.equal(practiceCells.get('72,16'),317);
+ assert(!practiceCells.has('2,16'));
+ assert.equal(input.riotId,'Space#mench','Match-card input must remain unchanged');
  const ovtTabs=fixtures.get(ovt.spreadsheetId);
  for(const [sheetId,title,index,hasGame] of [[3,'Bind - Premier',8,true],[4,'Sunset - Premier',2,true],[5,'Empty - Premier',1,false]]) {
    ovtTabs.set(title,{sheetId,title,index,gridProperties:{columnCount:78,rowCount:1000},cells:new Map(hasGame?[['0,17','Game 1']]:[]),notes:new Map()});
