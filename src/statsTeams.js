@@ -7,7 +7,7 @@ const ovtRoster = [
   { riotId: 'Space Kururugi#mench', sheetLabels: ['Space#flick', 'Space#mench'] }, // @Qu1ly
   { riotId: 'ジ lzyloyd#pivo', sheetLabels: [] }, // @lzyloyd
   { riotId: 'AHotNik#2410', sheetLabels: ['toshir0000#6666'] }, // @toshir0000
-  { riotId: 'Ax1oM#6525', sheetLabels: [] }, // @KitKatFN
+  { riotId: 'KitKat#6525', sheetLabels: ['Ax1oM#6525'] }, // @KitKatFN
   { riotId: 'Ice blue#bonr', sheetLabels: ['MILITANTUM#bonr'] }, // @Bonrik1
   // Substitutes, by priority
   { riotId: 'speak with dead#amen', sheetLabels: [] }, // @deadqq
